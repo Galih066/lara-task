@@ -6,3 +6,4 @@ use App\Http\Controllers\Auth\SignUpController;
 
 Route::get('/', [LoginController::class, 'index']);
 Route::get('/signup-org', [SignUpController::class, 'signUpOrg']);
+Route::post('/sent-org', [SignUpController::class, 'saveOrg']);

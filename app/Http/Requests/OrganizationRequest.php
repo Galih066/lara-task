@@ -11,7 +11,7 @@ class OrganizationRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,10 +22,21 @@ class OrganizationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'org-name' => 'required',
+            'org_name' => 'required',
             'username' => 'required',
             'email' => 'required',
             'password' => 'required|min:8',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'org_name.required' => 'A Organization Name is required',
+            'username.required' => 'A Username is required',
+            'email.required' => 'A Email is required',
+            'password.required' => 'A Password is required',
+            'password:min:8' => 'Minimum password value is 8',
         ];
     }
 }
