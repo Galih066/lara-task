@@ -1,7 +1,9 @@
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
+import { useToast } from "../../Components/ToastComp/ToastContext";
 
 export default function SignUpOrg() {
     const { errors } = usePage().props
+    const { addToast } = useToast()
     const { data, setData, post, processing } = useForm({
         org_name: "",
         username: "",
@@ -10,7 +12,10 @@ export default function SignUpOrg() {
     })
     const handleSubmit = (e) => {
         e.preventDefault()
-        post('/sent-org')
+        post('/sent-org', {
+            preserveScroll: true,
+            onSuccess: () => addToast('Successfully added organization', 'green')
+        })
     }
 
     return (
