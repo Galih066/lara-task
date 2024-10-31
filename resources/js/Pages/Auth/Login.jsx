@@ -1,6 +1,19 @@
-import { Head, Link } from "@inertiajs/react"
+import { Head, Link, useForm, usePage } from "@inertiajs/react"
+import ErrorAlert from "../../Components/AlertComp/ErrorAlert"
 
 export default function Login() {
+    const { errors } = usePage().props
+    const { data, setData, post, processing, errors: errorsLogin } = useForm({
+        email: "",
+        password: ""
+    })
+    const handleSubmit = (event) => {
+        event.preventDefault()
+        post('/sent-login', {
+            preserveScroll: true,
+        })
+    }
+
     return (
         <>
             <Head title="Login" />
@@ -12,7 +25,8 @@ export default function Login() {
                 </div>
 
                 <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-                    <form action="#" method="POST" className="space-y-6">
+                    {errorsLogin.login && <ErrorAlert title="Failed" description={errorsLogin.login} />}
+                    <form onSubmit={handleSubmit} method="POST" className="space-y-6 mt-3">
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
                                 Email address
@@ -22,11 +36,12 @@ export default function Login() {
                                     id="email"
                                     name="email"
                                     type="email"
-                                    required
-                                    autoComplete="email"
+                                    value={data.email}
                                     className="block w-full rounded-sm border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    onChange={e => setData('email', e.target.value)}
                                 />
                             </div>
+                            {errors.email && <span className="text-sm text-red-500">{errors.email}</span>}
                         </div>
 
                         <div>
@@ -45,17 +60,19 @@ export default function Login() {
                                     id="password"
                                     name="password"
                                     type="password"
-                                    required
-                                    autoComplete="current-password"
+                                    value={data.password}
                                     className="block w-full rounded-sm border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    onChange={e => setData('password', e.target.value)}
                                 />
                             </div>
+                            {errors.password && <span className="text-sm text-red-500">{errors.password}</span>}
                         </div>
 
                         <div>
                             <button
                                 type="submit"
                                 className="flex w-full justify-center rounded-sm bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                disabled={processing}
                             >
                                 Sign in
                             </button>
