@@ -2,30 +2,34 @@
 
 namespace App\Http\Controllers\Auth;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
-use Illuminate\Support\Facades\Auth;
+use App\Services\Auth\LoginService;
 
 class LoginController extends Controller
 {
-    public function index ()
+    protected $loginService;
+
+    public function __construct(LoginService $loginService)
+    {
+        $this->loginService = $loginService;
+    }
+
+    public function index()
     {
         return inertia('Auth/Login');
     }
 
-    public function login (LoginRequest $request)
+    public function login(LoginRequest $request)
     {
-        $credentials = $request->only('email', 'password');
-        $remember = $request->boolean('remember');
+        $result = $this->loginService->login($request);
 
-        if (Auth::attempt($credentials, $remember)) {
-            $request->session()->regenerate();
-            return to_route('dashboard_page');
+        if ($result['success']) {
+            return to_route($result['redirect']);
         }
 
         return back()->withErrors([
-            'login' => "We couldn't find an account with these credentials. Please check your email and password, or sign up if you don't have an account yet."
+            'login' => $result['error']
         ])->onlyInput('email');
     }
 }
