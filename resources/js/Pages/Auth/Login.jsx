@@ -25,7 +25,14 @@ export default function Login() {
                 </div>
 
                 <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-                    {errorsLogin.login && <ErrorAlert title="Failed" description={errorsLogin.login} />}
+                    {errorsLogin.login && 
+                        <ErrorAlert 
+                            title="Login Failed" 
+                            description={errorsLogin.login}
+                            duration={7000}
+                            onClose={() => delete errorsLogin.login}
+                        />
+                    }
                     <form onSubmit={handleSubmit} method="POST" className="space-y-6 mt-3">
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">

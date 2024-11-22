@@ -23,7 +23,7 @@ class LoginController extends Controller
         }
 
         return back()->withErrors([
-            'login' => 'The provided credentials do not match our records.'
+            'login' => "We couldn't find an account with these credentials. Please check your email and password, or sign up if you don't have an account yet."
         ])->onlyInput('email');
     }
 }
