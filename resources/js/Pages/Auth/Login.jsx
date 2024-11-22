@@ -1,5 +1,5 @@
 import { Head, Link, useForm, usePage } from "@inertiajs/react"
-import ErrorAlert from "../../Components/AlertComp/ErrorAlert"
+import ErrorAlert from "@/Components/AlertComp/ErrorAlert"
 
 export default function Login() {
     const { errors } = usePage().props
@@ -13,14 +13,28 @@ export default function Login() {
     const handleSubmit = (event) => {
         event.preventDefault()
         post('/sent-login', {
+            onError: (errors) => {
+                console.error(errors)
+            },
             preserveScroll: true,
         })
     }
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50/30 flex items-center justify-center p-6 animate-gradient-x">
+            <Head title="Login" />
             <div className="w-full max-w-md">
                 <div className="backdrop-blur-sm bg-white/60 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 space-y-8">
+                    {/* Error Alert */}
+                    {errorsLogin.login && (
+                        <ErrorAlert
+                            title="Login Failed"
+                            description={errorsLogin.login}
+                            duration={5000}
+                            onClose={() => delete errorsLogin.login}
+                        />
+                    )}
+
                     {/* Logo/Brand */}
                     <div className="text-center space-y-2">
                         <div className="mx-auto h-12 w-12 bg-gradient-to-r from-blue-500/10 to-sky-500/10 rounded-xl flex items-center justify-center transform transition-transform duration-300 hover:scale-110">

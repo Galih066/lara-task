@@ -16,8 +16,10 @@ class LoginController extends Controller
 
     public function login (LoginRequest $request)
     {
-        $credentials = $request->all();
-        if (Auth::attempt($credentials)) {
+        $credentials = $request->only('email', 'password');
+        $remember = $request->boolean('remember');
+
+        if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
             return to_route('dashboard_page');
         }
