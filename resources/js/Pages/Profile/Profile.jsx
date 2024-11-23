@@ -99,7 +99,7 @@ export default function Profile({ user, errors = {}, success }) {
             <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50/30 animate-gradient-x">
                 <Navigation user={user} />
 
-                <main className="max-w-5xl mx-auto py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
+                <main className="max-w-7xl mx-auto py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
