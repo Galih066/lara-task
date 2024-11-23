@@ -1,16 +1,41 @@
-import { Head } from "@inertiajs/react";
+import { Head, Link, useForm } from "@inertiajs/react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const DashboardPage = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [activeTab, setActiveTab] = useState("Dashboard");
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const dropdownRef = useRef(null);
+    const { post } = useForm();
 
     const menuItems = ["Dashboard", "Team", "Projects", "Calendar", "Reports"];
 
     const toggleMobileMenu = () => {
         setIsMobileMenuOpen(!isMobileMenuOpen);
     };
+
+    const toggleDropdown = () => {
+        setIsDropdownOpen(!isDropdownOpen);
+    };
+
+    const logoutAction = (event) => {
+        event.preventDefault();
+        post('/logout', {
+            preserveScroll: true,
+        })
+    }
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     return (
         <>
@@ -38,11 +63,10 @@ const DashboardPage = () => {
                                             key={item}
                                             onClick={() => setActiveTab(item)}
                                             whileHover={{ y: -2 }}
-                                            className={`${
-                                                activeTab === item
-                                                    ? "text-blue-600"
-                                                    : "text-gray-600"
-                                            } hover:text-blue-500 transition-colors duration-200 font-medium`}
+                                            className={`${activeTab === item
+                                                ? "text-blue-600"
+                                                : "text-gray-600"
+                                                } hover:text-blue-500 transition-colors duration-200 font-medium`}
                                         >
                                             {item}
                                         </motion.button>
@@ -93,7 +117,7 @@ const DashboardPage = () => {
                                             <path
                                                 strokeLinecap="round"
                                                 strokeLinejoin="round"
-                                                strokeWidth={2}
+                                                strokeWidth={1.5}
                                                 d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
                                             />
                                         </svg>
@@ -103,19 +127,65 @@ const DashboardPage = () => {
                                     </div>
                                 </motion.button>
 
-                                {/* Profile */}
-                                <motion.div
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    className="relative"
-                                >
-                                    <img
-                                        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                                        alt="Profile"
-                                        className="w-10 h-10 rounded-full ring-2 ring-blue-500/20"
-                                    />
-                                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white" />
-                                </motion.div>
+                                {/* User Dropdown */}
+                                <div className="relative" ref={dropdownRef}>
+                                    <motion.button
+                                        whileTap={{ scale: 0.95 }}
+                                        onClick={toggleDropdown}
+                                        className="flex items-center space-x-3 focus:outline-none"
+                                    >
+                                        {/* Avatar */}
+                                        <div className="h-8 w-8 rounded-full bg-gradient-to-r from-blue-500/10 to-sky-500/10 flex items-center justify-center">
+                                            <span className="text-sm font-medium text-blue-600">J</span>
+                                        </div>
+                                        {/* User Name */}
+                                        <span className="text-sm font-medium text-gray-700 hidden sm:block">
+                                            John
+                                        </span>
+                                        {/* Dropdown Arrow */}
+                                        <svg
+                                            className={`h-4 w-4 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''
+                                                }`}
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 20 20"
+                                            fill="currentColor"
+                                        >
+                                            <path
+                                                fillRule="evenodd"
+                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                                clipRule="evenodd"
+                                            />
+                                        </svg>
+                                    </motion.button>
+
+                                    {/* Dropdown Menu */}
+                                    <AnimatePresence>
+                                        {isDropdownOpen && (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: -10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: -10 }}
+                                                transition={{ duration: 0.2 }}
+                                                className="absolute right-0 mt-2 w-48 py-1 bg-white rounded-xl shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                            >
+                                                <Link
+                                                    href="/profile"
+                                                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 transition-colors duration-150"
+                                                >
+                                                    Profile
+                                                </Link>
+                                                <Link
+                                                    href="#"
+                                                    onClick={logoutAction}
+                                                    as="button"
+                                                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 transition-colors duration-150"
+                                                >
+                                                    Logout
+                                                </Link>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -137,11 +207,10 @@ const DashboardPage = () => {
                                                 setActiveTab(item);
                                                 setIsMobileMenuOpen(false);
                                             }}
-                                            className={`${
-                                                activeTab === item
-                                                    ? "bg-blue-50 text-blue-600"
-                                                    : "text-gray-600"
-                                            } w-full text-left px-4 py-2 rounded-lg transition-colors duration-200`}
+                                            className={`${activeTab === item
+                                                ? "bg-blue-50 text-blue-600"
+                                                : "text-gray-600"
+                                                } w-full text-left px-4 py-2 rounded-lg transition-colors duration-200`}
                                             whileTap={{ scale: 0.98 }}
                                         >
                                             {item}
