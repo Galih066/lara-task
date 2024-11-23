@@ -135,7 +135,7 @@ export default function Login() {
                                 </div>
                                 <div className="relative flex justify-center text-sm">
                                     <span className="px-2 bg-white/60 text-gray-500 backdrop-blur-sm">
-                                        Don't have an account?
+                                        Don't have an organization yet?
                                     </span>
                                 </div>
                             </div>
@@ -144,7 +144,7 @@ export default function Login() {
                                 href="/signup-org"
                                 className="flex items-center justify-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white/70 border border-gray-200 rounded-lg transition-all duration-200 ease-in-out hover:bg-gray-50 hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500/20"
                             >
-                                Create new account
+                                Create new organization
                             </Link>
                         </div>
                     </form>
