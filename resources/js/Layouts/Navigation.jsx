@@ -2,7 +2,7 @@ import { Link, useForm } from "@inertiajs/react";
 import { useState, useRef, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
-export default function Navigation() {
+export default function Navigation({ user }) {
     const menuItems = ["Dashboard", "Team", "Projects", "Calendar", "Reports"];
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [activeTab, setActiveTab] = useState("Dashboard");
@@ -130,11 +130,11 @@ export default function Navigation() {
                             >
                                 {/* Avatar */}
                                 <div className="h-8 w-8 rounded-full bg-gradient-to-r from-blue-500/10 to-sky-500/10 flex items-center justify-center">
-                                    <span className="text-sm font-medium text-blue-600">J</span>
+                                    <span className="text-sm font-medium text-blue-600">{user.name.charAt(0)}</span>
                                 </div>
                                 {/* User Name */}
                                 <span className="text-sm font-medium text-gray-700 hidden sm:block">
-                                    John
+                                    {user.name}
                                 </span>
                                 {/* Dropdown Arrow */}
                                 <svg

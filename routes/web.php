@@ -13,4 +13,5 @@ Route::post('/sent-login', [LoginController::class, 'login'])->name('submit_logi
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard_page');
     Route::post('/logout', [LogoutController::class, 'logout'])->name('submit_logout');
+    Route::get('/logged-in', [DashboardController::class, 'user'])->name('user_logged_in');
 });

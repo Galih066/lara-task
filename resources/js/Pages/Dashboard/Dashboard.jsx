@@ -2,13 +2,13 @@ import { Head } from "@inertiajs/react";
 import { motion } from "framer-motion";
 import Navigation from "@/Layouts/Navigation";
 
-const DashboardPage = () => {
+const DashboardPage = ({ user }) => {
     return (
         <>
             <Head title="Dashboard" />
             <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50/30 animate-gradient-x">
                 {/* Header */}
-                <Navigation />
+                <Navigation user={user} />
 
                 {/* Main Content */}
                 <main className="max-w-7xl mx-auto py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
@@ -19,7 +19,7 @@ const DashboardPage = () => {
                         transition={{ duration: 0.5 }}
                         className="text-center sm:text-left"
                     >
-                        <h1 className="text-2xl sm:text-3xl font-medium text-gray-900">Welcome back, John!</h1>
+                        <h1 className="text-2xl sm:text-3xl font-medium text-gray-900">Welcome back, {user.name}</h1>
                         <p className="mt-2 text-gray-500">Here's what's happening with your projects today.</p>
                     </motion.div>
 
