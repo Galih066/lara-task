@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\OrganizationRequest;
 use App\Models\Organization;
 use App\Models\User;
+use App\Models\Profile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 
@@ -27,11 +28,16 @@ class SignUpController extends Controller
                 'password' => $hashedPwd,
             ]);
     
-            Organization::create([
+            $org = Organization::create([
                 'org_name' => $request->org_name,
                 'user_id' => $user->id,
                 'admin_email' => $request->email,
                 'password' => $hashedPwd,
+            ]);
+
+            Profile::create([
+                'user_id' => $user->id,
+                'organization_id' => $org->id,
             ]);
             
             DB::commit();

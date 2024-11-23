@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('profiles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('organization_id')->constrained()->onDelete('cascade');
             
             // Personal Information
             $table->string('first_name')->nullable();
@@ -25,7 +26,6 @@ return new class extends Migration
             // Work Information
             $table->string('job_title')->nullable();
             $table->string('department')->nullable();
-            $table->string('employee_id')->nullable();
             $table->date('join_date')->nullable();
             
             // Contact Information
@@ -34,11 +34,6 @@ return new class extends Migration
             $table->string('state')->nullable();
             $table->string('country')->nullable();
             $table->string('postal_code')->nullable();
-            
-            // Emergency Contact
-            $table->string('emergency_contact_name')->nullable();
-            $table->string('emergency_contact_relation')->nullable();
-            $table->string('emergency_contact_phone')->nullable();
             
             // Profile Status
             $table->boolean('is_active')->default(true);
