@@ -25,5 +25,6 @@ class Profile extends Model
         'state',
         'country',
         'postal_code',
+        'department',
     ];
 }
