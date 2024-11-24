@@ -4,46 +4,29 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\OrganizationRequest;
-use App\Models\Organization;
-use App\Models\User;
-use App\Models\Profile;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
+use App\Services\SignUpService;
 
 class SignUpController extends Controller
 {
-    public function signUpOrg ()
+    protected $signUpService;
+
+    public function __construct(SignUpService $signUpService)
+    {
+        $this->signUpService = $signUpService;
+    }
+
+    public function signUpOrg()
     {
         return inertia('Auth/SignUpOrg');
     }
 
-    public function saveOrg (OrganizationRequest $request)
+    public function saveOrg(OrganizationRequest $request)
     {
-        $hashedPwd = Hash::make($request->password);
-        DB::beginTransaction();
         try {
-            $user = User::create([
-                'name' => $request->username,
-                'email' => $request->email,
-                'password' => $hashedPwd,
-            ]);
-    
-            $org = Organization::create([
-                'org_name' => $request->org_name,
-                'user_id' => $user->id,
-                'admin_email' => $request->email,
-                'password' => $hashedPwd,
-            ]);
-
-            Profile::create([
-                'user_id' => $user->id,
-                'organization_id' => $org->id,
-            ]);
-            
-            DB::commit();
+            $this->signUpService->createOrganization($request->validated());
             return to_route('sign_up_org_page');
         } catch (\Throwable $th) {
-            DB::rollBack();
+            return back()->withErrors(['error' => 'Failed to create organization. Please try again.']);
         }
     }
 }
