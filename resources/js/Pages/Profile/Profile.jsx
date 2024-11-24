@@ -6,7 +6,6 @@ import SuccessAlert from "@/Components/AlertComp/SuccessAlert";
 
 export default function Profile({ user }) {
     const [profileData, setProfileData] = useState(user);
-    console.log(profileData);
     const { profile } = profileData
     const [showSuccess, setShowSuccess] = useState(false);
     const { errors } = usePage().props;
