@@ -6,8 +6,17 @@ export default {
         "./resources/**/*.js",
     ],
     theme: {
-        extend: {},
+        extend: {
+            keyframes: {
+                toast: {
+                    '0%': { transform: 'translateY(-100%)' },
+                    '100%': { transform: 'translateY(0)' }
+                }
+            },
+            animation: {
+                toast: 'toast 0.5s ease-out'
+            }
+        },
     },
     plugins: [],
 }
-

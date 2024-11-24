@@ -1,10 +1,13 @@
-import { Head, useForm } from "@inertiajs/react";
+import { useState } from "react";
+import { Head, useForm, usePage } from "@inertiajs/react";
 import { motion } from "framer-motion";
 import Navigation from "@/Layouts/Navigation";
 import ErrorAlert from "@/Components/AlertComp/ErrorAlert";
 import SuccessAlert from "@/Components/AlertComp/SuccessAlert";
 
-export default function Profile({ user, errors = {}, success }) {
+export default function Profile({ user }) {
+    const [showSuccess, setShowSuccess] = useState(false);
+    const { errors } = usePage().props;
     const { data, setData, post, processing, reset } = useForm({
         first_name: user.first_name || '',
         last_name: user.last_name || '',
@@ -48,6 +51,15 @@ export default function Profile({ user, errors = {}, success }) {
 
         post(endpoints[section], {
             preserveScroll: true,
+            onSuccess: () => {
+                setShowSuccess(true);
+                setTimeout(() => {
+                    setShowSuccess(false);
+                }, 5000);
+            },
+            onError: () => {
+                setShowSuccess(false);
+            }
         });
     };
 
@@ -86,9 +98,24 @@ export default function Profile({ user, errors = {}, success }) {
             <Head title="Profile" />
             <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50/30 animate-gradient-x">
                 <Navigation user={user} />
+                
+                {showSuccess && (
+                    <SuccessAlert
+                        title="Profile Updated"
+                        message="Your profile has been successfully updated."
+                        onClose={() => setShowSuccess(false)}
+                    />
+                )}
+
                 <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-                    {success && <SuccessAlert message={success} />}
-                    
+                    {errors.update && (
+                        <ErrorAlert
+                            title="Update Failed"
+                            description={errors.update}
+                            onClose={() => delete errors.update}
+                        />
+                    )}
+
                     {/* Profile Header */}
                     <div className="mb-8 bg-white rounded-xl shadow-sm p-6">
                         <div className="flex flex-col md:flex-row gap-6">

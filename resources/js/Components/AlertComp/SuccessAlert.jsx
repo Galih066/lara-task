@@ -1,15 +1,103 @@
-const ErrorAlert = ({ title, description }) => {
-    return (
-        <div className="bg-teal-100 border-t-4 border-teal-500 rounded-b text-teal-900 px-4 py-3 shadow-md" role="alert">
-            <div className="flex">
-                <div className="py-1"><svg className="fill-current h-6 w-6 text-teal-500 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z" /></svg></div>
-                <div>
-                    <p className="font-bold">{title}</p>
-                    <p className="text-sm">{description}</p>
-                </div>
-            </div>
-        </div>
-    )
-}
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 
-export default ErrorAlert
+const SuccessAlert = ({ title = "Success", message, duration = 5000, onClose }) => {
+    const [isVisible, setIsVisible] = useState(true);
+
+    useEffect(() => {
+        if (duration && duration > 0) {
+            const timer = setTimeout(() => {
+                setIsVisible(false);
+            }, duration);
+            return () => clearTimeout(timer);
+        }
+    }, [duration]);
+
+    if (!isVisible && onClose) {
+        onClose();
+    }
+
+    const alert = (
+        <AnimatePresence>
+            {isVisible && (
+                <motion.div
+                    initial={{ opacity: 0, y: -50, x: 50 }}
+                    animate={{ opacity: 1, y: 0, x: 0 }}
+                    exit={{ opacity: 0, x: 100 }}
+                    transition={{ type: "spring", bounce: 0.25, duration: 0.5 }}
+                    style={{
+                        position: 'fixed',
+                        top: '1rem',
+                        right: '1rem',
+                        zIndex: 9999,
+                        maxWidth: '24rem',
+                        width: '100%'
+                    }}
+                >
+                    <div className="bg-white border-l-4 border-green-500 rounded-lg shadow-lg overflow-hidden">
+                        <div className="p-4">
+                            <div className="flex items-start">
+                                {/* Success Icon */}
+                                <div className="flex-shrink-0">
+                                    <svg
+                                        className="h-6 w-6 text-green-500"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                        />
+                                    </svg>
+                                </div>
+
+                                {/* Content */}
+                                <div className="ml-3 w-0 flex-1">
+                                    <h3 className="text-sm font-medium text-gray-900">
+                                        {title}
+                                    </h3>
+                                    {message && (
+                                        <p className="mt-1 text-sm text-gray-500">
+                                            {message}
+                                        </p>
+                                    )}
+                                </div>
+
+                                {/* Close Button */}
+                                <div className="ml-4 flex-shrink-0 flex">
+                                    <button
+                                        className="inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 rounded-md"
+                                        onClick={() => setIsVisible(false)}
+                                    >
+                                        <span className="sr-only">Close</span>
+                                        <svg
+                                            className="h-5 w-5"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 20 20"
+                                            fill="currentColor"
+                                        >
+                                            <path
+                                                fillRule="evenodd"
+                                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                                clipRule="evenodd"
+                                            />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </motion.div>
+            )}
+        </AnimatePresence>
+    );
+
+    return createPortal(alert, document.body);
+};
+
+export default SuccessAlert;
