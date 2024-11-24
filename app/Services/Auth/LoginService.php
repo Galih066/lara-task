@@ -23,7 +23,7 @@ class LoginService
             $request->session()->regenerate();
             return [
                 'success' => true,
-                'redirect' => 'dashboard_page'
+                'redirect' => 'dashboard'
             ];
         }
 
