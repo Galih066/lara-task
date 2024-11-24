@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\SignUpController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Profile\ProfileController;
+use App\Http\Controllers\Member\MemberController;
 
 Route::get('/', [LoginController::class, 'index'])->name('login_page');
 Route::get('/signup-org', [SignUpController::class, 'signUpOrg'])->name('sign_up_org_page');
@@ -22,5 +23,10 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/update/personal', [ProfileController::class, 'updatePersonal'])->name('profile.update.personal');
         Route::post('/update/work', [ProfileController::class, 'updateWork'])->name('profile.update.work');
         Route::post('/update/contact', [ProfileController::class, 'updateContact'])->name('profile.update.contact');
+    });
+
+    // Organization Membership
+    Route::prefix('member')->group(function () {
+        Route::get('/', [MemberController::class, 'index'])->name('member');
     });
 });
