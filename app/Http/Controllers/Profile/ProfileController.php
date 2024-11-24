@@ -3,84 +3,45 @@
 namespace App\Http\Controllers\Profile;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\Profile\UpdatePersonalRequest;
+use App\Http\Requests\Profile\UpdateWorkRequest;
+use App\Http\Requests\Profile\UpdateContactRequest;
+use App\Services\ProfileService;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Profile;
 
 class ProfileController extends Controller
 {
+    protected $profileService;
+
+    public function __construct(ProfileService $profileService)
+    {
+        $this->profileService = $profileService;
+    }
+
     public function index()
     {
         $user = Auth::user();
-        $profile = $user->profile;
-        return inertia('Profile/Profile', [
-            'user' => $user,
-            'profile' => $profile
-        ]);
+        return inertia('Profile/Profile', $this->profileService->getUserWithProfile($user));
     }
 
-    public function updatePersonal(Request $request)
+    public function updatePersonal(UpdatePersonalRequest $request)
     {
-        $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:20',
-            'birth_date' => 'nullable|date',
-            'gender' => 'nullable|string|in:male,female',
-        ]);
-
         $user = Auth::user();
-        $profile = $user->profile;
-        $profile->update($request->only([
-            'first_name',
-            'last_name',
-            'phone',
-            'birth_date',
-            'gender'
-        ]));
-
+        $this->profileService->updatePersonalInfo($user, $request->validated());
         return back()->with('success', 'Personal information updated successfully');
     }
 
-    public function updateWork(Request $request)
+    public function updateWork(UpdateWorkRequest $request)
     {
-        $request->validate([
-            'job_title' => 'nullable|string|max:255',
-            'department' => 'nullable|string|max:255',
-            'join_date' => 'nullable|date',
-        ]);
-
         $user = Auth::user();
-        $profile = $user->profile;
-        $profile->update($request->only([
-            'job_title',
-            'department',
-            'join_date'
-        ]));
-
+        $this->profileService->updateWorkInfo($user, $request->validated());
         return back()->with('success', 'Work information updated successfully');
     }
 
-    public function updateContact(Request $request)
+    public function updateContact(UpdateContactRequest $request)
     {
-        $request->validate([
-            'address' => 'nullable|string|max:255',
-            'city' => 'nullable|string|max:100',
-            'state' => 'nullable|string|max:100',
-            'country' => 'nullable|string|max:100',
-            'postal_code' => 'nullable|string|max:20',
-        ]);
-
         $user = Auth::user();
-        $profile = $user->profile;
-        $profile->update($request->only([
-            'address',
-            'city',
-            'state',
-            'country',
-            'postal_code'
-        ]));
-
+        $this->profileService->updateContactInfo($user, $request->validated());
         return back()->with('success', 'Contact information updated successfully');
     }
 }
