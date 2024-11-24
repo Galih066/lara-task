@@ -1,27 +1,29 @@
 import { useState } from "react";
 import { Head, useForm, usePage } from "@inertiajs/react";
-import { motion } from "framer-motion";
 import Navigation from "@/Layouts/Navigation";
 import ErrorAlert from "@/Components/AlertComp/ErrorAlert";
 import SuccessAlert from "@/Components/AlertComp/SuccessAlert";
 
 export default function Profile({ user }) {
+    const [profileData, setProfileData] = useState(user);
+    console.log(profileData);
+    const { profile } = profileData
     const [showSuccess, setShowSuccess] = useState(false);
     const { errors } = usePage().props;
-    const { data, setData, post, processing, reset } = useForm({
-        first_name: user.first_name || '',
-        last_name: user.last_name || '',
-        phone: user.phone || '',
-        birth_date: user.birth_date || '',
-        gender: user.gender || '',
-        job_title: user.job_title || '',
-        department: user.department || '',
-        join_date: user.join_date || '',
-        address: user.address || '',
-        city: user.city || '',
-        state: user.state || '',
-        country: user.country || '',
-        postal_code: user.postal_code || '',
+    const { data, setData, post, processing } = useForm({
+        first_name: profile.first_name || '',
+        last_name: profile.last_name || '',
+        phone: profile.phone || '',
+        birth_date: profile.birth_date || '',
+        gender: profile.gender || '',
+        job_title: profile.job_title || '',
+        department: profile.department || '',
+        join_date: profile.join_date || '',
+        address: profile.address || '',
+        city: profile.city || '',
+        state: profile.state || '',
+        country: profile.country || '',
+        postal_code: profile.postal_code || '',
     });
 
     const handleChange = (e) => {
@@ -98,7 +100,7 @@ export default function Profile({ user }) {
             <Head title="Profile" />
             <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50/30 animate-gradient-x">
                 <Navigation user={user} />
-                
+
                 {showSuccess && (
                     <SuccessAlert
                         title="Profile Updated"
@@ -107,66 +109,136 @@ export default function Profile({ user }) {
                     />
                 )}
 
-                <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-                    {errors.update && (
-                        <ErrorAlert
-                            title="Update Failed"
-                            description={errors.update}
-                            onClose={() => delete errors.update}
-                        />
-                    )}
+                {errors.update && (
+                    <ErrorAlert
+                        title="Update Failed"
+                        description={errors.update}
+                        onClose={() => delete errors.update}
+                    />
+                )}
 
+                <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                     {/* Profile Header */}
-                    <div className="mb-8 bg-white rounded-xl shadow-sm p-6">
-                        <div className="flex flex-col md:flex-row gap-6">
-                            {/* Profile Image */}
-                            <div className="relative group">
-                                <div className="w-24 h-24 rounded-xl bg-gradient-to-r from-blue-500/10 to-sky-500/10 flex items-center justify-center text-2xl font-semibold text-blue-600">
-                                    {data.first_name ? data.first_name.charAt(0).toUpperCase() : 'U'}
+                    <div className="mb-8 bg-white rounded-xl shadow-sm overflow-hidden">
+                        {/* Cover Image */}
+                        <div className="h-32 bg-gradient-to-r from-blue-500 to-blue-600"></div>
+
+                        <div className="p-6">
+                            <div className="sm:flex sm:items-center sm:justify-between">
+                                <div className="sm:flex sm:space-x-5">
+                                    {/* Profile Image */}
+                                    <div className="-mt-16 relative">
+                                        <div className="w-20 h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-xl bg-white flex items-center justify-center text-2xl md:text-3xl font-semibold text-blue-600 border-4 border-white shadow-md relative overflow-hidden">
+                                            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-sky-500/10"></div>
+                                            <span className="relative z-10">{profileData.name ? profileData.name.charAt(0).toUpperCase() : 'U'}</span>
+                                        </div>
+                                    </div>
+                                    {/* Basic Info */}
+                                    <div className="mt-4 sm:mt-0 text-center sm:pt-1 sm:text-left">
+                                        <p className="text-sm text-gray-500">Welcome back,</p>
+                                        <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+                                            {
+                                                profile.first_name && profile.last_name
+                                                    ? `${profile.first_name} ${profile.last_name}`
+                                                    : profileData.name
+                                            }
+                                        </h2>
+                                        <p className="text-sm font-medium text-gray-600">
+                                            {profileData.job_title || 'No job title set'} {profileData.department && `at ${data.department}`}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="mt-5 flex justify-center sm:mt-0">
+                                    <div className="flex flex-wrap gap-2">
+                                        {
+                                            profile.is_active === 1
+                                                ? (<span className="inline-flex items-center px-3 py-1 rounded-lg text-sm font-medium bg-green-50 text-green-700">
+                                                    <span className="w-2 h-2 rounded-full bg-green-400 mr-2"></span>
+                                                    Active Employee
+                                                </span>)
+                                                : (<span className="inline-flex items-center px-3 py-1 rounded-lg text-sm font-medium bg-red-50 text-red-700">
+                                                    <span className="w-2 h-2 rounded-full bg-red-400 mr-2"></span>
+                                                    Inactive Employee
+                                                </span>)
+                                        }
+                                        <span className="inline-flex items-center px-3 py-1 rounded-lg text-sm font-medium bg-emerald-50 text-emerald-700">
+                                            {profile.department || 'No department'}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
 
-                            {/* Basic Info */}
-                            <div className="flex-1">
-                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-                                    <div>
-                                        <h2 className="text-2xl font-semibold text-gray-900">
-                                            {data.first_name} {data.last_name}
-                                        </h2>
-                                        <p className="text-gray-600">{data.job_title || 'No job title set'}</p>
+                            {/* Detailed Info Grid */}
+                            <div className="mt-8 grid grid-cols-1 gap-6 divide-y divide-gray-200 md:grid-cols-3 md:gap-8 md:divide-y-0">
+                                {/* Contact Details */}
+                                <div className="pt-6 md:pt-0">
+                                    <div className="flex items-center text-gray-500 text-sm font-medium">
+                                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                        </svg>
+                                        Contact Information
                                     </div>
-                                    <div className="flex flex-wrap gap-2">
-                                        <span className="inline-flex items-center px-3 py-1 rounded-lg text-sm font-medium bg-blue-50 text-blue-700">
-                                            <span className="w-2 h-2 rounded-full bg-blue-400 mr-2"></span>
-                                            Active
-                                        </span>
-                                        <span className="inline-flex items-center px-3 py-1 rounded-lg text-sm font-medium bg-emerald-50 text-emerald-700">
-                                            {data.department || 'No department'}
-                                        </span>
+                                    <div className="mt-3 space-y-3">
+                                        <div>
+                                            <p className="text-sm text-gray-500">Email</p>
+                                            <p className="mt-1 text-sm font-medium text-gray-900">{profileData.email}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-gray-500">Phone</p>
+                                            <p className="mt-1 text-sm font-medium text-gray-900">{profile.phone || 'Not set'}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-gray-500">Location</p>
+                                            <p className="mt-1 text-sm font-medium text-gray-900">
+                                                {[profile.address, profile.city, profile.state, profile.country].filter(Boolean).join(', ') || 'Not set'}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
 
-                                {/* Quick Info Grid */}
-                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                                    <div>
-                                        <p className="text-sm text-gray-500">Email</p>
-                                        <p className="text-sm font-medium text-gray-900">{user.email}</p>
+                                {/* Personal Details */}
+                                <div className="pt-6 md:pt-0">
+                                    <div className="flex items-center text-gray-500 text-sm font-medium">
+                                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
+                                        Personal Details
                                     </div>
-                                    <div>
-                                        <p className="text-sm text-gray-500">Phone</p>
-                                        <p className="text-sm font-medium text-gray-900">{data.phone || 'Not set'}</p>
+                                    <div className="mt-3 space-y-3">
+                                        <div>
+                                            <p className="text-sm text-gray-500">Birth Date</p>
+                                            <p className="mt-1 text-sm font-medium text-gray-900">
+                                                {profile.birth_date ? new Date(profile.birth_date).toLocaleDateString() : 'Not set'}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-gray-500">Gender</p>
+                                            <p className="mt-1 text-sm font-medium text-gray-900">
+                                                {profile.gender ? profile.gender.charAt(0).toUpperCase() + profile.gender.slice(1) : 'Not set'}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="text-sm text-gray-500">Join Date</p>
-                                        <p className="text-sm font-medium text-gray-900">
-                                            {data.join_date ? new Date(data.join_date).toLocaleDateString() : 'Not set'}
-                                        </p>
+                                </div>
+
+                                {/* Work Details */}
+                                <div className="pt-6 md:pt-0">
+                                    <div className="flex items-center text-gray-500 text-sm font-medium">
+                                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                        </svg>
+                                        Work Details
                                     </div>
-                                    <div>
-                                        <p className="text-sm text-gray-500">Location</p>
-                                        <p className="text-sm font-medium text-gray-900">
-                                            {data.city && data.country ? `${data.city}, ${data.country}` : 'Not set'}
-                                        </p>
+                                    <div className="mt-3 space-y-3">
+                                        <div>
+                                            <p className="text-sm text-gray-500">Department</p>
+                                            <p className="mt-1 text-sm font-medium text-gray-900">{profile.department || 'Not set'}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-gray-500">Join Date</p>
+                                            <p className="mt-1 text-sm font-medium text-gray-900">
+                                                {profile.join_date ? new Date(profile.join_date).toLocaleDateString() : 'Not set'}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -193,7 +265,7 @@ export default function Profile({ user }) {
                                                 <select
                                                     id="gender"
                                                     name="gender"
-                                                    value={data.gender}
+                                                    value={profile.gender}
                                                     onChange={handleChange}
                                                     className="mt-1 block w-full px-4 py-2.5 text-gray-700 bg-white/50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none"
                                                 >
