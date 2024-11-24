@@ -22,7 +22,5 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/update/personal', [ProfileController::class, 'updatePersonal'])->name('profile.update.personal');
         Route::post('/update/work', [ProfileController::class, 'updateWork'])->name('profile.update.work');
         Route::post('/update/contact', [ProfileController::class, 'updateContact'])->name('profile.update.contact');
-        Route::post('/update/emergency', [ProfileController::class, 'updateEmergency'])->name('profile.update.emergency');
-        Route::post('/update/password', [ProfileController::class, 'updatePassword'])->name('profile.update.password');
     });
 });

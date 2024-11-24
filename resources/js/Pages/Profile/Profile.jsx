@@ -2,39 +2,27 @@ import { Head, useForm } from "@inertiajs/react";
 import { motion } from "framer-motion";
 import Navigation from "@/Layouts/Navigation";
 import ErrorAlert from "@/Components/AlertComp/ErrorAlert";
-import { useState } from 'react';
-import { router } from '@inertiajs/react';
 
 export default function Profile({ user, errors = {}, success }) {
-    const [data, setData] = useState({
-        name: user.name || '',
-        email: user.email || '',
+    const { data, setData, post, processing, reset } = useForm({
+        first_name: user.first_name || '',
+        last_name: user.last_name || '',
         phone: user.phone || '',
         birth_date: user.birth_date || '',
         gender: user.gender || '',
         job_title: user.job_title || '',
         department: user.department || '',
-        employee_id: user.employee_id || '',
         join_date: user.join_date || '',
         address: user.address || '',
         city: user.city || '',
         state: user.state || '',
         country: user.country || '',
         postal_code: user.postal_code || '',
-        emergency_contact_name: user.emergency_contact_name || '',
-        emergency_contact_relation: user.emergency_contact_relation || '',
-        emergency_contact_phone: user.emergency_contact_phone || '',
-        current_password: '',
-        password: '',
-        password_confirmation: '',
     });
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+        setData(name, value);
     };
 
     const handleSubmit = (section, e) => {
@@ -44,16 +32,12 @@ export default function Profile({ user, errors = {}, success }) {
             personal: '/profile/update/personal',
             work: '/profile/update/work',
             contact: '/profile/update/contact',
-            emergency: '/profile/update/emergency',
-            password: '/profile/update/password',
         };
 
         const sectionData = {
-            personal: ['name', 'email', 'phone', 'birth_date', 'gender'],
-            work: ['job_title', 'department', 'employee_id', 'join_date'],
+            personal: ['first_name', 'last_name', 'phone', 'birth_date', 'gender'],
+            work: ['job_title', 'department', 'join_date'],
             contact: ['address', 'city', 'state', 'country', 'postal_code'],
-            emergency: ['emergency_contact_name', 'emergency_contact_relation', 'emergency_contact_phone'],
-            password: ['current_password', 'password', 'password_confirmation'],
         };
 
         const formData = {};
@@ -61,7 +45,11 @@ export default function Profile({ user, errors = {}, success }) {
             formData[field] = data[field];
         });
 
-        router.post(endpoints[section], formData);
+        post(endpoints[section], {
+            onSuccess: () => {
+                // Handle success
+            },
+        });
     };
 
     const renderField = (label, id, type = "text", required = false) => (
@@ -76,6 +64,7 @@ export default function Profile({ user, errors = {}, success }) {
                 value={data[id]}
                 onChange={handleChange}
                 className="mt-1 block w-full px-4 py-2.5 text-gray-700 bg-white/50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none transition-colors duration-200"
+                disabled={processing}
             />
             {errors[id] && <p className="mt-1 text-sm text-red-500">{errors[id]}</p>}
         </div>
@@ -129,7 +118,7 @@ export default function Profile({ user, errors = {}, success }) {
                             {/* Profile Image */}
                             <div className="relative group">
                                 <div className="w-24 h-24 rounded-xl bg-gradient-to-r from-blue-500/10 to-sky-500/10 flex items-center justify-center text-2xl font-semibold text-blue-600">
-                                    {data.name.charAt(0).toUpperCase()}
+                                    {data.first_name.charAt(0).toUpperCase()}
                                 </div>
                                 <button
                                     type="button"
@@ -146,7 +135,7 @@ export default function Profile({ user, errors = {}, success }) {
                             <div className="flex-1">
                                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                     <div>
-                                        <h2 className="text-xl font-semibold text-gray-900">{data.name}</h2>
+                                        <h2 className="text-xl font-semibold text-gray-900">{data.first_name} {data.last_name}</h2>
                                         <p className="text-gray-500">{data.job_title || 'No job title set'}</p>
                                     </div>
                                     <div className="flex flex-wrap gap-2">
@@ -163,7 +152,7 @@ export default function Profile({ user, errors = {}, success }) {
                                 <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div>
                                         <p className="text-sm text-gray-500">Email</p>
-                                        <p className="text-sm font-medium text-gray-900">{data.email}</p>
+                                        <p className="text-sm font-medium text-gray-900">{user.email}</p>
                                     </div>
                                     <div>
                                         <p className="text-sm text-gray-500">Phone</p>
@@ -178,10 +167,6 @@ export default function Profile({ user, errors = {}, success }) {
                                 </div>
 
                                 <div className="mt-4 flex flex-wrap gap-4">
-                                    <div>
-                                        <p className="text-sm text-gray-500">Employee ID</p>
-                                        <p className="text-sm font-medium text-gray-900">{data.employee_id || 'Not set'}</p>
-                                    </div>
                                     <div>
                                         <p className="text-sm text-gray-500">Join Date</p>
                                         <p className="text-sm font-medium text-gray-900">
@@ -204,8 +189,8 @@ export default function Profile({ user, errors = {}, success }) {
                             <div className="backdrop-blur-sm bg-white/60 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6">
                                 {renderSection("Personal Information", "Your basic personal information",
                                     <>
-                                        {renderField("Full Name", "name", "text", true)}
-                                        {renderField("Email Address", "email", "email", true)}
+                                        {renderField("First Name", "first_name", "text", true)}
+                                        {renderField("Last Name", "last_name", "text", true)}
                                         {renderField("Phone Number", "phone", "tel")}
                                         {renderField("Date of Birth", "birth_date", "date")}
                                         <div>
@@ -245,7 +230,6 @@ export default function Profile({ user, errors = {}, success }) {
                                     <>
                                         {renderField("Job Title", "job_title")}
                                         {renderField("Department", "department")}
-                                        {renderField("Employee ID", "employee_id")}
                                         {renderField("Join Date", "join_date", "date")}
                                     </>
                                 )}
@@ -278,48 +262,6 @@ export default function Profile({ user, errors = {}, success }) {
                                         className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                     >
                                         Save Contact Information
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-
-                        <form onSubmit={(e) => handleSubmit('emergency', e)} className="space-y-8">
-                            {/* Emergency Contact Section */}
-                            <div className="backdrop-blur-sm bg-white/60 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6">
-                                {renderSection("Emergency Contact", "Contact person in case of emergency",
-                                    <>
-                                        {renderField("Contact Name", "emergency_contact_name")}
-                                        {renderField("Relationship", "emergency_contact_relation")}
-                                        {renderField("Contact Phone", "emergency_contact_phone", "tel")}
-                                    </>
-                                )}
-                                <div className="mt-4 flex justify-end">
-                                    <button
-                                        type="submit"
-                                        className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                    >
-                                        Save Emergency Contact
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-
-                        <form onSubmit={(e) => handleSubmit('password', e)} className="space-y-8">
-                            {/* Password Section */}
-                            <div className="backdrop-blur-sm bg-white/60 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6">
-                                {renderSection("Change Password", "Update your account password",
-                                    <>
-                                        {renderField("Current Password", "current_password", "password")}
-                                        {renderField("New Password", "password", "password")}
-                                        {renderField("Confirm New Password", "password_confirmation", "password")}
-                                    </>
-                                )}
-                                <div className="mt-4 flex justify-end">
-                                    <button
-                                        type="submit"
-                                        className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                    >
-                                        Update Password
                                     </button>
                                 </div>
                             </div>
