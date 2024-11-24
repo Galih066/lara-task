@@ -53,8 +53,12 @@ export default function Profile({ user }) {
 
         post(endpoints[section], {
             preserveScroll: true,
-            onSuccess: () => {
+            onSuccess: (response) => {
                 setShowSuccess(true);
+                // Update the profile data with the latest response
+                if (response?.props?.user) {
+                    setProfileData(response.props.user);
+                }
                 setTimeout(() => {
                     setShowSuccess(false);
                 }, 5000);
