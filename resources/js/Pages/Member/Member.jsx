@@ -12,43 +12,9 @@ import {
     PhoneIcon
 } from '@heroicons/react/24/solid';
 
-const MemberPage = ({ user }) => {
+const MemberPage = ({ user, members }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedRole, setSelectedRole] = useState('all');
-
-    // Sample data - replace with actual data from backend
-    const members = [
-        {
-            id: 1,
-            name: 'John Doe',
-            email: 'john@example.com',
-            phone: '+1234567890',
-            role: 'Admin',
-            department: 'Engineering',
-            joinDate: '2023-01-15',
-            status: 'active'
-        },
-        {
-            id: 2,
-            name: 'Jane Smith',
-            email: 'jane@example.com',
-            phone: '+1234567891',
-            role: 'Member',
-            department: 'Design',
-            joinDate: '2023-02-20',
-            status: 'active'
-        },
-        {
-            id: 3,
-            name: 'Mike Johnson',
-            email: 'mike@example.com',
-            phone: '+1234567892',
-            role: 'Member',
-            department: 'Marketing',
-            joinDate: '2023-03-10',
-            status: 'inactive'
-        },
-    ];
 
     const filteredMembers = members.filter(member => {
         const matchesSearch = member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -146,12 +112,12 @@ const MemberPage = ({ user }) => {
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
                                         {filteredMembers.map((member) => (
-                                            <tr key={member.id} className="hover:bg-gray-50">
+                                            <tr key={member.profileId} className="hover:bg-gray-50">
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="flex items-center">
                                                         <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
                                                             <span className="text-blue-600 font-medium text-sm">
-                                                                {member.name.split(' ').map(n => n[0]).join('')}
+                                                                {member.name.split(' ').map(n => n[0]).join('').toUpperCase()}
                                                             </span>
                                                         </div>
                                                         <div className="ml-4">
@@ -182,9 +148,9 @@ const MemberPage = ({ user }) => {
                                                     {member.department}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${member.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${member.isActive === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                                                         }`}>
-                                                        {member.status}
+                                                        {member.isActive}
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
