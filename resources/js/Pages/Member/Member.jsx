@@ -1,7 +1,7 @@
+import { useState } from "react";
 import { Head } from "@inertiajs/react";
 import { motion } from "framer-motion";
-import Navigation from "@/Layouts/Navigation";
-import { useState } from "react";
+import moment from "moment";
 import {
     UsersIcon,
     PlusIcon,
@@ -11,10 +11,49 @@ import {
     EnvelopeIcon,
     PhoneIcon
 } from '@heroicons/react/24/solid';
+import Navigation from "@/Layouts/Navigation";
 
 const MemberPage = ({ user, members }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedRole, setSelectedRole] = useState('all');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isClosing, setIsClosing] = useState(false);
+    const [isEntering, setIsEntering] = useState(false);
+    const [formData, setFormData] = useState({
+        username: '',
+        email: ''
+    });
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        console.log('Form submitted:', formData);
+        setFormData({ username: '', email: '' });
+        setIsModalOpen(false);
+    };
+
+    const openModal = () => {
+        setIsModalOpen(true);
+        requestAnimationFrame(() => {
+            setIsEntering(true);
+        });
+    };
+
+    const closeModal = () => {
+        setIsClosing(true);
+        setIsEntering(false);
+        setTimeout(() => {
+            setIsModalOpen(false);
+            setIsClosing(false);
+        }, 300);
+    };
 
     const filteredMembers = members.filter(member => {
         const matchesSearch = member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -50,7 +89,10 @@ const MemberPage = ({ user, members }) => {
                             transition={{ duration: 0.5, delay: 0.2 }}
                             className="mt-4 sm:mt-0"
                         >
-                            <button className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                            <button
+                                onClick={openModal}
+                                className="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:w-auto"
+                            >
                                 <PlusIcon className="h-5 w-5 mr-2" />
                                 Add Member
                             </button>
@@ -122,7 +164,7 @@ const MemberPage = ({ user, members }) => {
                                                         </div>
                                                         <div className="ml-4">
                                                             <div className="text-sm font-medium text-gray-900">{member.name}</div>
-                                                            <div className="text-sm text-gray-500">Joined {member.joinDate}</div>
+                                                            <div className="text-sm text-gray-500">Joined {moment(member.joinDate).format('DD MMMM YYYY')}</div>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -172,6 +214,105 @@ const MemberPage = ({ user, members }) => {
                     </motion.div>
                 </main>
             </div>
+
+            {/* Add Member Modal */}
+            {isModalOpen && (
+                <div className="fixed inset-0 z-50 overflow-y-auto">
+                    <div className="flex min-h-screen items-end justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                        {/* Background overlay */}
+                        <div
+                            className={`fixed inset-0 bg-gray-500 transition-opacity duration-300 ease-out
+                                ${isEntering ? 'opacity-75' : 'opacity-0'}`}
+                            onClick={closeModal}
+                        />
+
+                        {/* Modal panel */}
+                        <div className={`relative inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all duration-300 ease-out sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6
+                            ${isEntering
+                                ? 'opacity-100 translate-y-0 sm:scale-100'
+                                : 'opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95'}`}>
+                            <style jsx>{`
+                                @keyframes modal-enter {
+                                    from {
+                                        opacity: 0;
+                                        transform: translateY(1rem) scale(0.95);
+                                    }
+                                    to {
+                                        opacity: 1;
+                                        transform: translateY(0) scale(1);
+                                    }
+                                }
+                            `}</style>
+                            <div className="absolute top-0 right-0 pt-4 pr-4">
+                                <button
+                                    type="button"
+                                    onClick={closeModal}
+                                    className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                >
+                                    <span className="sr-only">Close</span>
+                                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div className="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                                <h3 className="text-lg leading-6 font-medium text-gray-900">Add New Member</h3>
+                                <div className="mt-4">
+                                    <form onSubmit={handleSubmit}>
+                                        <div className="space-y-4">
+                                            <div>
+                                                <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                                                    Username
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    name="username"
+                                                    id="username"
+                                                    value={formData.username}
+                                                    onChange={handleInputChange}
+                                                    className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                                                    focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                                    required
+                                                />
+                                            </div>
+                                            <div>
+                                                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                                                    Email
+                                                </label>
+                                                <input
+                                                    type="email"
+                                                    name="email"
+                                                    id="email"
+                                                    value={formData.email}
+                                                    onChange={handleInputChange}
+                                                    className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
+                                                    focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                                            <button
+                                                type="submit"
+                                                className="inline-flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
+                                            >
+                                                Add Member
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={closeModal}
+                                                className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 };

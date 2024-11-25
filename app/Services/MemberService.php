@@ -16,7 +16,8 @@ class MemberService
                 'last_name',
                 'phone',
                 'department',
-                'is_active'
+                'is_active',
+                'join_date'
             )
             ->with(['user' => function($query) {
                 $query->select('id', 'email', 'role');
@@ -37,7 +38,7 @@ class MemberService
                     'isActive' => $member->is_active == 1 ? 'Active' : 'Inactive',
                 ];
             });
-            
+
         return $members;
     }
 }
