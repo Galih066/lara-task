@@ -11,10 +11,7 @@ class ProfileService
     {
         $profile = $user->profile ?? $this->createProfile($user);
         
-        return [
-            'user' => $user,
-            'profile' => $profile
-        ];
+        return $user;
     }
 
     public function updatePersonalInfo(User $user, array $data)

@@ -20,8 +20,9 @@ class ProfileController extends Controller
 
     public function index()
     {
-        $user = Auth::user();
-        return inertia('Profile/Profile', $this->profileService->getUserWithProfile($user));
+        $loggedUser = Auth::user();
+        $user = $this->profileService->getUserWithProfile($loggedUser);
+        return inertia('Profile/Profile', compact('user'));
     }
 
     public function updatePersonal(UpdatePersonalRequest $request)

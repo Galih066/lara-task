@@ -2,9 +2,9 @@ import { Head } from "@inertiajs/react";
 import { motion } from "framer-motion";
 import Navigation from "@/Layouts/Navigation";
 import { useState } from "react";
-import { 
-    ChartBarSquareIcon, 
-    UsersIcon, 
+import {
+    ChartBarSquareIcon,
+    UsersIcon,
     DocumentCheckIcon,
     ArrowTrendingUpIcon,
     CalendarIcon,
@@ -15,26 +15,26 @@ const DashboardPage = ({ user }) => {
     const [activeTab, setActiveTab] = useState('overview');
 
     const stats = [
-        { 
-            title: "Active Projects", 
-            value: "12", 
-            change: "+2.5%", 
+        {
+            title: "Active Projects",
+            value: "12",
+            change: "+2.5%",
             trend: "up",
             icon: ChartBarSquareIcon,
             description: "Projects currently in progress"
         },
-        { 
-            title: "Total Tasks", 
-            value: "64", 
-            change: "+12.5%", 
+        {
+            title: "Total Tasks",
+            value: "64",
+            change: "+12.5%",
             trend: "up",
             icon: DocumentCheckIcon,
             description: "Tasks across all projects"
         },
-        { 
-            title: "Team Members", 
-            value: "8", 
-            change: "0%", 
+        {
+            title: "Team Members",
+            value: "8",
+            change: "0%",
             trend: "neutral",
             icon: UsersIcon,
             description: "Active team members"
@@ -75,7 +75,7 @@ const DashboardPage = ({ user }) => {
                                 Here's what's happening with your projects today.
                             </p>
                         </div>
-                        <motion.div 
+                        <motion.div
                             whileHover={{ scale: 1.05 }}
                             className="hidden sm:flex items-center space-x-4"
                         >
@@ -106,11 +106,10 @@ const DashboardPage = ({ user }) => {
                                         </div>
                                         <h2 className="text-sm font-medium text-gray-600">{stat.title}</h2>
                                     </div>
-                                    <span className={`flex items-center space-x-1 ${
-                                        stat.trend === 'up' ? 'text-green-500' : 
-                                        stat.trend === 'down' ? 'text-red-500' : 
-                                        'text-gray-500'
-                                    }`}>
+                                    <span className={`flex items-center space-x-1 ${stat.trend === 'up' ? 'text-green-500' :
+                                        stat.trend === 'down' ? 'text-red-500' :
+                                            'text-gray-500'
+                                        }`}>
                                         <ArrowTrendingUpIcon className="h-4 w-4" />
                                         <span className="text-sm font-medium">{stat.change}</span>
                                     </span>
@@ -130,11 +129,10 @@ const DashboardPage = ({ user }) => {
                                 <button
                                     key={tab}
                                     onClick={() => setActiveTab(tab)}
-                                    className={`${
-                                        activeTab === tab
-                                            ? 'border-blue-500 text-blue-600'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                    } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm capitalize transition-colors duration-200`}
+                                    className={`${activeTab === tab
+                                        ? 'border-blue-500 text-blue-600'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                        } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm capitalize transition-colors duration-200`}
                                 >
                                     {tab}
                                 </button>
@@ -158,11 +156,10 @@ const DashboardPage = ({ user }) => {
                                     >
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center space-x-3">
-                                                <span className={`inline-block w-2 h-2 rounded-full ${
-                                                    activity.status === 'completed' ? 'bg-green-400' :
+                                                <span className={`inline-block w-2 h-2 rounded-full ${activity.status === 'completed' ? 'bg-green-400' :
                                                     activity.status === 'pending' ? 'bg-yellow-400' :
-                                                    'bg-blue-400'
-                                                }`} />
+                                                        'bg-blue-400'
+                                                    }`} />
                                                 <span className="text-sm font-medium text-gray-900">{activity.title}</span>
                                             </div>
                                             <span className="text-sm text-gray-500">{activity.time}</span>
@@ -190,11 +187,10 @@ const DashboardPage = ({ user }) => {
                                                 <span className="text-sm font-medium text-gray-900">{deadline.title}</span>
                                             </div>
                                             <div className="flex items-center space-x-3">
-                                                <span className={`px-2 py-1 text-xs rounded-full ${
-                                                    deadline.priority === 'high' ? 'bg-red-100 text-red-800' :
+                                                <span className={`px-2 py-1 text-xs rounded-full ${deadline.priority === 'high' ? 'bg-red-100 text-red-800' :
                                                     deadline.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                                                    'bg-green-100 text-green-800'
-                                                }`}>
+                                                        'bg-green-100 text-green-800'
+                                                    }`}>
                                                     {deadline.priority}
                                                 </span>
                                                 <span className="text-sm text-gray-500">{deadline.date}</span>
