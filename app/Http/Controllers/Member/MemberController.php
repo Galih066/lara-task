@@ -34,4 +34,10 @@ class MemberController extends Controller
             'members' => $members
         ]);
     }
+
+    public function store(Request $request)
+    {
+        $this->memberService->addMember($request);
+        return redirect()->route('member.index');
+    }
 }
