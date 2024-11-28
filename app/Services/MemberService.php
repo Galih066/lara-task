@@ -6,6 +6,7 @@ use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 
 class MemberService
 {
@@ -58,6 +59,7 @@ class MemberService
             $dataProfile = [
                 "user_id" => $user->id,
                 "organization_id" => $loggedUser->profile->organization_id,
+                "join_date" => Carbon::now()->format('Y-m-d'),
             ];
             $profile = Profile::create($dataProfile);
             DB::commit();
