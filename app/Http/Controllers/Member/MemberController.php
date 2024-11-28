@@ -37,7 +37,9 @@ class MemberController extends Controller
 
     public function store(Request $request)
     {
-        $this->memberService->addMember($request);
-        return redirect()->route('member.index');
+        $loggedUser = Auth::user();
+        $user = $this->profileService->getUserWithProfile($loggedUser);
+        $this->memberService->addMember($request, $user);
+        return redirect()->route('member');
     }
 }

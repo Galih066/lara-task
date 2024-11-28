@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class MemberService
 {
@@ -44,14 +45,26 @@ class MemberService
         return $members;
     }
 
-    public function addMember($memberData)
+    public function addMember($memberData, $loggedUser)
     {
-        $dataUser = [
-            "email" => $memberData->email,
-            "name" => $memberData->username,
-            "password" => Hash::make(env('DEFAULT_PASSWORD')),
-        ];
-        $member = Profile::create($dataUser);
-        return $member;
+        DB::beginTransaction();
+        try {
+            $dataUser = [
+                "email" => $memberData->email,
+                "name" => $memberData->username,
+                "password" => Hash::make(env('DEFAULT_PASSWORD')),
+            ];
+            $user = User::create($dataUser);
+            $dataProfile = [
+                "user_id" => $user->id,
+                "organization_id" => $loggedUser->profile->organization_id,
+            ];
+            $profile = Profile::create($dataProfile);
+            DB::commit();
+            return;
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            throw $th;
+        }
     }
 }

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Head, useForm } from "@inertiajs/react";
 import { motion } from "framer-motion";
 import moment from "moment";
+import SuccessAlert from "@/Components/AlertComp/SuccessAlert";
 import {
     UsersIcon,
     PlusIcon,
@@ -19,6 +20,7 @@ const MemberPage = ({ user, members }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
     const [isEntering, setIsEntering] = useState(false);
+    const [showSuccess, setShowSuccess] = useState(false);
     const { data, setData, post, reset } = useForm({
         username: '',
         email: '',
@@ -31,6 +33,7 @@ const MemberPage = ({ user, members }) => {
             onSuccess: () => {
                 reset();
                 setIsModalOpen(false);
+                setShowSuccess(true);
             }
         });
     };
@@ -63,7 +66,13 @@ const MemberPage = ({ user, members }) => {
             <Head title="Members" />
             <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50/30">
                 <Navigation user={user} />
-
+                {showSuccess && (
+                    <SuccessAlert
+                        title="Member Added"
+                        message="New member has been successfully added."
+                        onClose={() => setShowSuccess(false)}
+                    />
+                )}
                 <main className="max-w-7xl mx-auto py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
                     {/* Header Section */}
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
