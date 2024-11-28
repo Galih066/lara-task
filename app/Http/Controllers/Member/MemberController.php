@@ -8,6 +8,7 @@ use App\Services\ProfileService;
 use App\Services\MemberService;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use App\Http\Requests\Member\StoreMemberRequest;
 
 class MemberController extends Controller
 {
@@ -35,11 +36,14 @@ class MemberController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreMemberRequest $request)
     {
         $loggedUser = Auth::user();
         $user = $this->profileService->getUserWithProfile($loggedUser);
-        $this->memberService->addMember($request, $user);
+        $validated = $request->validated();
+        
+        $this->memberService->addMember($validated, $user);
+        
         return redirect()->route('member');
     }
 }

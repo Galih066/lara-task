@@ -46,24 +46,27 @@ class MemberService
         return $members;
     }
 
-    public function addMember($memberData, $loggedUser)
+    public function addMember(array $memberData, $loggedUser)
     {
         DB::beginTransaction();
         try {
-            $dataUser = [
-                "email" => $memberData->email,
-                "name" => $memberData->username,
+            $user = User::create([
+                "email" => $memberData['email'],
+                "name" => $memberData['username'],
+                "role" => $memberData['role'],
                 "password" => Hash::make(env('DEFAULT_PASSWORD')),
-            ];
-            $user = User::create($dataUser);
-            $dataProfile = [
+            ]);
+
+            $profile = Profile::create([
                 "user_id" => $user->id,
                 "organization_id" => $loggedUser->profile->organization_id,
+                "department" => $memberData['department'],
+                "phone" => $memberData['phone'] ?? null,
                 "join_date" => Carbon::now()->format('Y-m-d'),
-            ];
-            $profile = Profile::create($dataProfile);
+            ]);
+
             DB::commit();
-            return;
+            return $user;
         } catch (\Throwable $th) {
             DB::rollBack();
             throw $th;

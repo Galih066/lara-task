@@ -21,19 +21,30 @@ const MemberPage = ({ user, members }) => {
     const [isClosing, setIsClosing] = useState(false);
     const [isEntering, setIsEntering] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
+    const [errors, setErrors] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const { data, setData, post, reset } = useForm({
         username: '',
         email: '',
+        role: 'member',
+        department: '',
+        phone: ''
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        setIsSubmitting(true);
         post('member/add-member', {
             preserveScroll: true,
             onSuccess: () => {
                 reset();
                 setIsModalOpen(false);
                 setShowSuccess(true);
+                setIsSubmitting(false);
+            },
+            onError: (errors) => {
+                setErrors(errors);
+                setIsSubmitting(false);
             }
         });
     };
@@ -263,52 +274,196 @@ const MemberPage = ({ user, members }) => {
                             <div className="mt-3 text-center sm:mt-0 sm:text-left w-full">
                                 <h3 className="text-lg leading-6 font-medium text-gray-900">Add New Member</h3>
                                 <div className="mt-4">
-                                    <form onSubmit={handleSubmit}>
-                                        <div className="space-y-4">
+                                    <form onSubmit={handleSubmit} className="space-y-6">
+                                        <div className="space-y-5">
+                                            {/* Username Field */}
                                             <div>
                                                 <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                                                    Username
+                                                    Username <span className="text-red-500">*</span>
                                                 </label>
-                                                <input
-                                                    type="text"
-                                                    name="username"
-                                                    id="username"
-                                                    value={data.username}
-                                                    onChange={e => setData('username', e.target.value)}
-                                                    className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
-                                                    focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                                                    required
-                                                />
+                                                <div className="mt-1 relative rounded-md shadow-sm">
+                                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                        <UsersIcon className="h-5 w-5 text-gray-400" />
+                                                    </div>
+                                                    <input
+                                                        type="text"
+                                                        name="username"
+                                                        id="username"
+                                                        value={data.username}
+                                                        onChange={e => setData('username', e.target.value)}
+                                                        className={`mt-1 block w-full px-3 py-2 bg-white border text-sm shadow-sm pl-10 
+                                                            ${errors.username 
+                                                                ? 'border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500' 
+                                                                : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                                                            } rounded-md`}
+                                                        placeholder="John Doe"
+                                                    />
+                                                    {errors.username && (
+                                                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                                            <svg className="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                            </svg>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                {errors.username && (
+                                                    <p className="mt-2 text-sm text-red-600">{errors.username}</p>
+                                                )}
                                             </div>
+
+                                            {/* Email Field */}
                                             <div>
                                                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                                                    Email
+                                                    Email Address <span className="text-red-500">*</span>
                                                 </label>
-                                                <input
-                                                    type="email"
-                                                    name="email"
-                                                    id="email"
-                                                    value={data.email}
-                                                    onChange={e => setData('email', e.target.value)}
-                                                    className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
-                                                    focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                                                    required
-                                                />
+                                                <div className="mt-1 relative rounded-md shadow-sm">
+                                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                        <EnvelopeIcon className="h-5 w-5 text-gray-400" />
+                                                    </div>
+                                                    <input
+                                                        type="email"
+                                                        name="email"
+                                                        id="email"
+                                                        value={data.email}
+                                                        onChange={e => setData('email', e.target.value)}
+                                                        className={`mt-1 block w-full px-3 py-2 bg-white border text-sm shadow-sm pl-10 
+                                                            ${errors.email 
+                                                                ? 'border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500' 
+                                                                : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                                                            } rounded-md`}
+                                                        placeholder="john@example.com"
+                                                    />
+                                                    {errors.email && (
+                                                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                                            <svg className="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                            </svg>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                {errors.email && (
+                                                    <p className="mt-2 text-sm text-red-600">{errors.email}</p>
+                                                )}
+                                            </div>
+
+                                            {/* Role Field */}
+                                            <div>
+                                                <label htmlFor="role" className="block text-sm font-medium text-gray-700">
+                                                    Role <span className="text-red-500">*</span>
+                                                </label>
+                                                <div className="mt-1 relative rounded-md shadow-sm">
+                                                    <select
+                                                        id="role"
+                                                        name="role"
+                                                        value={data.role}
+                                                        onChange={e => setData('role', e.target.value)}
+                                                        className={`mt-1 block w-full px-3 py-2 bg-white border text-sm shadow-sm
+                                                            ${errors.role 
+                                                                ? 'border-red-300 text-red-900 focus:outline-none focus:ring-red-500 focus:border-red-500' 
+                                                                : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                                                            } rounded-md`}
+                                                    >
+                                                        <option value="member">Member</option>
+                                                        <option value="admin">Admin</option>
+                                                    </select>
+                                                    {errors.role && (
+                                                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                                            <svg className="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                            </svg>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                {errors.role && (
+                                                    <p className="mt-2 text-sm text-red-600">{errors.role}</p>
+                                                )}
+                                            </div>
+
+                                            {/* Department Field */}
+                                            <div>
+                                                <label htmlFor="department" className="block text-sm font-medium text-gray-700">
+                                                    Department <span className="text-red-500">*</span>
+                                                </label>
+                                                <div className="mt-1 relative rounded-md shadow-sm">
+                                                    <input
+                                                        type="text"
+                                                        name="department"
+                                                        id="department"
+                                                        value={data.department}
+                                                        onChange={e => setData('department', e.target.value)}
+                                                        className={`mt-1 block w-full px-3 py-2 bg-white border text-sm shadow-sm
+                                                            ${errors.department 
+                                                                ? 'border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500' 
+                                                                : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                                                            } rounded-md`}
+                                                        placeholder="Engineering"
+                                                    />
+                                                    {errors.department && (
+                                                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                                            <svg className="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                            </svg>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                {errors.department && (
+                                                    <p className="mt-2 text-sm text-red-600">{errors.department}</p>
+                                                )}
+                                            </div>
+
+                                            {/* Phone Field */}
+                                            <div>
+                                                <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                                                    Phone Number
+                                                </label>
+                                                <div className="mt-1 relative rounded-md shadow-sm">
+                                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                        <PhoneIcon className="h-5 w-5 text-gray-400" />
+                                                    </div>
+                                                    <input
+                                                        type="tel"
+                                                        name="phone"
+                                                        id="phone"
+                                                        value={data.phone}
+                                                        onChange={e => setData('phone', e.target.value)}
+                                                        className={`mt-1 block w-full px-3 py-2 bg-white border text-sm shadow-sm pl-10 
+                                                            ${errors.phone 
+                                                                ? 'border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500' 
+                                                                : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                                                            } rounded-md`}
+                                                        placeholder="+1 (555) 000-0000"
+                                                    />
+                                                    {errors.phone && (
+                                                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                                            <svg className="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                            </svg>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                {errors.phone && (
+                                                    <p className="mt-2 text-sm text-red-600">{errors.phone}</p>
+                                                )}
                                             </div>
                                         </div>
-                                        <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+
+                                        <div className="mt-6">
                                             <button
                                                 type="submit"
-                                                className="inline-flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
+                                                disabled={isSubmitting}
+                                                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
-                                                Add Member
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={closeModal}
-                                                className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
-                                            >
-                                                Cancel
+                                                {isSubmitting ? (
+                                                    <>
+                                                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                        </svg>
+                                                        Adding Member...
+                                                    </>
+                                                ) : (
+                                                    'Add Member'
+                                                )}
                                             </button>
                                         </div>
                                     </form>
