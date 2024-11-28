@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\Profile;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class MemberService
 {
@@ -40,5 +42,16 @@ class MemberService
             });
 
         return $members;
+    }
+
+    public function addMember($memberData)
+    {
+        $dataUser = [
+            "email" => $memberData->email,
+            "name" => $memberData->username,
+            "password" => Hash::make(env('DEFAULT_PASSWORD')),
+        ];
+        $member = Profile::create($dataUser);
+        return $member;
     }
 }

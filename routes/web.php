@@ -28,5 +28,6 @@ Route::middleware(['auth'])->group(function () {
     // Organization Membership
     Route::prefix('member')->group(function () {
         Route::get('/', [MemberController::class, 'index'])->name('member');
+        Route::post('/add-member', [MemberController::class, 'store'])->name('member.store');
     });
 });

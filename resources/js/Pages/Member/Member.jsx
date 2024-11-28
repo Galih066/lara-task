@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Head } from "@inertiajs/react";
+import { Head, useForm } from "@inertiajs/react";
 import { motion } from "framer-motion";
 import moment from "moment";
 import {
@@ -19,24 +19,20 @@ const MemberPage = ({ user, members }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
     const [isEntering, setIsEntering] = useState(false);
-    const [formData, setFormData] = useState({
+    const { data, setData, post, reset } = useForm({
         username: '',
-        email: ''
+        email: '',
     });
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
-    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log('Form submitted:', formData);
-        setFormData({ username: '', email: '' });
-        setIsModalOpen(false);
+        post('member/add-member', {
+            preserveScroll: true,
+            onSuccess: () => {
+                reset();
+                setIsModalOpen(false);
+            }
+        });
     };
 
     const openModal = () => {
@@ -268,8 +264,8 @@ const MemberPage = ({ user, members }) => {
                                                     type="text"
                                                     name="username"
                                                     id="username"
-                                                    value={formData.username}
-                                                    onChange={handleInputChange}
+                                                    value={data.username}
+                                                    onChange={e => setData('username', e.target.value)}
                                                     className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
                                                     focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                                                     required
@@ -283,8 +279,8 @@ const MemberPage = ({ user, members }) => {
                                                     type="email"
                                                     name="email"
                                                     id="email"
-                                                    value={formData.email}
-                                                    onChange={handleInputChange}
+                                                    value={data.email}
+                                                    onChange={e => setData('email', e.target.value)}
                                                     className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
                                                     focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                                                     required
