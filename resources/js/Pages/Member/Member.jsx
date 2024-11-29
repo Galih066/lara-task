@@ -6,6 +6,7 @@ import MemberHeader from "@/Components/Member/MemberHeader";
 import MemberFilters from "@/Components/Member/MemberFilters";
 import MemberTable from "@/Components/Member/MemberTable";
 import AddMemberModal from "@/Components/Member/AddMemberModal";
+import MemberSummary from "@/Components/Member/MemberSummary";
 
 const MemberPage = ({ user, members }) => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -79,6 +80,7 @@ const MemberPage = ({ user, members }) => {
                 )}
                 <main className="max-w-7xl mx-auto py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
                     <MemberHeader onAddMember={openModal} />
+                    <MemberSummary />
                     <MemberFilters
                         searchQuery={searchQuery}
                         setSearchQuery={setSearchQuery}
