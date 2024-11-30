@@ -28,7 +28,7 @@ class MemberController extends Controller
     {
         $loggedUser = Auth::user();
         $user = $this->profileService->getUserWithProfile($loggedUser);
-        $members = $this->memberService->getMembers($user->profile->organization_id);
+        $members = $this->memberService->getMembers($user->profile->organization_id, $loggedUser);
         
         return Inertia::render('Member/Member', [
             'user' => $user,
