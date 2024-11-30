@@ -8,37 +8,7 @@ import TaskBoard from "@/Components/Task/TaskBoard";
 
 const Task = ({ user }) => {
     const [showFilters, setShowFilters] = useState(false);
-
-    // Sample data - replace with actual data from backend
-    const taskStats = {
-        total: {
-            count: 24,
-            trend: 'up',
-            trendValue: '12% vs last week',
-            dueTodayCount: 3
-        },
-        inProgress: {
-            count: 8,
-            completion: '45%',
-            onTrack: 6,
-            delayed: 2
-        },
-        completed: {
-            count: 16,
-            trend: 'up',
-            trendValue: '23% this week',
-            thisMonth: 42
-        },
-        priority: {
-            high: 5,
-            medium: 12,
-            low: 7,
-            overdue: 2
-        }
-    };
-
-    // Sample tasks data
-    const tasks = [
+    const [tasks, setTasks] = useState([
         {
             id: 1,
             title: 'Design new landing page',
@@ -66,11 +36,90 @@ const Task = ({ user }) => {
             assignee: 'Robert King',
             dueDate: 'Completed'
         }
-    ];
+    ]);
 
     const handleNewTask = () => {
-        // TODO: Implement new task creation
-        console.log('Create new task');
+        const newTask = {
+            id: tasks.length + 1,
+            title: 'New Task',
+            description: 'Add description here...',
+            priority: 'medium',
+            status: 'todo',
+            assignee: user.name,
+            dueDate: 'Not set'
+        };
+        setTasks([...tasks, newTask]);
+    };
+
+    const handleUpdateTask = (updatedTask) => {
+        setTasks(tasks.map(task => 
+            task.id === updatedTask.id ? updatedTask : task
+        ));
+    };
+
+    const handleDeleteTask = (taskId) => {
+        setTasks(tasks.filter(task => task.id !== taskId));
+    };
+
+    const handleDragEnd = (result) => {
+        const { destination, source, draggableId } = result;
+
+        // If there's no destination or the item was dropped in its original position
+        if (!destination || 
+            (destination.droppableId === source.droppableId && 
+             destination.index === source.index)) {
+            return;
+        }
+
+        // Create a new array to avoid mutating state directly
+        const updatedTasks = Array.from(tasks);
+        const draggedTask = updatedTasks.find(task => task.id.toString() === draggableId);
+        
+        if (!draggedTask) return;
+
+        // Remove task from source
+        updatedTasks.splice(updatedTasks.indexOf(draggedTask), 1);
+        
+        // Find the correct position to insert the task
+        const destinationTasks = updatedTasks.filter(task => task.status === destination.droppableId);
+        const otherTasks = updatedTasks.filter(task => task.status !== destination.droppableId);
+        
+        // Update task status
+        draggedTask.status = destination.droppableId;
+        
+        // Insert at the correct position
+        destinationTasks.splice(destination.index, 0, draggedTask);
+        
+        // Combine all tasks
+        setTasks([...otherTasks, ...destinationTasks]);
+    };
+
+    // Calculate task stats based on current tasks
+    const taskStats = {
+        total: {
+            count: tasks.length,
+            trend: 'up',
+            trendValue: '12% vs last week',
+            dueTodayCount: tasks.filter(t => t.dueDate === 'Due today').length
+        },
+        inProgress: {
+            count: tasks.filter(t => t.status === 'in_progress').length,
+            completion: '45%',
+            onTrack: tasks.filter(t => t.status === 'in_progress' && t.priority !== 'high').length,
+            delayed: tasks.filter(t => t.status === 'in_progress' && t.priority === 'high').length
+        },
+        completed: {
+            count: tasks.filter(t => t.status === 'done').length,
+            trend: 'up',
+            trendValue: '23% this week',
+            thisMonth: tasks.filter(t => t.status === 'done').length
+        },
+        priority: {
+            high: tasks.filter(t => t.priority === 'high').length,
+            medium: tasks.filter(t => t.priority === 'medium').length,
+            low: tasks.filter(t => t.priority === 'low').length,
+            overdue: tasks.filter(t => t.dueDate === 'Overdue').length
+        }
     };
 
     return (
@@ -87,7 +136,12 @@ const Task = ({ user }) => {
                     />
                     <TaskSummary stats={taskStats} />
                     <TaskFilters showFilters={showFilters} />
-                    <TaskBoard tasks={tasks} />
+                    <TaskBoard 
+                        tasks={tasks}
+                        onUpdateTask={handleUpdateTask}
+                        onDeleteTask={handleDeleteTask}
+                        onDragEnd={handleDragEnd}
+                    />
                 </main>
             </div>
         </>
