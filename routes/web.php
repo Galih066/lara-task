@@ -7,12 +7,13 @@ use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Profile\ProfileController;
 use App\Http\Controllers\Member\MemberController;
+use App\Http\Controllers\Task\TaskController;
 
 Route::get('/', [LoginController::class, 'index'])->name('login_page');
 Route::get('/signup-org', [SignUpController::class, 'signUpOrg'])->name('sign_up_org_page');
 Route::post('/sent-org', [SignUpController::class, 'saveOrg'])->name('submit_org');
 Route::post('/sent-login', [LoginController::class, 'login'])->name('submit_login');
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
     Route::get('/logged-in', [DashboardController::class, 'user'])->name('user_logged_in');
@@ -29,5 +30,9 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('member')->group(function () {
         Route::get('/', [MemberController::class, 'index'])->name('member');
         Route::post('/add-member', [MemberController::class, 'store'])->name('member.store');
+    });
+
+    Route::prefix('task')->group(function () {
+        Route::get('/', [TaskController::class, 'index'])->name('task');
     });
 });

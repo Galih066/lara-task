@@ -60,7 +60,7 @@ export default function Navigation({ user }) {
                                 Dashboard
                             </Link>
                             <Link
-                                href="/tasks"
+                                href="/task"
                                 className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors duration-150"
                             >
                                 Tasks
