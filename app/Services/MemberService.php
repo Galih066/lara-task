@@ -32,7 +32,7 @@ class MemberService
             'join_date'
         )
         ->with(['user' => function($query) {
-            $query->select('id', 'email', 'role');
+            $query->select('id', 'email', 'role', 'name');
         }])
         ->get()
         ->map(function ($member) {
@@ -41,7 +41,7 @@ class MemberService
                 'userId' => $member->user->id,
                 'name' => ($member->first_name != null || $member->last_name != null) 
                     ? trim($member->first_name . ' ' . $member->last_name)
-                    : 'Not set',
+                    : $member->user->name,
                 'email' => $member->user->email,
                 'role' => $member->user->role,
                 'phone' => $member->phone == null ? 'Not set' : $member->phone,
