@@ -19,6 +19,7 @@ class SignUpService
             $user = User::create([
                 'name' => $data['username'],
                 'email' => $data['email'],
+                'role' => 'owner',
                 'password' => $hashedPwd,
             ]);
     
