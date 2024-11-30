@@ -24,7 +24,7 @@ class StoreMemberRequest extends FormRequest
         return [
             'username' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'role' => ['required', 'string', 'in:admin,member'],
+            'role' => ['required', 'string', 'in:admin,user'],
             'department' => ['required', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'regex:/^\+?[\d\s-]{10,}$/'],
         ];

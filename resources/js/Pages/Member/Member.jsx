@@ -20,7 +20,7 @@ const MemberPage = ({ user, members }) => {
     const { data, setData, post, reset } = useForm({
         username: '',
         email: '',
-        role: 'member',
+        role: '',
         department: '',
         phone: ''
     });
@@ -60,7 +60,8 @@ const MemberPage = ({ user, members }) => {
     };
 
     const filteredMembers = members.filter(member => {
-        const matchesSearch = member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        const matchesSearch =
+            member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             member.email.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesRole = selectedRole === 'all' || member.role.toLowerCase() === selectedRole.toLowerCase();
         return matchesSearch && matchesRole;

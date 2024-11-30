@@ -35,7 +35,6 @@ const MemberTable = ({ members }) => {
                     if (currentIndex > 0) {
                         setSelectedRow(currentIndex - 1);
                     } else if (currentIndex === 0 && currentPage > 1) {
-                        // Move to last item of previous page
                         setCurrentPage(prev => prev - 1);
                         setSelectedRow(itemsPerPage - 1);
                     }
@@ -45,14 +44,12 @@ const MemberTable = ({ members }) => {
                     if (currentIndex < maxIndex) {
                         setSelectedRow(currentIndex + 1);
                     } else if (currentIndex === maxIndex && currentPage < totalPages) {
-                        // Move to first item of next page
                         setCurrentPage(prev => prev + 1);
                         setSelectedRow(0);
                     }
                     break;
                 case 'Enter':
                     if (selectedRow !== null) {
-                        // Handle row selection (e.g., open edit modal)
                         console.log('Selected member:', paginatedMembers[selectedRow]);
                     }
                     break;
@@ -126,9 +123,8 @@ const MemberTable = ({ members }) => {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                            member.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
-                                        }`}>
+                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${member.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
+                                            }`}>
                                             {member.role}
                                         </span>
                                     </td>
@@ -136,9 +132,8 @@ const MemberTable = ({ members }) => {
                                         {member.department}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                            member.isActive === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                                        }`}>
+                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${member.isActive === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                                            }`}>
                                             {member.isActive}
                                         </span>
                                     </td>

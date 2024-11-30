@@ -5,7 +5,7 @@ const MemberFilters = ({ searchQuery, setSearchQuery, selectedRole, setSelectedR
     const roles = [
         { value: 'all', label: 'All Roles' },
         { value: 'admin', label: 'Admin' },
-        { value: 'member', label: 'Member' }
+        { value: 'user', label: 'User' }
     ];
 
     return (
@@ -87,14 +87,14 @@ const MemberFilters = ({ searchQuery, setSearchQuery, selectedRole, setSelectedR
                         Admins
                     </button>
                     <button
-                        onClick={() => setSelectedRole('member')}
+                        onClick={() => setSelectedRole('user')}
                         className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
-                                  ${selectedRole === 'member'
+                                  ${selectedRole === 'user'
                                 ? 'bg-blue-100 text-blue-700'
                                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                             } transition-colors duration-200`}
                     >
-                        Members
+                        Users
                     </button>
                     <button
                         onClick={() => setSelectedRole('all')}
