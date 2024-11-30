@@ -5,9 +5,13 @@ import TaskHeader from "@/Components/Task/TaskHeader";
 import TaskFilters from "@/Components/Task/TaskFilters";
 import TaskSummary from "@/Components/Task/TaskSummary";
 import TaskBoard from "@/Components/Task/TaskBoard";
+import TaskList from "@/Components/Task/TaskList";
+import TaskCalendar from "@/Components/Task/TaskCalendar";
 
 const Task = ({ user }) => {
     const [showFilters, setShowFilters] = useState(false);
+    const [currentView, setCurrentView] = useState('board');
+    const [searchQuery, setSearchQuery] = useState('');
     const [tasks, setTasks] = useState([
         {
             id: 1,
@@ -16,7 +20,7 @@ const Task = ({ user }) => {
             priority: 'high',
             status: 'todo',
             assignee: 'John Doe',
-            dueDate: 'Due in 3 days'
+            dueDate: '2024-04-20'
         },
         {
             id: 2,
@@ -25,7 +29,7 @@ const Task = ({ user }) => {
             priority: 'medium',
             status: 'in_progress',
             assignee: 'Alice Smith',
-            dueDate: 'Due tomorrow'
+            dueDate: '2024-04-15'
         },
         {
             id: 3,
@@ -34,7 +38,7 @@ const Task = ({ user }) => {
             priority: 'low',
             status: 'done',
             assignee: 'Robert King',
-            dueDate: 'Completed'
+            dueDate: '2024-04-10'
         }
     ]);
 
@@ -46,7 +50,7 @@ const Task = ({ user }) => {
             priority: 'medium',
             status: 'todo',
             assignee: user.name,
-            dueDate: 'Not set'
+            dueDate: new Date().toISOString().split('T')[0]
         };
         setTasks([...tasks, newTask]);
     };
@@ -64,85 +68,84 @@ const Task = ({ user }) => {
     const handleDragEnd = (result) => {
         const { destination, source, draggableId } = result;
 
-        // If there's no destination or the item was dropped in its original position
         if (!destination || 
             (destination.droppableId === source.droppableId && 
              destination.index === source.index)) {
             return;
         }
 
-        // Create a new array to avoid mutating state directly
         const updatedTasks = Array.from(tasks);
         const draggedTask = updatedTasks.find(task => task.id.toString() === draggableId);
         
         if (!draggedTask) return;
 
-        // Remove task from source
-        updatedTasks.splice(updatedTasks.indexOf(draggedTask), 1);
-        
-        // Find the correct position to insert the task
-        const destinationTasks = updatedTasks.filter(task => task.status === destination.droppableId);
-        const otherTasks = updatedTasks.filter(task => task.status !== destination.droppableId);
-        
-        // Update task status
         draggedTask.status = destination.droppableId;
-        
-        // Insert at the correct position
-        destinationTasks.splice(destination.index, 0, draggedTask);
-        
-        // Combine all tasks
-        setTasks([...otherTasks, ...destinationTasks]);
+        setTasks(updatedTasks);
     };
 
-    // Calculate task stats based on current tasks
-    const taskStats = {
-        total: {
-            count: tasks.length,
-            trend: 'up',
-            trendValue: '12% vs last week',
-            dueTodayCount: tasks.filter(t => t.dueDate === 'Due today').length
-        },
-        inProgress: {
-            count: tasks.filter(t => t.status === 'in_progress').length,
-            completion: '45%',
-            onTrack: tasks.filter(t => t.status === 'in_progress' && t.priority !== 'high').length,
-            delayed: tasks.filter(t => t.status === 'in_progress' && t.priority === 'high').length
-        },
-        completed: {
-            count: tasks.filter(t => t.status === 'done').length,
-            trend: 'up',
-            trendValue: '23% this week',
-            thisMonth: tasks.filter(t => t.status === 'done').length
-        },
-        priority: {
-            high: tasks.filter(t => t.priority === 'high').length,
-            medium: tasks.filter(t => t.priority === 'medium').length,
-            low: tasks.filter(t => t.priority === 'low').length,
-            overdue: tasks.filter(t => t.dueDate === 'Overdue').length
+    const filteredTasks = tasks.filter(task => {
+        if (!searchQuery) return true;
+        const searchLower = searchQuery.toLowerCase();
+        return (
+            task.title.toLowerCase().includes(searchLower) ||
+            task.description.toLowerCase().includes(searchLower) ||
+            task.assignee.toLowerCase().includes(searchLower)
+        );
+    });
+
+    const renderView = () => {
+        switch (currentView) {
+            case 'list':
+                return (
+                    <TaskList
+                        tasks={filteredTasks}
+                        onUpdateTask={handleUpdateTask}
+                        onDeleteTask={handleDeleteTask}
+                    />
+                );
+            case 'calendar':
+                return (
+                    <TaskCalendar
+                        tasks={filteredTasks}
+                        onUpdateTask={handleUpdateTask}
+                        onDeleteTask={handleDeleteTask}
+                    />
+                );
+            default:
+                return (
+                    <TaskBoard
+                        tasks={filteredTasks}
+                        onUpdateTask={handleUpdateTask}
+                        onDeleteTask={handleDeleteTask}
+                        onDragEnd={handleDragEnd}
+                    />
+                );
         }
     };
 
     return (
         <>
             <Head title="Tasks" />
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50/30">
-                <Navigation user={user} />
-
-                {/* Main Content */}
-                <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <Navigation user={user} />
+            
+            <div className="py-12">
+                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <TaskHeader 
                         onToggleFilters={() => setShowFilters(!showFilters)}
                         onNewTask={handleNewTask}
+                        view={currentView}
+                        onViewChange={setCurrentView}
+                        onSearch={setSearchQuery}
                     />
-                    <TaskSummary stats={taskStats} />
+                    
                     <TaskFilters showFilters={showFilters} />
-                    <TaskBoard 
-                        tasks={tasks}
-                        onUpdateTask={handleUpdateTask}
-                        onDeleteTask={handleDeleteTask}
-                        onDragEnd={handleDragEnd}
-                    />
-                </main>
+                    
+                    <TaskSummary tasks={filteredTasks} />
+                    
+                    <div className="mt-6">
+                        {renderView()}
+                    </div>
+                </div>
             </div>
         </>
     );

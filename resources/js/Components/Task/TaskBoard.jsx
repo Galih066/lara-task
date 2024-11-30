@@ -48,9 +48,35 @@ const getDragStyle = (style, snapshot) => {
     return style;
 };
 
+const getPriorityColor = (priority) => {
+    switch (priority.toLowerCase()) {
+        case 'high':
+            return 'bg-red-100 text-red-800';
+        case 'medium':
+            return 'bg-yellow-100 text-yellow-800';
+        case 'low':
+            return 'bg-green-100 text-green-800';
+        default:
+            return 'bg-gray-100 text-gray-800';
+    }
+};
+
+const getDueDateStatus = (dueDate) => {
+    if (!dueDate) return null;
+    const today = new Date();
+    const due = new Date(dueDate);
+    const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 0) return { class: 'text-red-600', text: 'Overdue' };
+    if (diffDays === 0) return { class: 'text-orange-600', text: 'Due Today' };
+    if (diffDays <= 2) return { class: 'text-yellow-600', text: 'Due Soon' };
+    return { class: 'text-gray-600', text: `Due in ${diffDays} days` };
+};
+
 const TaskCard = ({ task, index, onUpdate, onDelete }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editedTask, setEditedTask] = useState(task);
+    const [isHovered, setIsHovered] = useState(false);
 
     const handleSave = () => {
         onUpdate(editedTask);
@@ -61,6 +87,8 @@ const TaskCard = ({ task, index, onUpdate, onDelete }) => {
         setEditedTask(task);
         setIsEditing(false);
     };
+
+    const dueStatus = getDueDateStatus(task.dueDate);
 
     return (
         <Draggable draggableId={task.id.toString()} index={index}>
@@ -75,6 +103,8 @@ const TaskCard = ({ task, index, onUpdate, onDelete }) => {
                             ? 'shadow-xl ring-2 ring-blue-500 rotate-3 scale-105 cursor-grabbing z-50' 
                             : 'hover:border-blue-500 hover:shadow-md cursor-grab transition-all duration-200'
                     }`}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
                 >
                     {isEditing ? (
                         <div className="space-y-3" onClick={(e) => e.stopPropagation()}>
@@ -82,82 +112,74 @@ const TaskCard = ({ task, index, onUpdate, onDelete }) => {
                                 type="text"
                                 value={editedTask.title}
                                 onChange={(e) => setEditedTask({ ...editedTask, title: e.target.value })}
-                                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Task title"
                             />
                             <textarea
                                 value={editedTask.description}
                                 onChange={(e) => setEditedTask({ ...editedTask, description: e.target.value })}
-                                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Task description"
                                 rows={3}
                             />
-                            <select
-                                value={editedTask.priority}
-                                onChange={(e) => setEditedTask({ ...editedTask, priority: e.target.value })}
-                                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            >
-                                <option value="high">High</option>
-                                <option value="medium">Medium</option>
-                                <option value="low">Low</option>
-                            </select>
-                            <div className="flex justify-end space-x-2">
-                                <button 
-                                    onClick={handleSave} 
-                                    className="p-1 text-green-600 hover:text-green-800 transition-colors"
-                                >
-                                    <CheckIcon className="w-5 h-5" />
-                                </button>
-                                <button 
-                                    onClick={handleCancel} 
-                                    className="p-1 text-red-600 hover:text-red-800 transition-colors"
+                            <div className="flex justify-end gap-2">
+                                <button
+                                    onClick={handleCancel}
+                                    className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800"
                                 >
                                     <XMarkIcon className="w-5 h-5" />
+                                </button>
+                                <button
+                                    onClick={handleSave}
+                                    className="px-3 py-1.5 text-sm text-green-600 hover:text-green-800"
+                                >
+                                    <CheckIcon className="w-5 h-5" />
                                 </button>
                             </div>
                         </div>
                     ) : (
                         <>
                             <div className="flex items-start justify-between">
-                                <h4 className="text-sm font-medium text-gray-900">{task.title}</h4>
-                                <div className="flex space-x-2">
-                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                        task.priority === 'high' ? 'bg-red-100 text-red-800' :
-                                        task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                                        'bg-green-100 text-green-800'
-                                    }`}>
-                                        {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-                                    </span>
-                                </div>
+                                <h3 className="text-sm font-medium text-gray-900">{task.title}</h3>
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
+                                    {task.priority}
+                                </span>
                             </div>
-                            <p className="mt-1 text-sm text-gray-500">{task.description}</p>
+                            <p className="mt-1 text-sm text-gray-500 line-clamp-2">{task.description}</p>
                             <div className="mt-4 flex items-center justify-between">
-                                <div className="flex items-center">
-                                    <div className="flex -space-x-2">
-                                        <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs">
-                                            {task.assignee.split(' ').map(n => n[0]).join('').toUpperCase()}
-                                        </div>
-                                    </div>
-                                </div>
                                 <div className="flex items-center space-x-2">
-                                    <span className="text-xs text-gray-500">{task.dueDate}</span>
-                                    <button 
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setIsEditing(true);
-                                        }}
-                                        className="p-1 text-gray-400 hover:text-gray-600 opacity-0 group-hover:opacity-100 transition-all duration-200"
-                                    >
-                                        <PencilIcon className="w-4 h-4" />
-                                    </button>
-                                    <button 
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            onDelete(task.id);
-                                        }}
-                                        className="p-1 text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all duration-200"
-                                    >
-                                        <TrashIcon className="w-4 h-4" />
-                                    </button>
+                                    <span className="inline-block h-6 w-6 rounded-full bg-gray-200 text-xs flex items-center justify-center">
+                                        {task.assignee.charAt(0)}
+                                    </span>
+                                    <span className="text-xs text-gray-500">{task.assignee}</span>
                                 </div>
+                                {dueStatus && (
+                                    <span className={`text-xs ${dueStatus.class}`}>
+                                        {dueStatus.text}
+                                    </span>
+                                )}
+                            </div>
+                            
+                            {/* Quick actions - visible on hover */}
+                            <div className={`absolute top-2 right-2 flex items-center gap-1 transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setIsEditing(true);
+                                    }}
+                                    className="p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
+                                >
+                                    <PencilIcon className="w-4 h-4" />
+                                </button>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onDelete(task.id);
+                                    }}
+                                    className="p-1 text-gray-400 hover:text-red-600 rounded-full hover:bg-gray-100"
+                                >
+                                    <TrashIcon className="w-4 h-4" />
+                                </button>
                             </div>
                         </>
                     )}
