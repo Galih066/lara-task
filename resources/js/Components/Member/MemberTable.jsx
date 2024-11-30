@@ -1,13 +1,14 @@
 import { motion } from "framer-motion";
 import moment from "moment";
 import { useState, useMemo, useEffect } from "react";
-import { PencilSquareIcon, TrashIcon, EnvelopeIcon } from '@heroicons/react/24/solid';
+import { PencilSquareIcon, TrashIcon, EnvelopeIcon, UsersIcon } from '@heroicons/react/24/solid';
 import TablePagination from "./TablePagination";
+import EmptyState from "@/Components/EmptyState";
 
 const MemberTable = ({ members }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedRow, setSelectedRow] = useState(null);
-    const itemsPerPage = 5; // Changed from 10 to 5 to see pagination with less data
+    const itemsPerPage = 5;
 
     const paginatedMembers = useMemo(() => {
         const startIndex = (currentPage - 1) * itemsPerPage;
@@ -19,12 +20,12 @@ const MemberTable = ({ members }) => {
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
-        setSelectedRow(null); // Reset selection when page changes
+        setSelectedRow(null);
     };
 
     useEffect(() => {
         const handleKeyDown = (e) => {
-            if (e.target.tagName === 'INPUT') return; // Don't handle if user is typing in an input
+            if (e.target.tagName === 'INPUT') return;
 
             const currentIndex = selectedRow !== null ? selectedRow : -1;
             const maxIndex = paginatedMembers.length - 1;
@@ -60,7 +61,6 @@ const MemberTable = ({ members }) => {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [selectedRow, currentPage, paginatedMembers.length, totalPages]);
 
-    // Scroll selected row into view
     useEffect(() => {
         if (selectedRow !== null) {
             const element = document.getElementById(`member-row-${selectedRow}`);
@@ -91,64 +91,76 @@ const MemberTable = ({ members }) => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {paginatedMembers.map((member, index) => (
-                                <tr
-                                    key={member.profileId}
-                                    id={`member-row-${index}`}
-                                    className={`hover:bg-gray-50 ${selectedRow === index ? 'bg-blue-50' : ''}`}
-                                    onClick={() => setSelectedRow(index)}
-                                    tabIndex={0}
-                                    role="row"
-                                    aria-selected={selectedRow === index}
-                                >
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="flex items-center">
-                                            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                                <span className="text-blue-600 font-medium text-sm">
-                                                    {member.name.split(' ').map(n => n[0]).join('').toUpperCase()}
-                                                </span>
-                                            </div>
-                                            <div className="ml-4">
-                                                <div className="text-sm font-medium text-gray-900">{member.name}</div>
-                                                <div className="text-sm text-gray-500">Joined {moment(member.joinDate).format('DD MMMM YYYY')}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="flex flex-col space-y-1">
-                                            <div className="flex items-center text-sm text-gray-500">
-                                                <EnvelopeIcon className="h-4 w-4 mr-2" />
-                                                {member.email}
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${member.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
-                                            }`}>
-                                            {member.role}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {member.department}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${member.isActive === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                                            }`}>
-                                            {member.isActive}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <div className="flex items-center space-x-3">
-                                            <button className="text-blue-600 hover:text-blue-900">
-                                                <PencilSquareIcon className="h-5 w-5" />
-                                            </button>
-                                            <button className="text-red-600 hover:text-red-900">
-                                                <TrashIcon className="h-5 w-5" />
-                                            </button>
-                                        </div>
+                            {members.length === 0 ? (
+                                <tr>
+                                    <td colSpan="6">
+                                        <EmptyState
+                                            icon={UsersIcon}
+                                            title="No members found"
+                                            description="Try adjusting your search or filter to find what you're looking for"
+                                        />
                                     </td>
                                 </tr>
-                            ))}
+                            ) : (
+                                paginatedMembers.map((member, index) => (
+                                    <tr
+                                        key={member.profileId}
+                                        id={`member-row-${index}`}
+                                        className={`hover:bg-gray-50 ${selectedRow === index ? 'bg-blue-50' : ''}`}
+                                        onClick={() => setSelectedRow(index)}
+                                        tabIndex={0}
+                                        role="row"
+                                        aria-selected={selectedRow === index}
+                                    >
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="flex items-center">
+                                                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                                    <span className="text-blue-600 font-medium text-sm">
+                                                        {member.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                                                    </span>
+                                                </div>
+                                                <div className="ml-4">
+                                                    <div className="text-sm font-medium text-gray-900">{member.name}</div>
+                                                    <div className="text-sm text-gray-500">Joined {moment(member.joinDate).format('DD MMMM YYYY')}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="flex flex-col space-y-1">
+                                                <div className="flex items-center text-sm text-gray-500">
+                                                    <EnvelopeIcon className="h-4 w-4 mr-2" />
+                                                    {member.email}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${member.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
+                                                }`}>
+                                                {member.role.charAt(0).toUpperCase() + member.role.slice(1)}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {member.department}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${member.isActive === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                                                }`}>
+                                                {member.isActive}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <div className="flex items-center space-x-3">
+                                                <button className="text-blue-600 hover:text-blue-900">
+                                                    <PencilSquareIcon className="h-5 w-5" />
+                                                </button>
+                                                <button className="text-red-600 hover:text-red-900">
+                                                    <TrashIcon className="h-5 w-5" />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </table>
                 </div>

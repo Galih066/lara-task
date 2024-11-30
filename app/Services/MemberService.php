@@ -35,7 +35,7 @@ class MemberService
                         ? trim($member->first_name . ' ' . $member->last_name)
                         : 'Not set',
                     'email' => $member->user->email,
-                    'role' => $member->user->role == 'admin' ? 'Admin' : 'User',
+                    'role' => $member->user->role,
                     'phone' => $member->phone == null ? 'Not set' : $member->phone,
                     'department' => $member->department == null ? 'Not set' : $member->department,
                     'joinDate' => $member->join_date == null ? 'Not set' : $member->join_date,

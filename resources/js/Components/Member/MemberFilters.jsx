@@ -16,7 +16,6 @@ const MemberFilters = ({ searchQuery, setSearchQuery, selectedRole, setSelectedR
             className="bg-white rounded-xl shadow-sm p-4 mb-6"
         >
             <div className="flex flex-col sm:flex-row gap-4">
-                {/* Search Input */}
                 <div className="flex-1">
                     <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -35,7 +34,6 @@ const MemberFilters = ({ searchQuery, setSearchQuery, selectedRole, setSelectedR
                     </div>
                 </div>
 
-                {/* Role Filter */}
                 <div className="sm:w-48">
                     <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -73,7 +71,6 @@ const MemberFilters = ({ searchQuery, setSearchQuery, selectedRole, setSelectedR
                     </div>
                 </div>
 
-                {/* Quick Filter Pills */}
                 <div className="hidden lg:flex items-center space-x-2">
                     <span className="text-sm text-gray-500">Quick Filters:</span>
                     <button
