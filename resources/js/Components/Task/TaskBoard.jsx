@@ -9,17 +9,17 @@ const TaskColumn = ({ title, count, children, droppableId }) => (
             <div 
                 ref={provided.innerRef}
                 {...provided.droppableProps}
-                className={`bg-white rounded-xl shadow-sm p-4 transition-colors duration-200 ${
+                className={`bg-white rounded-xl shadow-sm p-4 transition-colors duration-200 flex flex-col h-full ${
                     snapshot.isDraggingOver ? 'bg-blue-50 ring-2 ring-blue-200' : ''
                 }`}
             >
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-4 flex-shrink-0">
                     <h3 className="text-lg font-medium text-gray-900">{title}</h3>
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                         {count}
                     </span>
                 </div>
-                <div className="space-y-3 min-h-[200px]">
+                <div className="space-y-3 overflow-y-auto flex-grow">
                     {children}
                     {provided.placeholder}
                 </div>
@@ -192,11 +192,12 @@ const TaskCard = ({ task, index, onUpdate, onDelete }) => {
 const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onDragEnd }) => {
     const todoTasks = tasks.filter(task => task.status === 'todo');
     const inProgressTasks = tasks.filter(task => task.status === 'in_progress');
+    const reviewTasks = tasks.filter(task => task.status === 'review');
     const doneTasks = tasks.filter(task => task.status === 'done');
 
     return (
         <DragDropContext onDragEnd={onDragEnd}>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 h-[calc(100vh-16rem)]">
                 <TaskColumn title="To Do" count={todoTasks.length} droppableId="todo">
                     {todoTasks.map((task, index) => (
                         <TaskCard 
@@ -211,6 +212,18 @@ const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onDragEnd }) => {
 
                 <TaskColumn title="In Progress" count={inProgressTasks.length} droppableId="in_progress">
                     {inProgressTasks.map((task, index) => (
+                        <TaskCard 
+                            key={task.id} 
+                            task={task}
+                            index={index}
+                            onUpdate={onUpdateTask}
+                            onDelete={onDeleteTask}
+                        />
+                    ))}
+                </TaskColumn>
+
+                <TaskColumn title="Review" count={reviewTasks.length} droppableId="review">
+                    {reviewTasks.map((task, index) => (
                         <TaskCard 
                             key={task.id} 
                             task={task}

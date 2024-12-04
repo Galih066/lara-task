@@ -16,6 +16,7 @@ const TaskSummary = ({ tasks }) => {
             inProgress: tasks.filter(t => t.status === 'in_progress').length,
             completed: tasks.filter(t => t.status === 'done').length,
             todo: tasks.filter(t => t.status === 'todo').length,
+            review: tasks.filter(t => t.status === 'review').length,
             priority: {
                 high: tasks.filter(t => t.priority === 'high').length,
                 medium: tasks.filter(t => t.priority === 'medium').length,
@@ -44,7 +45,7 @@ const TaskSummary = ({ tasks }) => {
                 icon={ChartBarIcon}
                 title="Total Tasks"
                 value={stats.total}
-                description={`${stats.inProgress} active, ${stats.overdue} overdue`}
+                description={`${stats.inProgress} active, ${stats.review} in review`}
                 color="bg-blue-600"
                 dueToday={stats.dueToday}
             />
