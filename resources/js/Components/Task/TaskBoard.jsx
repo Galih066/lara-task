@@ -98,91 +98,50 @@ const TaskCard = ({ task, index, onUpdate, onDelete }) => {
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                     style={getDragStyle(provided.draggableProps.style, snapshot)}
-                    className={`p-4 bg-white border border-gray-200 rounded-lg shadow-sm group ${
-                        snapshot.isDragging 
-                            ? 'shadow-xl ring-2 ring-blue-500 rotate-3 scale-105 cursor-grabbing z-50' 
-                            : 'hover:border-blue-500 hover:shadow-md cursor-grab transition-all duration-200'
-                    }`}
+                    className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm group"
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
                 >
-                    {isEditing ? (
-                        <div className="space-y-3" onClick={(e) => e.stopPropagation()}>
-                            <input
-                                type="text"
-                                value={editedTask.title}
-                                onChange={(e) => setEditedTask({ ...editedTask, title: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Task title"
-                            />
-                            <textarea
-                                value={editedTask.description}
-                                onChange={(e) => setEditedTask({ ...editedTask, description: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Task description"
-                                rows={3}
-                            />
-                            <div className="flex justify-end gap-2">
-                                <button
-                                    onClick={handleCancel}
-                                    className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800"
-                                >
-                                    <XMarkIcon className="w-5 h-5" />
-                                </button>
-                                <button
-                                    onClick={handleSave}
-                                    className="px-3 py-1.5 text-sm text-green-600 hover:text-green-800"
-                                >
-                                    <CheckIcon className="w-5 h-5" />
-                                </button>
-                            </div>
+                    <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                            <h4 className="text-sm font-medium text-gray-900">{task.title}</h4>
+                            <p className="mt-1 text-sm text-gray-600 line-clamp-2">{task.description}</p>
                         </div>
-                    ) : (
-                        <>
-                            <div className="flex items-start justify-between">
-                                <h3 className="text-sm font-medium text-gray-900">{task.title}</h3>
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
-                                    {task.priority}
-                                </span>
-                            </div>
-                            <p className="mt-1 text-sm text-gray-500 line-clamp-2">{task.description}</p>
-                            <div className="mt-4 flex items-center justify-between">
-                                <div className="flex items-center space-x-2">
-                                    <span className="inline-block h-6 w-6 rounded-full bg-gray-200 text-xs flex items-center justify-center">
-                                        {task.assignee.charAt(0)}
-                                    </span>
-                                    <span className="text-xs text-gray-500">{task.assignee}</span>
-                                </div>
-                                {dueStatus && (
-                                    <span className={`text-xs ${dueStatus.class}`}>
-                                        {dueStatus.text}
-                                    </span>
-                                )}
-                            </div>
-                            
-                            {/* Quick actions - visible on hover */}
-                            <div className={`absolute top-2 right-2 flex items-center gap-1 transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setIsEditing(true);
-                                    }}
-                                    className="p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
-                                >
-                                    <PencilIcon className="w-4 h-4" />
-                                </button>
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        onDelete(task.id);
-                                    }}
-                                    className="p-1 text-gray-400 hover:text-red-600 rounded-full hover:bg-gray-100"
-                                >
-                                    <TrashIcon className="w-4 h-4" />
-                                </button>
-                            </div>
-                        </>
-                    )}
+                        <div className={`flex space-x-2 ${isHovered ? 'opacity-100' : 'opacity-0'} transition-opacity`}>
+                            <button
+                                onClick={() => setIsEditing(true)}
+                                className="text-gray-400 hover:text-gray-500"
+                            >
+                                <PencilIcon className="h-4 w-4" />
+                            </button>
+                            <button
+                                onClick={() => onDelete(task.id)}
+                                className="text-gray-400 hover:text-red-500"
+                            >
+                                <TrashIcon className="h-4 w-4" />
+                            </button>
+                        </div>
+                    </div>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                        <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${getPriorityColor(task.priority)}`}>
+                            {task.priority}
+                        </span>
+                        {dueStatus && (
+                            <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${dueStatus.class}`}>
+                                {dueStatus.text}
+                            </span>
+                        )}
+                    </div>
+                    <div className="mt-4 flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                            <span className="text-xs text-gray-500">Initiator:</span>
+                            <span className="text-xs font-medium text-gray-700">{task.initiator}</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <span className="text-xs text-gray-500">Assignees:</span>
+                            <span className="text-xs font-medium text-gray-700">{task.assignees?.length || 0}</span>
+                        </div>
+                    </div>
                 </div>
             )}
         </Draggable>

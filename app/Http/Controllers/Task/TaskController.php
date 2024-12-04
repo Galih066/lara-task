@@ -23,7 +23,10 @@ class TaskController extends Controller
         $user = $this->profileService->getUserWithProfile($loggedUser);
         
         return Inertia::render('Task/Task', [
-            'user' => $user
+            'auth' => [
+                'user' => $user
+            ],
+            'users' => \App\Models\User::all()
         ]);
     }
 }
