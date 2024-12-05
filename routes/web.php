@@ -34,5 +34,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::prefix('task')->group(function () {
         Route::get('/', [TaskController::class, 'index'])->name('task');
+        Route::post('/store', [TaskController::class, 'store'])->name('tasks.store');
     });
 });

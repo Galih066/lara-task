@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Head } from "@inertiajs/react";
 import Navigation from "@/Layouts/Navigation";
 import TaskHeader from "@/Components/Task/TaskHeader";
@@ -12,6 +12,7 @@ import CreateTaskForm from "@/Components/Task/CreateTaskForm";
 const Task = ({ auth, users }) => {
     const [showFilters, setShowFilters] = useState(false);
     const [showCreateForm, setShowCreateForm] = useState(false);
+    const [isEntering, setIsEntering] = useState(false);
     const [currentView, setCurrentView] = useState('board');
     const [searchQuery, setSearchQuery] = useState('');
     const [tasks, setTasks] = useState([
@@ -49,6 +50,14 @@ const Task = ({ auth, users }) => {
 
     const handleNewTask = () => {
         setShowCreateForm(true);
+        // Start entrance animation after a brief delay
+        setTimeout(() => setIsEntering(true), 50);
+    };
+
+    const handleCloseTask = () => {
+        setIsEntering(false);
+        // Wait for exit animation to complete before hiding modal
+        setTimeout(() => setShowCreateForm(false), 300);
     };
 
     const handleUpdateTask = (updatedTask) => {
@@ -141,8 +150,10 @@ const Task = ({ auth, users }) => {
 
                 {showCreateForm && (
                     <CreateTaskForm
-                        onClose={() => setShowCreateForm(false)}
-                        users={users || []} // Fallback to empty array if users prop is not provided
+                        onClose={handleCloseTask}
+                        users={users || []}
+                        isModalOpen={showCreateForm}
+                        isEntering={isEntering}
                     />
                 )}
             </div>
