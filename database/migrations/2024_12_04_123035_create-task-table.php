@@ -19,6 +19,7 @@ return new class extends Migration
             $table->json('assignees');
             $table->date('due_date');
             $table->date('completed_date')->nullable();
+            $table->string('attachment_id')->nullable();
             $table->string('priority');
             $table->string('status');
             $table->timestamps();
