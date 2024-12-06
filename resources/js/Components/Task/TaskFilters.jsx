@@ -1,6 +1,10 @@
 import { motion } from "framer-motion";
 
-const TaskFilters = ({ showFilters }) => {
+const TaskFilters = ({ showFilters, onFilterChange }) => {
+    const handleFilterChange = (type, value) => {
+        onFilterChange?.(type, value);
+    };
+
     return (
         <motion.div
             initial={false}
@@ -15,7 +19,10 @@ const TaskFilters = ({ showFilters }) => {
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Status
                         </label>
-                        <select className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                        <select 
+                            className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg"
+                            onChange={(e) => handleFilterChange('status', e.target.value)}
+                        >
                             <option value="all">All Status</option>
                             <option value="todo">To Do</option>
                             <option value="in_progress">In Progress</option>
@@ -28,7 +35,10 @@ const TaskFilters = ({ showFilters }) => {
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Priority
                         </label>
-                        <select className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                        <select 
+                            className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg"
+                            onChange={(e) => handleFilterChange('priority', e.target.value)}
+                        >
                             <option value="all">All Priorities</option>
                             <option value="low">Low</option>
                             <option value="medium">Medium</option>
@@ -41,7 +51,10 @@ const TaskFilters = ({ showFilters }) => {
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Assignee
                         </label>
-                        <select className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                        <select 
+                            className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg"
+                            onChange={(e) => handleFilterChange('assignee', e.target.value)}
+                        >
                             <option value="all">All Assignees</option>
                             <option value="me">Assigned to Me</option>
                             <option value="unassigned">Unassigned</option>

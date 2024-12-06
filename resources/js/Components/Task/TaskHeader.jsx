@@ -1,4 +1,6 @@
-import { PlusIcon, AdjustmentsHorizontalIcon, MagnifyingGlassIcon, ViewColumnsIcon, ListBulletIcon, CalendarIcon } from "@heroicons/react/24/outline";
+import { PlusIcon, AdjustmentsHorizontalIcon, MagnifyingGlassIcon, ViewColumnsIcon, ListBulletIcon, CalendarIcon, FunnelIcon } from "@heroicons/react/24/outline";
+import { useState } from "react";
+import TaskFilters from "./TaskFilters";
 
 const ViewButton = ({ icon: Icon, label, isActive, onClick }) => (
     <button
@@ -13,7 +15,17 @@ const ViewButton = ({ icon: Icon, label, isActive, onClick }) => (
     </button>
 );
 
-const TaskHeader = ({ onToggleFilters, onNewTask, view, onViewChange, onSearch }) => {
+const TaskHeader = ({ onToggleFilters, onNewTask, view, onViewChange, onSearch, onFilterChange }) => {
+    const [showFilters, setShowFilters] = useState(false);
+
+    const toggleFilters = () => {
+        setShowFilters(!showFilters);
+    };
+
+    const handleFilterChange = (type, value) => {
+        onFilterChange?.(type, value);
+    };
+
     return (
         <div className="space-y-4 mb-8">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -25,10 +37,12 @@ const TaskHeader = ({ onToggleFilters, onNewTask, view, onViewChange, onSearch }
                 </div>
                 <div className="flex items-center gap-3">
                     <button
-                        onClick={onToggleFilters}
-                        className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        onClick={toggleFilters}
+                        className={`inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                            showFilters ? "bg-gray-50" : ""
+                        }`}
                     >
-                        <AdjustmentsHorizontalIcon className="w-5 h-5 mr-2 text-gray-400" />
+                        <FunnelIcon className="w-5 h-5 mr-2 text-gray-400" />
                         Filters
                     </button>
                     <button
@@ -76,6 +90,8 @@ const TaskHeader = ({ onToggleFilters, onNewTask, view, onViewChange, onSearch }
                     />
                 </div>
             </div>
+
+            <TaskFilters showFilters={showFilters} onFilterChange={handleFilterChange} />
         </div>
     );
 };
