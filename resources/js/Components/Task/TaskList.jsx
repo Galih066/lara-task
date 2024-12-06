@@ -16,6 +16,19 @@ const TaskRow = ({ task, onUpdate, onDelete }) => {
         }
     };
 
+    const getStatusColor = (status) => {
+        switch (status.toLowerCase()) {
+            case 'todo':
+                return 'bg-gray-100 text-gray-800';
+            case 'in_progress':
+                return 'bg-blue-100 text-blue-800';
+            case 'done':
+                return 'bg-green-100 text-green-800';
+            default:
+                return 'bg-gray-100 text-gray-800';
+        }
+    };
+
     const getDueDateStatus = (dueDate) => {
         if (!dueDate) return null;
         const today = new Date();
@@ -29,6 +42,7 @@ const TaskRow = ({ task, onUpdate, onDelete }) => {
     };
 
     const dueStatus = getDueDateStatus(task.dueDate);
+    const assigneesCount = task.assignees?.length || 0;
 
     return (
         <motion.div 
@@ -46,32 +60,42 @@ const TaskRow = ({ task, onUpdate, onDelete }) => {
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
                             {task.priority}
                         </span>
-                        <div className="flex items-center space-x-2">
-                            <span className="inline-block h-6 w-6 rounded-full bg-gray-200 text-xs flex items-center justify-center">
-                                {task.assignee.charAt(0)}
-                            </span>
-                            <span className="text-xs text-gray-500">{task.assignee}</span>
-                        </div>
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}>
+                            {task.status.replace('_', ' ')}
+                        </span>
+                        {assigneesCount > 0 && (
+                            <div className="flex -space-x-1">
+                                {assigneesCount === 1 ? (
+                                    <span className="inline-block h-6 w-6 rounded-full bg-gray-200 text-xs flex items-center justify-center">
+                                        {task.initiator?.charAt(0) || '?'}
+                                    </span>
+                                ) : (
+                                    <span className="inline-block h-6 px-2 rounded-full bg-gray-200 text-xs flex items-center justify-center">
+                                        +{assigneesCount}
+                                    </span>
+                                )}
+                            </div>
+                        )}
                         {dueStatus && (
                             <span className={`text-xs ${dueStatus.class}`}>
                                 {dueStatus.text}
                             </span>
                         )}
-                        <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                            <button
-                                onClick={() => onUpdate(task)}
-                                className="p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
-                            >
-                                <PencilIcon className="w-4 h-4" />
-                            </button>
-                            <button
-                                onClick={() => onDelete(task.id)}
-                                className="p-1 text-gray-400 hover:text-red-600 rounded-full hover:bg-gray-100"
-                            >
-                                <TrashIcon className="w-4 h-4" />
-                            </button>
-                        </div>
                     </div>
+                </div>
+                <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                        onClick={() => onUpdate(task)}
+                        className="p-1 hover:bg-gray-100 rounded-full"
+                    >
+                        <PencilIcon className="h-4 w-4 text-gray-500" />
+                    </button>
+                    <button
+                        onClick={() => onDelete(task.id)}
+                        className="p-1 hover:bg-red-100 rounded-full"
+                    >
+                        <TrashIcon className="h-4 w-4 text-red-500" />
+                    </button>
                 </div>
             </div>
         </motion.div>
@@ -79,73 +103,73 @@ const TaskRow = ({ task, onUpdate, onDelete }) => {
 };
 
 const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
-    const [sortField, setSortField] = useState('dueDate');
-    const [sortDirection, setSortDirection] = useState('asc');
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
-    const sortTasks = (tasks) => {
-        return [...tasks].sort((a, b) => {
-            let comparison = 0;
-            switch (sortField) {
-                case 'title':
-                    comparison = a.title.localeCompare(b.title);
-                    break;
-                case 'priority':
-                    const priorityOrder = { high: 3, medium: 2, low: 1 };
-                    comparison = priorityOrder[a.priority] - priorityOrder[b.priority];
-                    break;
-                case 'dueDate':
-                    comparison = new Date(a.dueDate) - new Date(b.dueDate);
-                    break;
-                default:
-                    comparison = 0;
-            }
-            return sortDirection === 'asc' ? comparison : -comparison;
-        });
+    const sortedTasks = [...tasks].sort((a, b) => {
+        if (!sortConfig.key) return 0;
+        
+        const aValue = a[sortConfig.key];
+        const bValue = b[sortConfig.key];
+        
+        if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    const requestSort = (key) => {
+        const direction = sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc';
+        setSortConfig({ key, direction });
     };
 
-    const toggleSort = (field) => {
-        if (sortField === field) {
-            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-        } else {
-            setSortField(field);
-            setSortDirection('asc');
-        }
+    const SortIcon = ({ columnKey }) => {
+        if (sortConfig.key !== columnKey) return null;
+        return sortConfig.direction === 'asc' ? (
+            <ChevronUpIcon className="h-4 w-4" />
+        ) : (
+            <ChevronDownIcon className="h-4 w-4" />
+        );
     };
-
-    const SortHeader = ({ field, label }) => (
-        <button
-            onClick={() => toggleSort(field)}
-            className="flex items-center space-x-1 text-sm font-medium text-gray-700 hover:text-gray-900"
-        >
-            <span>{label}</span>
-            {sortField === field && (
-                sortDirection === 'asc' ? 
-                <ChevronUpIcon className="w-4 h-4" /> : 
-                <ChevronDownIcon className="w-4 h-4" />
-            )}
-        </button>
-    );
-
-    const sortedTasks = sortTasks(tasks);
 
     return (
         <div className="space-y-4">
-            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <div className="flex justify-between items-center">
-                    <SortHeader field="title" label="Title" />
-                    <SortHeader field="priority" label="Priority" />
-                    <SortHeader field="dueDate" label="Due Date" />
+            <div className="bg-white rounded-lg shadow">
+                <div className="px-4 py-3 border-b border-gray-200">
+                    <div className="flex justify-between items-center">
+                        <button
+                            onClick={() => requestSort('title')}
+                            className="flex items-center space-x-1 text-sm font-medium text-gray-700"
+                        >
+                            <span>Title</span>
+                            <SortIcon columnKey="title" />
+                        </button>
+                        <div className="flex items-center space-x-4">
+                            <button
+                                onClick={() => requestSort('priority')}
+                                className="flex items-center space-x-1 text-sm font-medium text-gray-700"
+                            >
+                                <span>Priority</span>
+                                <SortIcon columnKey="priority" />
+                            </button>
+                            <button
+                                onClick={() => requestSort('dueDate')}
+                                className="flex items-center space-x-1 text-sm font-medium text-gray-700"
+                            >
+                                <span>Due Date</span>
+                                <SortIcon columnKey="dueDate" />
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div className="space-y-2">
-                {sortedTasks.map(task => (
-                    <TaskRow
-                        key={task.id}
-                        task={task}
-                        onUpdate={onUpdateTask}
-                        onDelete={onDeleteTask}
-                    />
-                ))}
+                <div className="divide-y divide-gray-200">
+                    {sortedTasks.map(task => (
+                        <TaskRow
+                            key={task.id}
+                            task={task}
+                            onUpdate={onUpdateTask}
+                            onDelete={onDeleteTask}
+                        />
+                    ))}
+                </div>
             </div>
         </div>
     );
