@@ -52,10 +52,10 @@ const AssigneeSelect = ({ value, onChange, users, error }) => {
             <label htmlFor="assignees" className="block text-sm font-medium leading-6 text-gray-900">
                 Assignees <span className="text-red-500">*</span>
             </label>
-            <div className="relative mt-2">
+            <div className="relative mt-1">
                 <div className="relative">
-                    <div 
-                        className="min-h-[42px] relative w-full cursor-text rounded-md bg-white text-left border-0 ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-600"
+                    <div
+                        className="min-h-[42px] relative w-full cursor-text rounded-lg bg-white text-left border-0 ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-600"
                         onClick={() => setIsOpen(true)}
                     >
                         <div className="flex flex-wrap gap-1 p-1">
@@ -86,8 +86,7 @@ const AssigneeSelect = ({ value, onChange, users, error }) => {
                                     );
                                 })
                             ) : (
-                                <div className="flex items-center gap-2 px-2 py-1.5 text-gray-500">
-                                    <UserIcon className="h-5 w-5" />
+                                <div className="flex items-center gap-2 px-2 py-1 text-gray-500">
                                     <span>No assignees</span>
                                 </div>
                             )}
@@ -135,11 +134,10 @@ const AssigneeSelect = ({ value, onChange, users, error }) => {
                                         {getFrequentCollaborators().map((user) => (
                                             <button
                                                 key={user.id}
-                                                className={`flex w-full items-center gap-2 px-2 py-1.5 rounded-md text-sm ${
-                                                    value.includes(user.id)
-                                                        ? 'bg-blue-50 text-blue-700'
-                                                        : 'text-gray-700 hover:bg-gray-100'
-                                                }`}
+                                                className={`flex w-full items-center gap-2 px-2 py-1.5 rounded-md text-sm ${value.includes(user.id)
+                                                    ? 'bg-blue-50 text-blue-700'
+                                                    : 'text-gray-700 hover:bg-gray-100'
+                                                    }`}
                                                 onClick={() => toggleAssignee(user.id)}
                                             >
                                                 <span className="flex-shrink-0 inline-flex items-center justify-center h-6 w-6 rounded-full bg-blue-100">
@@ -162,11 +160,10 @@ const AssigneeSelect = ({ value, onChange, users, error }) => {
                                         {filteredUsers.map((user) => (
                                             <button
                                                 key={user.id}
-                                                className={`flex w-full items-center gap-2 px-3 py-2 text-sm ${
-                                                    value.includes(user.id)
-                                                        ? 'bg-blue-50 text-blue-700'
-                                                        : 'text-gray-700 hover:bg-gray-100'
-                                                }`}
+                                                className={`flex w-full items-center gap-2 px-3 py-2 text-sm ${value.includes(user.id)
+                                                    ? 'bg-blue-50 text-blue-700'
+                                                    : 'text-gray-700 hover:bg-gray-100'
+                                                    }`}
                                                 onClick={() => toggleAssignee(user.id)}
                                             >
                                                 <span className="flex-shrink-0 inline-flex items-center justify-center h-6 w-6 rounded-full bg-blue-100">

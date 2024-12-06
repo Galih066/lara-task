@@ -3,7 +3,6 @@ import { useForm } from '@inertiajs/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import AssigneeSelect from './Form/AssigneeSelect';
 import ImageUpload from './Form/ImageUpload';
-import FormField from './Form/FormField';
 
 const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering }) => {
     const [selectedFiles, setSelectedFiles] = useState([]);
@@ -11,6 +10,7 @@ const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering }) => {
         title: '',
         description: '',
         assignees: [],
+        start_date: '',
         due_date: '',
         priority: 'medium',
         status: 'todo',
@@ -25,6 +25,7 @@ const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering }) => {
         data.assignees.forEach(assignee => {
             formData.append('assignees[]', assignee);
         });
+        formData.append('start_date', data.start_date);
         formData.append('due_date', data.due_date);
         formData.append('priority', data.priority);
         formData.append('status', data.status);
@@ -41,13 +42,6 @@ const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering }) => {
             },
             onError: (errors) => {
                 console.error('Form submission errors:', errors);
-            },
-            onFinish: () => {
-                if (Object.keys(errors).length === 0) {
-                    reset();
-                    setSelectedFiles([]);
-                    onClose();
-                }
             },
         });
     };
@@ -67,123 +61,151 @@ const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering }) => {
     if (!isModalOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-            <div className="flex min-h-screen items-end justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-                <div
-                    className={`fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity duration-300 ease-out ${
-                        isEntering ? 'opacity-100' : 'opacity-0'
-                    }`}
-                    onClick={onClose}
-                />
-
-                <div className={`relative inline-block transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all duration-300 ease-out sm:my-8 sm:w-full sm:max-w-5xl sm:align-middle ${
-                    isEntering ? 'translate-y-0 opacity-100 sm:scale-100' : 'translate-y-4 opacity-0 sm:translate-y-0 sm:scale-95'
-                }`}>
-                    <div className="absolute right-0 top-0 pr-4 pt-4">
-                        <button
-                            type="button"
-                            className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                            onClick={onClose}
-                        >
-                            <span className="sr-only">Close</span>
-                            <XMarkIcon className="h-6 w-6" />
-                        </button>
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-500 bg-opacity-75 transition-opacity">
+            <div className="flex min-h-screen items-center justify-center p-4">
+                <div className={`relative w-full max-w-4xl transform overflow-hidden rounded-xl bg-white shadow-2xl transition-all duration-300 ease-out ${isEntering ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-4 opacity-0 scale-95'
+                    }`}>
+                    <div className="border-b border-gray-200 bg-white px-6 py-4">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-xl font-semibold text-gray-900">Create New Task</h3>
+                            <button
+                                onClick={onClose}
+                                className="rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <XMarkIcon className="h-6 w-6" />
+                            </button>
+                        </div>
                     </div>
 
-                    <div className="bg-white px-4 pb-4 pt-5 sm:p-6">
-                        <div className="sm:flex sm:items-start">
-                            <div className="mt-3 w-full text-center sm:mt-0 sm:text-left">
-                                <h3 className="text-lg font-semibold leading-6 text-gray-900">
-                                    Create New Task
-                                </h3>
-                                <div className="mt-6">
-                                    <form onSubmit={handleSubmit} className="space-y-6">
-                                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                                            <FormField label="Title" required error={errors.title}>
-                                                <input
-                                                    type="text"
-                                                    value={data.title}
-                                                    onChange={e => setData('title', e.target.value)}
-                                                    className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                                                    placeholder="Enter task title"
-                                                    required
+                    <form onSubmit={handleSubmit} className="p-8">
+                        <div className="space-y-8">
+                            <div className="bg-gray-50 p-6 rounded-lg">
+                                <h3 className="text-lg font-medium text-gray-900 mb-6">Basic Information</h3>
+                                <div className="space-y-6">
+                                    <div>
+                                        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">Task Title</label>
+                                        <input
+                                            type="text"
+                                            id="title"
+                                            value={data.title}
+                                            onChange={e => setData('title', e.target.value)}
+                                            className="w-full h-10 px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            placeholder="Enter task title"
+                                        />
+                                        {errors.title && <p className="mt-2 text-sm text-red-600">{errors.title}</p>}
+                                    </div>
+
+                                    <div>
+                                        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                                        <textarea
+                                            id="description"
+                                            rows={4}
+                                            value={data.description}
+                                            onChange={e => setData('description', e.target.value)}
+                                            className="w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            placeholder="Describe the task..."
+                                        />
+                                        {errors.description && <p className="mt-2 text-sm text-red-600">{errors.description}</p>}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-gray-50 p-6 rounded-lg">
+                                <h3 className="text-lg font-medium text-gray-900 mb-6">Task Details</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <div className="space-y-6">
+                                        <div className='space-y-4'>
+                                            <div>
+                                                <AssigneeSelect
+                                                    users={users}
+                                                    value={data.assignees}
+                                                    onChange={value => setData('assignees', value)}
                                                 />
-                                            </FormField>
-
-                                            <AssigneeSelect
-                                                value={data.assignees}
-                                                onChange={(newValue) => setData('assignees', newValue)}
-                                                users={users}
-                                                error={errors.assignees}
-                                            />
-
-                                            <div className="md:col-span-2">
-                                                <FormField label="Description" required error={errors.description}>
-                                                    <textarea
-                                                        value={data.description}
-                                                        onChange={e => setData('description', e.target.value)}
-                                                        rows={4}
-                                                        className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                                                        placeholder="Enter task description"
-                                                        required
-                                                    />
-                                                </FormField>
+                                                {errors.assignees && <p className="mt-2 text-sm text-red-600">{errors.assignees}</p>}
                                             </div>
-
-                                            <FormField label="Due Date" required error={errors.due_date}>
+                                            <div>
+                                                <label htmlFor="due_date" className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Due Date
+                                                </label>
                                                 <input
                                                     type="date"
+                                                    id="due_date"
                                                     value={data.due_date}
                                                     onChange={e => setData('due_date', e.target.value)}
-                                                    className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                                                    required
+                                                    min={data.start_date || new Date().toISOString().split('T')[0]}
+                                                    className="w-full h-10 px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                                 />
-                                            </FormField>
+                                                {errors.due_date && <p className="mt-2 text-sm text-red-600">{errors.due_date}</p>}
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                            <FormField label="Priority" required error={errors.priority}>
+                                    <div className="space-y-6">
+                                        <div className="space-y-4">
+                                            <div>
+                                                <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
                                                 <select
+                                                    id="priority"
                                                     value={data.priority}
                                                     onChange={e => setData('priority', e.target.value)}
-                                                    className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                                                    required
+                                                    className="w-full h-10 px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                                 >
                                                     <option value="low">Low</option>
                                                     <option value="medium">Medium</option>
                                                     <option value="high">High</option>
                                                 </select>
-                                            </FormField>
-
-                                            <div className="md:col-span-2">
-                                                <ImageUpload
-                                                    files={selectedFiles}
-                                                    onFileChange={handleFileChange}
-                                                    onRemoveFile={removeFile}
-                                                    error={errors.images}
+                                                {errors.priority && <p className="mt-2 text-sm text-red-600">{errors.priority}</p>}
+                                            </div>
+                                            <div>
+                                                <label htmlFor="start_date" className="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
+                                                <input
+                                                    type="date"
+                                                    id="start_date"
+                                                    value={data.start_date}
+                                                    onChange={e => {
+                                                        setData('start_date', e.target.value);
+                                                        if (data.due_date && e.target.value > data.due_date) {
+                                                            setData('due_date', e.target.value);
+                                                        }
+                                                    }}
+                                                    min={new Date().toISOString().split('T')[0]}
+                                                    className="w-full h-10 px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                                 />
+                                                {errors.start_date && <p className="mt-2 text-sm text-red-600">{errors.start_date}</p>}
                                             </div>
                                         </div>
-
-                                        <div className="mt-6 flex justify-end gap-3">
-                                            <button
-                                                type="button"
-                                                onClick={onClose}
-                                                className="rounded-md px-3 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500"
-                                            >
-                                                Cancel
-                                            </button>
-                                            <button
-                                                type="submit"
-                                                disabled={processing}
-                                                className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                                            >
-                                                Create Task
-                                            </button>
-                                        </div>
-                                    </form>
+                                    </div>
                                 </div>
                             </div>
+
+                            <div className="bg-gray-50 p-6 rounded-lg">
+                                <h3 className="text-lg font-medium text-gray-900 mb-6">Attachments</h3>
+                                <ImageUpload
+                                    selectedFiles={selectedFiles}
+                                    onFileChange={handleFileChange}
+                                    onRemove={removeFile}
+                                />
+                                {errors.images && <p className="mt-2 text-sm text-red-600">{errors.images}</p>}
+                            </div>
+
+                            <div className="flex justify-end space-x-4">
+                                <button
+                                    type="button"
+                                    onClick={onClose}
+                                    className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={processing}
+                                    className="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                                >
+                                    {processing ? 'Creating...' : 'Create Task'}
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
