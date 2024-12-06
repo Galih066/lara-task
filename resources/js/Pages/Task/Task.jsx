@@ -61,7 +61,7 @@ const Task = ({ auth, users }) => {
     };
 
     const handleUpdateTask = (updatedTask) => {
-        setTasks(tasks.map(task => 
+        setTasks(tasks.map(task =>
             task.id === updatedTask.id ? updatedTask : task
         ));
     };
@@ -73,15 +73,15 @@ const Task = ({ auth, users }) => {
     const handleDragEnd = (result) => {
         const { destination, source, draggableId } = result;
 
-        if (!destination || 
-            (destination.droppableId === source.droppableId && 
-             destination.index === source.index)) {
+        if (!destination ||
+            (destination.droppableId === source.droppableId &&
+                destination.index === source.index)) {
             return;
         }
 
         const updatedTasks = Array.from(tasks);
         const draggedTask = updatedTasks.find(task => task.id.toString() === draggableId);
-        
+
         if (!draggedTask) return;
 
         draggedTask.status = destination.droppableId;
@@ -103,19 +103,19 @@ const Task = ({ auth, users }) => {
             <Head title="Tasks" />
             <div className="min-h-screen bg-gray-50">
                 <Navigation user={auth.user} />
-                
+
                 <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                    <TaskHeader 
+                    <TaskHeader
                         onNewTask={handleNewTask}
                         onToggleFilters={() => setShowFilters(!showFilters)}
                         onViewChange={setCurrentView}
-                        currentView={currentView}
+                        view={currentView}
                         onSearch={setSearchQuery}
                         searchQuery={searchQuery}
                     />
 
                     {showFilters && (
-                        <TaskFilters 
+                        <TaskFilters
                             className="mb-6"
                         />
                     )}
