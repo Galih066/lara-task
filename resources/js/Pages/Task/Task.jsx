@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Head } from "@inertiajs/react";
 import Navigation from "@/Layouts/Navigation";
 import TaskHeader from "@/Components/Task/TaskHeader";

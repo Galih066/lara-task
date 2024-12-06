@@ -1,4 +1,4 @@
-import { PlusIcon, AdjustmentsHorizontalIcon, MagnifyingGlassIcon, ViewColumnsIcon, ListBulletIcon, CalendarIcon, FunnelIcon } from "@heroicons/react/24/outline";
+import { PlusIcon, MagnifyingGlassIcon, ViewColumnsIcon, ListBulletIcon, CalendarIcon, FunnelIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import TaskFilters from "./TaskFilters";
 
