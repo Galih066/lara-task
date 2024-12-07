@@ -65,9 +65,9 @@ const MemberPage = ({ user, members }) => {
             member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             member.email.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesRole = selectedRole === 'all' || member.role.toLowerCase() === selectedRole.toLowerCase();
-        const matchesStatus = selectedStatus === 'all' || 
-            (selectedStatus === 'active' && member.is_active) || 
-            (selectedStatus === 'inactive' && !member.is_active);
+        const matchesStatus = selectedStatus === 'all' ||
+            (selectedStatus === 'inactive' && member.is_active) ||
+            (selectedStatus === 'active' && !member.is_active);
         return matchesSearch && matchesRole && matchesStatus;
     });
 
