@@ -11,6 +11,7 @@ import MemberSummary from "@/Components/Member/MemberSummary";
 const MemberPage = ({ user, members }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedRole, setSelectedRole] = useState('all');
+    const [selectedStatus, setSelectedStatus] = useState('all');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
     const [isEntering, setIsEntering] = useState(false);
@@ -64,7 +65,10 @@ const MemberPage = ({ user, members }) => {
             member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             member.email.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesRole = selectedRole === 'all' || member.role.toLowerCase() === selectedRole.toLowerCase();
-        return matchesSearch && matchesRole;
+        const matchesStatus = selectedStatus === 'all' || 
+            (selectedStatus === 'active' && member.is_active) || 
+            (selectedStatus === 'inactive' && !member.is_active);
+        return matchesSearch && matchesRole && matchesStatus;
     });
 
     return (
@@ -87,6 +91,8 @@ const MemberPage = ({ user, members }) => {
                         setSearchQuery={setSearchQuery}
                         selectedRole={selectedRole}
                         setSelectedRole={setSelectedRole}
+                        selectedStatus={selectedStatus}
+                        setSelectedStatus={setSelectedStatus}
                     />
                     <MemberTable members={filteredMembers} />
                     <AddMemberModal

@@ -1,11 +1,24 @@
 import { motion } from "framer-motion";
 import { MagnifyingGlassIcon, FunnelIcon } from '@heroicons/react/24/solid';
 
-const MemberFilters = ({ searchQuery, setSearchQuery, selectedRole, setSelectedRole }) => {
+const MemberFilters = ({ 
+    searchQuery, 
+    setSearchQuery, 
+    selectedRole, 
+    setSelectedRole,
+    selectedStatus,
+    setSelectedStatus 
+}) => {
     const roles = [
         { value: 'all', label: 'All Roles' },
         { value: 'admin', label: 'Admin' },
         { value: 'user', label: 'User' }
+    ];
+
+    const statuses = [
+        { value: 'all', label: 'All Status' },
+        { value: 'active', label: 'Active' },
+        { value: 'inactive', label: 'Inactive' }
     ];
 
     return (
@@ -71,6 +84,43 @@ const MemberFilters = ({ searchQuery, setSearchQuery, selectedRole, setSelectedR
                     </div>
                 </div>
 
+                <div className="sm:w-48">
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <FunnelIcon className="h-4 w-4 text-gray-400" aria-hidden="true" />
+                        </div>
+                        <select
+                            value={selectedStatus}
+                            onChange={(e) => setSelectedStatus(e.target.value)}
+                            className="block w-full pl-10 pr-10 py-2.5 text-sm border border-gray-200 rounded-lg
+                                     focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                     appearance-none bg-white transition-colors duration-200
+                                     hover:border-gray-300 cursor-pointer"
+                        >
+                            {statuses.map((status) => (
+                                <option key={status.value} value={status.value}>
+                                    {status.label}
+                                </option>
+                            ))}
+                        </select>
+                        <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                            <svg
+                                className="h-4 w-4 text-gray-400"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M19 9l-7 7-7-7"
+                                />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
                 <div className="hidden lg:flex items-center space-x-2">
                     <span className="text-sm text-gray-500">Quick Filters:</span>
                     <button
@@ -102,6 +152,26 @@ const MemberFilters = ({ searchQuery, setSearchQuery, selectedRole, setSelectedR
                             } transition-colors duration-200`}
                     >
                         All
+                    </button>
+                    <button
+                        onClick={() => setSelectedStatus('active')}
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
+                                  ${selectedStatus === 'active'
+                                ? 'bg-green-100 text-green-700'
+                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            } transition-colors duration-200`}
+                    >
+                        Active
+                    </button>
+                    <button
+                        onClick={() => setSelectedStatus('inactive')}
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
+                                  ${selectedStatus === 'inactive'
+                                ? 'bg-red-100 text-red-700'
+                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            } transition-colors duration-200`}
+                    >
+                        Inactive
                     </button>
                 </div>
             </div>
