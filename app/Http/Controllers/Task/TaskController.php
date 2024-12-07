@@ -3,72 +3,43 @@
 namespace App\Http\Controllers\Task;
 
 use App\Http\Controllers\Controller;
-use App\Services\ProfileService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use App\Http\Requests\Task\StoreTaskRequest;
+use App\Services\ProfileService;
+use App\Services\TaskService;
 
 class TaskController extends Controller
 {
     protected $profileService;
+    protected $taskService;
 
-    public function __construct(ProfileService $profileService)
+    public function __construct(ProfileService $profileService, TaskService $taskService)
     {
         $this->profileService = $profileService;
+        $this->taskService = $taskService;
     }
 
     public function index()
     {
         $loggedUser = Auth::user();
         $user = $this->profileService->getUserWithProfile($loggedUser);
+        $empOrg = $this->taskService->getOrgEmployees($loggedUser->profile->organization_id);
         
         return Inertia::render('Task/Task', [
-            'auth' => [
-                'user' => $user
-            ],
-            'users' => \App\Models\User::all()
+            'user' => $user,
+            'empOrg' => $empOrg,
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreTaskRequest $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'assignees' => 'required|array',
-            'assignees.*' => 'exists:users,id',
-            'due_date' => 'required|date',
-            'priority' => 'required|in:low,medium,high',
-            'status' => 'required|in:todo,in_progress,done',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
-        ]);
-
         try {
-            $task = new \App\Models\Task();
-            $task->title = $request->title;
-            $task->description = $request->description;
-            $task->due_date = $request->due_date;
-            $task->priority = $request->priority;
-            $task->status = $request->status;
-            $task->initiator_id = Auth::id();
-            $task->save();
-
-            // Save assignees
-            $task->assignees()->attach($request->assignees);
-
-            // Handle image uploads
-            if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $image) {
-                    $path = $image->store('task-images', 'public');
-                    $task->images()->create([
-                        'path' => $path
-                    ]);
-                }
-            }
+            $task = $this->taskService->store($request);
 
             return response()->json([
                 'message' => 'Task created successfully',
-                'task' => $task->load('assignees', 'images')
+                'task' => $task
             ]);
         } catch (\Exception $e) {
             return response()->json([

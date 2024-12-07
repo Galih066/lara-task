@@ -9,7 +9,8 @@ import TaskList from "@/Components/Task/TaskList";
 import TaskCalendar from "@/Components/Task/TaskCalendar";
 import CreateTaskForm from "@/Components/Task/CreateTaskForm";
 
-const Task = ({ auth, users }) => {
+const Task = ({ user, empOrg }) => {
+    console.log(empOrg);
     const [showFilters, setShowFilters] = useState(false);
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [isEntering, setIsEntering] = useState(false);
@@ -22,8 +23,8 @@ const Task = ({ auth, users }) => {
             description: 'Create a modern and responsive landing page design...',
             priority: 'high',
             status: 'todo',
-            initiator: auth?.user?.name || 'Unknown',
-            assignees: [auth?.user?.id || 1],
+            initiator: user?.name || 'Unknown',
+            assignees: [user?.id || 1],
             dueDate: '2024-04-20'
         },
         {
@@ -32,8 +33,8 @@ const Task = ({ auth, users }) => {
             description: 'Set up user authentication system with Laravel Breeze...',
             priority: 'medium',
             status: 'in_progress',
-            initiator: auth?.user?.name || 'Unknown',
-            assignees: [auth?.user?.id || 1],
+            initiator: user?.name || 'Unknown',
+            assignees: [user?.id || 1],
             dueDate: '2024-04-15'
         },
         {
@@ -42,8 +43,8 @@ const Task = ({ auth, users }) => {
             description: 'Initialize project and set up basic folder structure...',
             priority: 'low',
             status: 'done',
-            initiator: auth?.user?.name || 'Unknown',
-            assignees: [auth?.user?.id || 1],
+            initiator: user?.name || 'Unknown',
+            assignees: [user?.id || 1],
             dueDate: '2024-04-10'
         }
     ]);
@@ -102,7 +103,7 @@ const Task = ({ auth, users }) => {
         <>
             <Head title="Tasks" />
             <div className="min-h-screen bg-gray-50">
-                <Navigation user={auth.user} />
+                <Navigation user={user} />
 
                 <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                     <TaskHeader
@@ -151,7 +152,7 @@ const Task = ({ auth, users }) => {
                 {showCreateForm && (
                     <CreateTaskForm
                         onClose={handleCloseTask}
-                        users={users || []}
+                        users={empOrg || []}
                         isModalOpen={showCreateForm}
                         isEntering={isEntering}
                     />
