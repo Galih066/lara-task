@@ -38,7 +38,6 @@ export default function Navigation({ user }) {
         <header className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16 items-center">
-                    {/* Left side */}
                     <div className="flex items-center gap-8">
                         <Link href="/dashboard" className="flex items-center gap-2">
                             <motion.div
@@ -51,7 +50,6 @@ export default function Navigation({ user }) {
                             <span className="text-lg font-semibold text-gray-900">TaskFlow</span>
                         </Link>
 
-                        {/* Desktop Navigation */}
                         <nav className="hidden md:flex items-center gap-6">
                             <Link
                                 href="/dashboard"
@@ -65,16 +63,14 @@ export default function Navigation({ user }) {
                             >
                                 Tasks
                             </Link>
-                            {
-                                (user.role === 'admin' || user.role === 'owner') && (
-                                    <Link
-                                        href="/member"
-                                        className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors duration-150"
-                                    >
-                                        Members
-                                    </Link>
-                                )
-                            }
+                            {(user.role === 'admin' || user.role === 'owner') && (
+                                <Link
+                                    href="/member"
+                                    className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors duration-150"
+                                >
+                                    Members
+                                </Link>
+                            )}
                             <Link
                                 href="/profile"
                                 className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors duration-150"
@@ -84,9 +80,7 @@ export default function Navigation({ user }) {
                         </nav>
                     </div>
 
-                    {/* Right side */}
                     <div className="flex items-center gap-4">
-                        {/* Mobile menu button */}
                         <motion.button
                             whileTap={{ scale: 0.95 }}
                             onClick={toggleMobileMenu}
@@ -116,7 +110,6 @@ export default function Navigation({ user }) {
                             </svg>
                         </motion.button>
 
-                        {/* User Dropdown */}
                         <div className="relative" ref={dropdownRef}>
                             <motion.button
                                 whileTap={{ scale: 0.95 }}
@@ -143,7 +136,6 @@ export default function Navigation({ user }) {
                                 </svg>
                             </motion.button>
 
-                            {/* Dropdown Menu */}
                             <AnimatePresence>
                                 {isDropdownOpen && (
                                     <motion.div
@@ -153,13 +145,11 @@ export default function Navigation({ user }) {
                                         transition={{ duration: 0.2 }}
                                         className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none divide-y divide-gray-100"
                                     >
-                                        {/* User Info Section */}
                                         <div className="px-4 py-3">
                                             <p className="text-sm font-medium text-gray-900">{user.name}</p>
                                             <p className="text-sm text-gray-500 truncate">{user.email}</p>
                                         </div>
 
-                                        {/* Main Menu Items */}
                                         <div className="py-1">
                                             <Link
                                                 href="/profile"
@@ -172,7 +162,20 @@ export default function Navigation({ user }) {
                                             </Link>
                                         </div>
 
-                                        {/* Logout Section */}
+                                        {(user.role === 'admin' || user.role === 'owner') && (
+                                            <div className="py-1">
+                                                <Link
+                                                    href="/organization"
+                                                    className="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                                >
+                                                    <svg className="mr-3 h-5 w-5 text-gray-400 group-hover:text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                                    </svg>
+                                                    Organization Settings
+                                                </Link>
+                                            </div>
+                                        )}
+
                                         <div className="py-1">
                                             <Link
                                                 href="#"
@@ -181,7 +184,7 @@ export default function Navigation({ user }) {
                                                 className="group flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                                             >
                                                 <svg className="mr-3 h-5 w-5 text-red-400 group-hover:text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 11-6 0v-1m6 0H9" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                                 </svg>
                                                 Logout
                                             </Link>
@@ -194,35 +197,42 @@ export default function Navigation({ user }) {
                 </div>
             </div>
 
-            {/* Mobile Navigation Menu */}
             <AnimatePresence>
                 {isMobileMenuOpen && (
                     <motion.div
                         initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
+                        animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="md:hidden border-t border-gray-100"
+                        className="md:hidden bg-white border-t border-gray-100"
                     >
-                        <nav className="px-4 py-3 space-y-1">
+                        <div className="px-2 pt-2 pb-3 space-y-1">
                             <Link
                                 href="/dashboard"
-                                className="block px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50 rounded-lg"
+                                className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:text-blue-600 hover:bg-blue-50"
                             >
                                 Dashboard
                             </Link>
                             <Link
-                                href="/tasks"
-                                className="block px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg"
+                                href="/task"
+                                className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50"
                             >
                                 Tasks
                             </Link>
+                            {(user.role === 'admin' || user.role === 'owner') && (
+                                <Link
+                                    href="/member"
+                                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                                >
+                                    Members
+                                </Link>
+                            )}
                             <Link
                                 href="/profile"
-                                className="block px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg"
+                                className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50"
                             >
                                 Profile
                             </Link>
-                        </nav>
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>

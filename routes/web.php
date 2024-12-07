@@ -8,6 +8,7 @@ use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Profile\ProfileController;
 use App\Http\Controllers\Member\MemberController;
 use App\Http\Controllers\Task\TaskController;
+use App\Http\Controllers\Organization\OrganizationController;
 
 Route::get('/', [LoginController::class, 'index'])->name('login_page');
 Route::get('/signup-org', [SignUpController::class, 'signUpOrg'])->name('sign_up_org_page');
@@ -30,6 +31,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('member')->group(function () {
         Route::get('/', [MemberController::class, 'index'])->name('member');
         Route::post('/add-member', [MemberController::class, 'store'])->name('member.store');
+    });
+
+    // Organization Data
+    Route::prefix('organization')->group(function () {
+        Route::get('/', [OrganizationController::class, 'index'])->name('organization');
     });
 
     Route::prefix('task')->group(function () {
