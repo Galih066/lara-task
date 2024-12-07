@@ -78,7 +78,7 @@ const MemberTable = ({ members }) => {
             className="mt-6"
         >
             <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto min-h-[400px]">
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                             <tr>
