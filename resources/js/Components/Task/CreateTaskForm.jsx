@@ -33,7 +33,7 @@ const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering }) => {
             formData.append(`images[${index}]`, file);
         });
 
-        post(route('tasks.store'), formData, {
+        post('task/store', formData, {
             forceFormData: true,
             onSuccess: () => {
                 reset();
