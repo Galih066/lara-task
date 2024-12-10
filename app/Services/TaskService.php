@@ -43,22 +43,22 @@ class TaskService
         $task->due_date = $request->due_date;
         $task->priority = $request->priority;
         $task->status = $request->status;
-        $task->initiator_id = Auth::id();
+        $task->initiator = Auth::id();
+        $task->assignees = json_encode($request->assignees);
         $task->save();
 
-        // Save assignees
-        $task->assignees()->attach($request->assignees);
-
-        // Handle image uploads
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 $path = $image->store('task-images', 'public');
                 $task->images()->create([
-                    'path' => $path
+                    'image_path' => $path,
+                    'original_name' => $image->getClientOriginalName(),
+                    'mime_type' => $image->getMimeType(),
+                    'size' => $image->getSize() ?? 0
                 ]);
             }
         }
 
-        return $task->load('assignees', 'images');
+        return $task->load('images');
     }
 }
