@@ -133,6 +133,7 @@ const AssigneeSelect = ({ value, onChange, users, error }) => {
                                     <div className="mt-2 space-y-1">
                                         {getFrequentCollaborators().map((user) => (
                                             <button
+                                                type="button"
                                                 key={user.id}
                                                 className={`flex w-full items-center gap-2 px-2 py-1.5 rounded-md text-sm ${value.includes(user.id)
                                                     ? 'bg-blue-50 text-blue-700'
@@ -159,6 +160,7 @@ const AssigneeSelect = ({ value, onChange, users, error }) => {
                                     <div className="py-2">
                                         {filteredUsers.map((user) => (
                                             <button
+                                                type="button"
                                                 key={user.id}
                                                 className={`flex w-full items-center gap-2 px-3 py-2 text-sm ${value.includes(user.id)
                                                     ? 'bg-blue-50 text-blue-700'

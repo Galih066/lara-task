@@ -3,10 +3,22 @@ import { useForm } from '@inertiajs/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import AssigneeSelect from './Form/AssigneeSelect';
 import ImageUpload from './Form/ImageUpload';
+import { router } from '@inertiajs/react';
 
 const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering }) => {
     const [selectedFiles, setSelectedFiles] = useState([]);
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const [formState, setFormState] = useState({
+        title: '',
+        description: '',
+        assignees: [],
+        start_date: '',
+        due_date: '',
+        priority: 'medium',
+        status: 'todo',
+        images: [],
+    });
+
+    const { data, setData, processing, errors, reset } = useForm({
         title: '',
         description: '',
         assignees: [],
@@ -19,25 +31,50 @@ const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        
+        // First, set all the form data
+        setData({
+            title: formState.title,
+            description: formState.description,
+            assignees: formState.assignees,
+            start_date: formState.start_date,
+            due_date: formState.due_date,
+            priority: formState.priority,
+            status: formState.status,
+            images: selectedFiles
+        });
+
+        // Then create the FormData object
         const formData = new FormData();
-        formData.append('title', data.title);
-        formData.append('description', data.description);
-        data.assignees.forEach(assignee => {
+        formData.append('title', formState.title);
+        formData.append('description', formState.description);
+        formState.assignees.forEach(assignee => {
             formData.append('assignees[]', assignee);
         });
-        formData.append('start_date', data.start_date);
-        formData.append('due_date', data.due_date);
-        formData.append('priority', data.priority);
-        formData.append('status', data.status);
+        formData.append('start_date', formState.start_date);
+        formData.append('due_date', formState.due_date);
+        formData.append('priority', formState.priority);
+        formData.append('status', formState.status);
         selectedFiles.forEach((file, index) => {
             formData.append(`images[${index}]`, file);
         });
 
-        post('task/store', formData, {
+        router.post('/task/store', formData, {
             forceFormData: true,
+            preserveScroll: true,
             onSuccess: () => {
                 reset();
                 setSelectedFiles([]);
+                setFormState({
+                    title: '',
+                    description: '',
+                    assignees: [],
+                    start_date: '',
+                    due_date: '',
+                    priority: 'medium',
+                    status: 'todo',
+                    images: [],
+                });
                 onClose();
             },
             onError: (errors) => {
@@ -49,13 +86,13 @@ const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering }) => {
     const handleFileChange = (e) => {
         const files = Array.from(e.target.files);
         setSelectedFiles(files);
-        setData('images', files);
+        setFormState(prev => ({ ...prev, images: files }));
     };
 
     const removeFile = (index) => {
         const updatedFiles = selectedFiles.filter((_, i) => i !== index);
         setSelectedFiles(updatedFiles);
-        setData('images', updatedFiles);
+        setFormState(prev => ({ ...prev, images: updatedFiles }));
     };
 
     if (!isModalOpen) return null;
@@ -87,8 +124,8 @@ const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering }) => {
                                         <input
                                             type="text"
                                             id="title"
-                                            value={data.title}
-                                            onChange={e => setData('title', e.target.value)}
+                                            value={formState.title}
+                                            onChange={e => setFormState(prev => ({ ...prev, title: e.target.value }))}
                                             className="w-full h-10 px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                             placeholder="Enter task title"
                                         />
@@ -100,8 +137,8 @@ const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering }) => {
                                         <textarea
                                             id="description"
                                             rows={4}
-                                            value={data.description}
-                                            onChange={e => setData('description', e.target.value)}
+                                            value={formState.description}
+                                            onChange={e => setFormState(prev => ({ ...prev, description: e.target.value }))}
                                             className="w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                             placeholder="Describe the task..."
                                         />
@@ -118,8 +155,8 @@ const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering }) => {
                                             <div>
                                                 <AssigneeSelect
                                                     users={users}
-                                                    value={data.assignees}
-                                                    onChange={value => setData('assignees', value)}
+                                                    value={formState.assignees}
+                                                    onChange={value => setFormState(prev => ({ ...prev, assignees: value }))}
                                                 />
                                                 {errors.assignees && <p className="mt-2 text-sm text-red-600">{errors.assignees}</p>}
                                             </div>
@@ -130,9 +167,9 @@ const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering }) => {
                                                 <input
                                                     type="date"
                                                     id="due_date"
-                                                    value={data.due_date}
-                                                    onChange={e => setData('due_date', e.target.value)}
-                                                    min={data.start_date || new Date().toISOString().split('T')[0]}
+                                                    value={formState.due_date}
+                                                    onChange={e => setFormState(prev => ({ ...prev, due_date: e.target.value }))}
+                                                    min={formState.start_date || new Date().toISOString().split('T')[0]}
                                                     className="w-full h-10 px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                                 />
                                                 {errors.due_date && <p className="mt-2 text-sm text-red-600">{errors.due_date}</p>}
@@ -146,8 +183,8 @@ const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering }) => {
                                                 <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
                                                 <select
                                                     id="priority"
-                                                    value={data.priority}
-                                                    onChange={e => setData('priority', e.target.value)}
+                                                    value={formState.priority}
+                                                    onChange={e => setFormState(prev => ({ ...prev, priority: e.target.value }))}
                                                     className="w-full h-10 px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                                 >
                                                     <option value="low">Low</option>
@@ -161,11 +198,11 @@ const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering }) => {
                                                 <input
                                                     type="date"
                                                     id="start_date"
-                                                    value={data.start_date}
+                                                    value={formState.start_date}
                                                     onChange={e => {
-                                                        setData('start_date', e.target.value);
-                                                        if (data.due_date && e.target.value > data.due_date) {
-                                                            setData('due_date', e.target.value);
+                                                        setFormState(prev => ({ ...prev, start_date: e.target.value }));
+                                                        if (formState.due_date && e.target.value > formState.due_date) {
+                                                            setFormState(prev => ({ ...prev, due_date: e.target.value }));
                                                         }
                                                     }}
                                                     min={new Date().toISOString().split('T')[0]}
