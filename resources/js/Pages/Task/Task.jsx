@@ -8,9 +8,9 @@ import TaskBoard from "@/Components/Task/TaskBoard";
 import TaskList from "@/Components/Task/TaskList";
 import TaskCalendar from "@/Components/Task/TaskCalendar";
 import CreateTaskForm from "@/Components/Task/CreateTaskForm";
+import SuccessAlert from "@/Components/AlertComp/SuccessAlert";
 
 const Task = ({ user, empOrg }) => {
-    console.log(empOrg);
     const [showFilters, setShowFilters] = useState(false);
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [isEntering, setIsEntering] = useState(false);
@@ -48,6 +48,7 @@ const Task = ({ user, empOrg }) => {
             dueDate: '2024-04-10'
         }
     ]);
+    const [showSuccess, setShowSuccess] = useState(false);
 
     const handleNewTask = () => {
         setShowCreateForm(true);
@@ -102,9 +103,16 @@ const Task = ({ user, empOrg }) => {
     return (
         <>
             <Head title="Tasks" />
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50/30">
                 <Navigation user={user} />
-
+                {showSuccess && (
+                    <SuccessAlert
+                        title="Task Created"
+                        message="Your task has been successfully created."
+                        duration={5000}
+                        onClose={() => setShowSuccess(false)}
+                    />
+                )}
                 <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                     <TaskHeader
                         onNewTask={handleNewTask}
@@ -151,10 +159,14 @@ const Task = ({ user, empOrg }) => {
 
                 {showCreateForm && (
                     <CreateTaskForm
-                        onClose={handleCloseTask}
-                        users={empOrg || []}
+                        users={empOrg}
                         isModalOpen={showCreateForm}
                         isEntering={isEntering}
+                        onClose={() => {
+                            setShowCreateForm(false);
+                            setIsEntering(false);
+                        }}
+                        onSuccess={() => setShowSuccess(true)}
                     />
                 )}
             </div>

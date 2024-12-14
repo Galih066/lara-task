@@ -5,7 +5,7 @@ import AssigneeSelect from './Form/AssigneeSelect';
 import ImageUpload from './Form/ImageUpload';
 import { router } from '@inertiajs/react';
 
-const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering }) => {
+const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering, onSuccess }) => {
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [formState, setFormState] = useState({
         title: '',
@@ -75,6 +75,7 @@ const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering }) => {
                     status: 'todo',
                     images: [],
                 });
+                onSuccess();
                 onClose();
             },
             onError: (errors) => {

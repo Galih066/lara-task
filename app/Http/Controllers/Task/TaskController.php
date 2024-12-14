@@ -34,18 +34,7 @@ class TaskController extends Controller
 
     public function store(StoreTaskRequest $request)
     {
-        try {
-            $task = $this->taskService->store($request);
-
-            return response()->json([
-                'message' => 'Task created successfully',
-                'task' => $task
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error creating task',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        $this->taskService->store($request);
+        return redirect()->route('task');
     }
 }

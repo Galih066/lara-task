@@ -59,6 +59,6 @@ class TaskService
             }
         }
 
-        return $task->load('images');
+        return $task;
     }
 }
