@@ -13,7 +13,8 @@ class TaskImage extends Model
         'task_id',
         'image_path',
         'original_name',
-        'mime_type'
+        'mime_type',
+        'size'
     ];
 
     public function task()
