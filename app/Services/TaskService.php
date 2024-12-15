@@ -64,7 +64,8 @@ class TaskService
 
     public function getAllTasks()
     {
-        return Task::with(['initiatorUser:id,name', 'images'])
+        return Task::select('id', 'title', 'description', 'priority', 'status', 'due_date', 'initiator')
+            ->with('initiatorUser:id,name')
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($task) {
@@ -75,16 +76,32 @@ class TaskService
                     'priority' => $task->priority,
                     'status' => $task->status,
                     'initiator' => $task->initiatorUser->name,
-                    'assignees' => json_decode($task->assignees),
                     'dueDate' => $task->due_date,
-                    'images' => $task->images->map(function ($image) {
-                        return [
-                            'id' => $image->id,
-                            'path' => $image->image_path,
-                            'name' => $image->original_name
-                        ];
-                    })
                 ];
             });
+    }
+
+    public function getTaskDetail($taskId)
+    {
+        $task = Task::with(['initiatorUser:id,name', 'images'])
+            ->findOrFail($taskId);
+
+        return [
+            'id' => $task->id,
+            'title' => $task->title,
+            'description' => $task->description,
+            'priority' => $task->priority,
+            'status' => $task->status,
+            'initiator' => $task->initiatorUser->name,
+            'assignees' => json_decode($task->assignees),
+            'dueDate' => $task->due_date,
+            'images' => $task->images->map(function ($image) {
+                return [
+                    'id' => $image->id,
+                    'path' => $image->image_path,
+                    'name' => $image->original_name
+                ];
+            })
+        ];
     }
 }

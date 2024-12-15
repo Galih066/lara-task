@@ -39,4 +39,10 @@ class TaskController extends Controller
         $this->taskService->store($request);
         return redirect()->route('task');
     }
+
+    public function show($taskId)
+    {
+        $task = $this->taskService->getTaskDetail($taskId);
+        return response()->json($task);
+    }
 }

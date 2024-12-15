@@ -157,7 +157,7 @@ const Task = ({ user, empOrg, initialTasks }) => {
 
                 {showTaskDetail && selectedTask && (
                     <TaskDetail
-                        task={selectedTask}
+                        taskId={selectedTask.id}
                         onClose={handleCloseTask}
                         isModalOpen={showTaskDetail}
                         isEntering={isEntering}
