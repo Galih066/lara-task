@@ -3,7 +3,83 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useState } from "react";
 import { PencilIcon, TrashIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
-const TaskColumn = ({ title, count, children, droppableId }) => (
+const TaskCard = ({ task, index, onUpdate, onDelete, onClick }) => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [editedTask, setEditedTask] = useState(task);
+    const [isHovered, setIsHovered] = useState(false);
+
+    const handleSave = () => {
+        onUpdate(editedTask);
+        setIsEditing(false);
+    };
+
+    const handleCancel = () => {
+        setEditedTask(task);
+        setIsEditing(false);
+    };
+
+    const dueStatus = getDueDateStatus(task.dueDate);
+
+    return (
+        <Draggable draggableId={task.id.toString()} index={index}>
+            {(provided, snapshot) => (
+                <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    style={getDragStyle(provided.draggableProps.style, snapshot)}
+                    className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm group"
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    onClick={() => onClick(task)}
+                >
+                    <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                            <h4 className="text-sm font-medium text-gray-900">{task.title}</h4>
+                            <p className="mt-1 text-sm text-gray-600 line-clamp-2">{task.description}</p>
+                        </div>
+                        <div className={`flex space-x-2 ${isHovered ? 'opacity-100' : 'opacity-0'} transition-opacity`}>
+                            <button
+                                onClick={() => setIsEditing(true)}
+                                className="text-gray-400 hover:text-gray-500"
+                            >
+                                <PencilIcon className="h-4 w-4" />
+                            </button>
+                            <button
+                                onClick={() => onDelete(task.id)}
+                                className="text-gray-400 hover:text-red-500"
+                            >
+                                <TrashIcon className="h-4 w-4" />
+                            </button>
+                        </div>
+                    </div>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                        <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${getPriorityColor(task.priority)}`}>
+                            {task.priority}
+                        </span>
+                        {dueStatus && (
+                            <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${dueStatus.class}`}>
+                                {dueStatus.text}
+                            </span>
+                        )}
+                    </div>
+                    <div className="mt-4 flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                            <span className="text-xs text-gray-500">Initiator:</span>
+                            <span className="text-xs font-medium text-gray-700">{task.initiator}</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <span className="text-xs text-gray-500">Assignees:</span>
+                            <span className="text-xs font-medium text-gray-700">{task.assignees?.length || 0}</span>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </Draggable>
+    );
+};
+
+const TaskColumn = ({ title, count, children, droppableId, onTaskClick }) => (
     <Droppable droppableId={droppableId}>
         {(provided, snapshot) => (
             <div 
@@ -73,82 +149,7 @@ const getDueDateStatus = (dueDate) => {
     return { class: 'text-gray-600', text: `Due in ${diffDays} days` };
 };
 
-const TaskCard = ({ task, index, onUpdate, onDelete }) => {
-    const [isEditing, setIsEditing] = useState(false);
-    const [editedTask, setEditedTask] = useState(task);
-    const [isHovered, setIsHovered] = useState(false);
-
-    const handleSave = () => {
-        onUpdate(editedTask);
-        setIsEditing(false);
-    };
-
-    const handleCancel = () => {
-        setEditedTask(task);
-        setIsEditing(false);
-    };
-
-    const dueStatus = getDueDateStatus(task.dueDate);
-
-    return (
-        <Draggable draggableId={task.id.toString()} index={index}>
-            {(provided, snapshot) => (
-                <div
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    style={getDragStyle(provided.draggableProps.style, snapshot)}
-                    className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm group"
-                    onMouseEnter={() => setIsHovered(true)}
-                    onMouseLeave={() => setIsHovered(false)}
-                >
-                    <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                            <h4 className="text-sm font-medium text-gray-900">{task.title}</h4>
-                            <p className="mt-1 text-sm text-gray-600 line-clamp-2">{task.description}</p>
-                        </div>
-                        <div className={`flex space-x-2 ${isHovered ? 'opacity-100' : 'opacity-0'} transition-opacity`}>
-                            <button
-                                onClick={() => setIsEditing(true)}
-                                className="text-gray-400 hover:text-gray-500"
-                            >
-                                <PencilIcon className="h-4 w-4" />
-                            </button>
-                            <button
-                                onClick={() => onDelete(task.id)}
-                                className="text-gray-400 hover:text-red-500"
-                            >
-                                <TrashIcon className="h-4 w-4" />
-                            </button>
-                        </div>
-                    </div>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                        <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${getPriorityColor(task.priority)}`}>
-                            {task.priority}
-                        </span>
-                        {dueStatus && (
-                            <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${dueStatus.class}`}>
-                                {dueStatus.text}
-                            </span>
-                        )}
-                    </div>
-                    <div className="mt-4 flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                            <span className="text-xs text-gray-500">Initiator:</span>
-                            <span className="text-xs font-medium text-gray-700">{task.initiator}</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <span className="text-xs text-gray-500">Assignees:</span>
-                            <span className="text-xs font-medium text-gray-700">{task.assignees?.length || 0}</span>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </Draggable>
-    );
-};
-
-const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onDragEnd }) => {
+const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onDragEnd, onTaskClick }) => {
     const todoTasks = tasks.filter(task => task.status === 'todo');
     const inProgressTasks = tasks.filter(task => task.status === 'in_progress');
     const reviewTasks = tasks.filter(task => task.status === 'review');
@@ -157,7 +158,7 @@ const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onDragEnd }) => {
     return (
         <DragDropContext onDragEnd={onDragEnd}>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 h-[calc(100vh-16rem)]">
-                <TaskColumn title="To Do" count={todoTasks.length} droppableId="todo">
+                <TaskColumn title="To Do" count={todoTasks.length} droppableId="todo" onTaskClick={onTaskClick}>
                     {todoTasks.map((task, index) => (
                         <TaskCard 
                             key={task.id} 
@@ -165,11 +166,12 @@ const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onDragEnd }) => {
                             index={index}
                             onUpdate={onUpdateTask}
                             onDelete={onDeleteTask}
+                            onClick={onTaskClick}
                         />
                     ))}
                 </TaskColumn>
 
-                <TaskColumn title="In Progress" count={inProgressTasks.length} droppableId="in_progress">
+                <TaskColumn title="In Progress" count={inProgressTasks.length} droppableId="in_progress" onTaskClick={onTaskClick}>
                     {inProgressTasks.map((task, index) => (
                         <TaskCard 
                             key={task.id} 
@@ -177,11 +179,12 @@ const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onDragEnd }) => {
                             index={index}
                             onUpdate={onUpdateTask}
                             onDelete={onDeleteTask}
+                            onClick={onTaskClick}
                         />
                     ))}
                 </TaskColumn>
 
-                <TaskColumn title="Review" count={reviewTasks.length} droppableId="review">
+                <TaskColumn title="Review" count={reviewTasks.length} droppableId="review" onTaskClick={onTaskClick}>
                     {reviewTasks.map((task, index) => (
                         <TaskCard 
                             key={task.id} 
@@ -189,11 +192,12 @@ const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onDragEnd }) => {
                             index={index}
                             onUpdate={onUpdateTask}
                             onDelete={onDeleteTask}
+                            onClick={onTaskClick}
                         />
                     ))}
                 </TaskColumn>
 
-                <TaskColumn title="Done" count={doneTasks.length} droppableId="done">
+                <TaskColumn title="Done" count={doneTasks.length} droppableId="done" onTaskClick={onTaskClick}>
                     {doneTasks.map((task, index) => (
                         <TaskCard 
                             key={task.id} 
@@ -201,6 +205,7 @@ const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onDragEnd }) => {
                             index={index}
                             onUpdate={onUpdateTask}
                             onDelete={onDeleteTask}
+                            onClick={onTaskClick}
                         />
                     ))}
                 </TaskColumn>

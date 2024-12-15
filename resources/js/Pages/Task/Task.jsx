@@ -8,11 +8,14 @@ import TaskBoard from "@/Components/Task/TaskBoard";
 import TaskList from "@/Components/Task/TaskList";
 import TaskCalendar from "@/Components/Task/TaskCalendar";
 import CreateTaskForm from "@/Components/Task/CreateTaskForm";
+import TaskDetail from "@/Components/Task/TaskDetail";
 import SuccessAlert from "@/Components/AlertComp/SuccessAlert";
 
 const Task = ({ user, empOrg, initialTasks }) => {
     const [showFilters, setShowFilters] = useState(false);
     const [showCreateForm, setShowCreateForm] = useState(false);
+    const [showTaskDetail, setShowTaskDetail] = useState(false);
+    const [selectedTask, setSelectedTask] = useState(null);
     const [isEntering, setIsEntering] = useState(false);
     const [currentView, setCurrentView] = useState('board');
     const [searchQuery, setSearchQuery] = useState('');
@@ -21,7 +24,6 @@ const Task = ({ user, empOrg, initialTasks }) => {
 
     const handleNewTask = () => {
         setShowCreateForm(true);
-        // Start entrance animation after a brief delay
         setTimeout(() => setIsEntering(true), 50);
     };
 
@@ -32,8 +34,17 @@ const Task = ({ user, empOrg, initialTasks }) => {
 
     const handleCloseTask = () => {
         setIsEntering(false);
-        // Wait for exit animation to complete before hiding modal
-        setTimeout(() => setShowCreateForm(false), 300);
+        setTimeout(() => {
+            setShowCreateForm(false);
+            setShowTaskDetail(false);
+            setSelectedTask(null);
+        }, 300);
+    };
+
+    const handleTaskClick = (task) => {
+        setSelectedTask(task);
+        setShowTaskDetail(true);
+        setTimeout(() => setIsEntering(true), 50);
     };
 
     const handleUpdateTask = (updatedTask) => {
@@ -109,6 +120,7 @@ const Task = ({ user, empOrg, initialTasks }) => {
                         {currentView === 'board' && (
                             <TaskBoard
                                 tasks={filteredTasks}
+                                onTaskClick={handleTaskClick}
                                 onUpdateTask={handleUpdateTask}
                                 onDeleteTask={handleDeleteTask}
                                 onDragEnd={handleDragEnd}
@@ -117,6 +129,7 @@ const Task = ({ user, empOrg, initialTasks }) => {
                         {currentView === 'list' && (
                             <TaskList
                                 tasks={filteredTasks}
+                                onTaskClick={handleTaskClick}
                                 onUpdateTask={handleUpdateTask}
                                 onDeleteTask={handleDeleteTask}
                             />
@@ -124,6 +137,7 @@ const Task = ({ user, empOrg, initialTasks }) => {
                         {currentView === 'calendar' && (
                             <TaskCalendar
                                 tasks={filteredTasks}
+                                onTaskClick={handleTaskClick}
                                 onUpdateTask={handleUpdateTask}
                                 onDeleteTask={handleDeleteTask}
                             />
@@ -138,6 +152,15 @@ const Task = ({ user, empOrg, initialTasks }) => {
                         isModalOpen={showCreateForm}
                         isEntering={isEntering}
                         onSuccess={handleTaskCreated}
+                    />
+                )}
+
+                {showTaskDetail && selectedTask && (
+                    <TaskDetail
+                        task={selectedTask}
+                        onClose={handleCloseTask}
+                        isModalOpen={showTaskDetail}
+                        isEntering={isEntering}
                     />
                 )}
             </div>
