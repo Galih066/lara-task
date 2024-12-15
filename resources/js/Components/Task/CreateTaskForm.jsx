@@ -18,33 +18,11 @@ const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering, onSuccess }) 
         images: [],
     });
 
-    const { data, setData, processing, errors, reset } = useForm({
-        title: '',
-        description: '',
-        assignees: [],
-        start_date: '',
-        due_date: '',
-        priority: 'medium',
-        status: 'todo',
-        images: [],
-    });
+    const { errors, reset } = useForm();
 
     const handleSubmit = (e) => {
         e.preventDefault();
         
-        // First, set all the form data
-        setData({
-            title: formState.title,
-            description: formState.description,
-            assignees: formState.assignees,
-            start_date: formState.start_date,
-            due_date: formState.due_date,
-            priority: formState.priority,
-            status: formState.status,
-            images: selectedFiles
-        });
-
-        // Then create the FormData object
         const formData = new FormData();
         formData.append('title', formState.title);
         formData.append('description', formState.description);
@@ -101,8 +79,7 @@ const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering, onSuccess }) 
     return (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-500 bg-opacity-75 transition-opacity">
             <div className="flex min-h-screen items-center justify-center p-4">
-                <div className={`relative w-full max-w-4xl transform overflow-hidden rounded-xl bg-white shadow-2xl transition-all duration-300 ease-out ${isEntering ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-4 opacity-0 scale-95'
-                    }`}>
+                <div className={`relative w-full max-w-4xl transform overflow-hidden rounded-xl bg-white shadow-2xl transition-all duration-300 ease-out ${isEntering ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-4 opacity-0 scale-95'}`}>
                     <div className="border-b border-gray-200 bg-white px-6 py-4">
                         <div className="flex items-center justify-between">
                             <h3 className="text-xl font-semibold text-gray-900">Create New Task</h3>
@@ -194,6 +171,7 @@ const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering, onSuccess }) 
                                                 </select>
                                                 {errors.priority && <p className="mt-2 text-sm text-red-600">{errors.priority}</p>}
                                             </div>
+
                                             <div>
                                                 <label htmlFor="start_date" className="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
                                                 <input
@@ -236,10 +214,9 @@ const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering, onSuccess }) 
                                 </button>
                                 <button
                                     type="submit"
-                                    disabled={processing}
-                                    className="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                                    className="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                 >
-                                    {processing ? 'Creating...' : 'Create Task'}
+                                    Create Task
                                 </button>
                             </div>
                         </div>
