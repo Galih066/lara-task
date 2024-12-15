@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
+use App\Models\TaskImage;
 
 class Task extends Model
 {
@@ -24,5 +26,10 @@ class Task extends Model
     public function images()
     {
         return $this->hasMany(TaskImage::class);
+    }
+
+    public function initiatorUser()
+    {
+        return $this->belongsTo(User::class, 'initiator');
     }
 }

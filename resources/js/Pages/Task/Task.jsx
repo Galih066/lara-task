@@ -10,44 +10,13 @@ import TaskCalendar from "@/Components/Task/TaskCalendar";
 import CreateTaskForm from "@/Components/Task/CreateTaskForm";
 import SuccessAlert from "@/Components/AlertComp/SuccessAlert";
 
-const Task = ({ user, empOrg }) => {
+const Task = ({ user, empOrg, initialTasks }) => {
     const [showFilters, setShowFilters] = useState(false);
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [isEntering, setIsEntering] = useState(false);
     const [currentView, setCurrentView] = useState('board');
     const [searchQuery, setSearchQuery] = useState('');
-    const [tasks, setTasks] = useState([
-        {
-            id: 1,
-            title: 'Design new landing page',
-            description: 'Create a modern and responsive landing page design...',
-            priority: 'high',
-            status: 'todo',
-            initiator: user?.name || 'Unknown',
-            assignees: [user?.id || 1],
-            dueDate: '2024-04-20'
-        },
-        {
-            id: 2,
-            title: 'Implement authentication',
-            description: 'Set up user authentication system with Laravel Breeze...',
-            priority: 'medium',
-            status: 'in_progress',
-            initiator: user?.name || 'Unknown',
-            assignees: [user?.id || 1],
-            dueDate: '2024-04-15'
-        },
-        {
-            id: 3,
-            title: 'Setup project structure',
-            description: 'Initialize project and set up basic folder structure...',
-            priority: 'low',
-            status: 'done',
-            initiator: user?.name || 'Unknown',
-            assignees: [user?.id || 1],
-            dueDate: '2024-04-10'
-        }
-    ]);
+    const [tasks, setTasks] = useState(initialTasks);
     const [showSuccess, setShowSuccess] = useState(false);
 
     const handleNewTask = () => {

@@ -25,10 +25,12 @@ class TaskController extends Controller
         $loggedUser = Auth::user();
         $user = $this->profileService->getUserWithProfile($loggedUser);
         $empOrg = $this->taskService->getOrgEmployees($loggedUser->profile->organization_id);
+        $tasks = $this->taskService->getAllTasks();
         
         return Inertia::render('Task/Task', [
             'user' => $user,
             'empOrg' => $empOrg,
+            'initialTasks' => $tasks,
         ]);
     }
 

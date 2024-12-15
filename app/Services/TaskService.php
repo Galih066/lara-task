@@ -61,4 +61,23 @@ class TaskService
 
         return $task;
     }
+
+    public function getAllTasks()
+    {
+        return Task::with('initiatorUser:id,name')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($task) {
+                return [
+                    'id' => $task->id,
+                    'title' => $task->title,
+                    'description' => $task->description,
+                    'priority' => $task->priority,
+                    'status' => $task->status,
+                    'initiator' => $task->initiatorUser->name,
+                    'assignees' => json_decode($task->assignees),
+                    'dueDate' => $task->due_date,
+                ];
+            });
+    }
 }
