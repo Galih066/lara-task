@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { useForm } from '@inertiajs/react';
+import { useForm, router } from '@inertiajs/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import AssigneeSelect from './Form/AssigneeSelect';
 import ImageUpload from './Form/ImageUpload';
-import { router } from '@inertiajs/react';
 
 const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering, onSuccess }) => {
     const [selectedFiles, setSelectedFiles] = useState([]);
@@ -39,7 +38,6 @@ const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering, onSuccess }) 
 
         router.post('/task/store', formData, {
             forceFormData: true,
-            preserveScroll: true,
             onSuccess: () => {
                 reset();
                 setSelectedFiles([]);
@@ -55,6 +53,7 @@ const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering, onSuccess }) 
                 });
                 onSuccess();
                 onClose();
+                router.visit(window.location.pathname);
             },
             onError: (errors) => {
                 console.error('Form submission errors:', errors);

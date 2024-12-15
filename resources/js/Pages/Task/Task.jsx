@@ -25,6 +25,11 @@ const Task = ({ user, empOrg, initialTasks }) => {
         setTimeout(() => setIsEntering(true), 50);
     };
 
+    const handleTaskCreated = () => {
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+    };
+
     const handleCloseTask = () => {
         setIsEntering(false);
         // Wait for exit animation to complete before hiding modal
@@ -128,14 +133,11 @@ const Task = ({ user, empOrg, initialTasks }) => {
 
                 {showCreateForm && (
                     <CreateTaskForm
+                        onClose={handleCloseTask}
                         users={empOrg}
                         isModalOpen={showCreateForm}
                         isEntering={isEntering}
-                        onClose={() => {
-                            setShowCreateForm(false);
-                            setIsEntering(false);
-                        }}
-                        onSuccess={() => setShowSuccess(true)}
+                        onSuccess={handleTaskCreated}
                     />
                 )}
             </div>
