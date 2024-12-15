@@ -64,7 +64,7 @@ class TaskService
 
     public function getAllTasks()
     {
-        return Task::with('initiatorUser:id,name')
+        return Task::with(['initiatorUser:id,name', 'images'])
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($task) {
@@ -77,6 +77,13 @@ class TaskService
                     'initiator' => $task->initiatorUser->name,
                     'assignees' => json_decode($task->assignees),
                     'dueDate' => $task->due_date,
+                    'images' => $task->images->map(function ($image) {
+                        return [
+                            'id' => $image->id,
+                            'path' => $image->image_path,
+                            'name' => $image->original_name
+                        ];
+                    })
                 ];
             });
     }

@@ -85,11 +85,11 @@ const TaskDetail = ({ task, onClose, isModalOpen, isEntering }) => {
                                 <div className="bg-gray-50 p-6 rounded-lg">
                                     <h3 className="text-lg font-medium text-gray-900 mb-6">Attachments</h3>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                        {task.images.map((image, index) => (
-                                            <div key={index} className="relative group">
+                                        {task.images.map((image) => (
+                                            <div key={image.id} className="relative group">
                                                 <img
                                                     src={`/storage/${image.path}`}
-                                                    alt={`Task attachment ${index + 1}`}
+                                                    alt={image.name}
                                                     className="w-full h-32 object-cover rounded-lg"
                                                 />
                                                 <a
