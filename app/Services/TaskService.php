@@ -90,8 +90,23 @@ class TaskService
 
     public function getTaskDetail($taskId)
     {
-        $task = Task::with(['initiatorUser:id,name', 'images'])
+        $task = Task::with(['initiatorUser:id,name,email', 'images'])
             ->findOrFail($taskId);
+
+        // Get assignee details
+        $assigneeIds = json_decode($task->assignees);
+        $assignees = Profile::whereIn('user_id', $assigneeIds)
+            ->with('user:id,name,email')
+            ->get()
+            ->map(function ($profile) {
+                return [
+                    'id' => $profile->user->id,
+                    'name' => $profile->user->name,
+                    'email' => $profile->user->email,
+                    'job_title' => $profile->job_title,
+                    'department' => $profile->department,
+                ];
+            });
 
         return [
             'id' => $task->id,
@@ -99,14 +114,23 @@ class TaskService
             'description' => $task->description,
             'priority' => $task->priority,
             'status' => $task->status,
-            'initiator' => $task->initiatorUser->name,
-            'assignees' => json_decode($task->assignees),
+            'initiator' => [
+                'id' => $task->initiatorUser->id,
+                'name' => $task->initiatorUser->name,
+                'email' => $task->initiatorUser->email,
+            ],
+            'assignees' => $assignees,
             'dueDate' => $task->due_date,
+            'completedDate' => $task->completed_date,
+            'createdAt' => $task->created_at,
+            'updatedAt' => $task->updated_at,
             'images' => $task->images->map(function ($image) {
                 return [
                     'id' => $image->id,
                     'path' => $image->image_path,
-                    'name' => $image->original_name
+                    'name' => $image->original_name,
+                    'size' => $image->size,
+                    'type' => $image->mime_type,
                 ];
             })
         ];
