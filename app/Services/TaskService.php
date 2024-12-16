@@ -64,7 +64,10 @@ class TaskService
 
     public function getAllTasks()
     {
-        return Task::select('id', 'title', 'description', 'priority', 'status', 'due_date', 'initiator')
+        $userId = Auth::id();
+        $tasks = Task::select('id', 'title', 'description', 'priority', 'status', 'due_date', 'initiator', 'assignees')
+            ->whereRaw('JSON_SEARCH(assignees, "one", ?) IS NOT NULL', [$userId])
+            ->orWhere('initiator', $userId)
             ->with('initiatorUser:id,name')
             ->orderBy('created_at', 'desc')
             ->get()
@@ -79,6 +82,8 @@ class TaskService
                     'dueDate' => $task->due_date,
                 ];
             });
+        
+        return $tasks;
     }
 
     public function getTaskDetail($taskId)

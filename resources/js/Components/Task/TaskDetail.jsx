@@ -32,9 +32,8 @@ const TaskDetail = ({ taskId, onClose, isModalOpen, isEntering }) => {
     return (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-500 bg-opacity-75 transition-opacity">
             <div className="flex min-h-screen items-center justify-center p-4">
-                <div className={`relative w-full max-w-4xl transform overflow-hidden rounded-xl bg-white shadow-2xl transition-all duration-300 ease-out ${
-                    isEntering ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-4 opacity-0 scale-95'
-                }`}>
+                <div className={`relative w-full max-w-4xl transform overflow-hidden rounded-xl bg-white shadow-2xl transition-all duration-300 ease-out ${isEntering ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-4 opacity-0 scale-95'
+                    }`}>
                     <div className="border-b border-gray-200 bg-white px-6 py-4">
                         <div className="flex items-center justify-between">
                             <h3 className="text-xl font-semibold text-gray-900">Task Details</h3>
@@ -77,24 +76,22 @@ const TaskDetail = ({ taskId, onClose, isModalOpen, isEntering }) => {
                                         <div className="space-y-6">
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                                                    task.status === 'todo' ? 'bg-yellow-100 text-yellow-800' :
-                                                    task.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-                                                    'bg-green-100 text-green-800'
-                                                }`}>
+                                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${task.status === 'todo' ? 'bg-yellow-100 text-yellow-800' :
+                                                        task.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                                                            'bg-green-100 text-green-800'
+                                                    }`}>
                                                     {task.status === 'todo' ? 'To Do' :
-                                                     task.status === 'in_progress' ? 'In Progress' :
-                                                     'Done'}
+                                                        task.status === 'in_progress' ? 'In Progress' :
+                                                            'Done'}
                                                 </span>
                                             </div>
 
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
-                                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                                                    task.priority === 'low' ? 'bg-gray-100 text-gray-800' :
-                                                    task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                                                    'bg-red-100 text-red-800'
-                                                }`}>
+                                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${task.priority === 'low' ? 'bg-gray-100 text-gray-800' :
+                                                        task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                                                            'bg-red-100 text-red-800'
+                                                    }`}>
                                                     {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
                                                 </span>
                                             </div>
