@@ -1,25 +1,9 @@
-import { motion } from "framer-motion";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useState } from "react";
-import { PencilIcon, TrashIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import axios from 'axios';
-import { router } from '@inertiajs/react';
+import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 const TaskCard = ({ task, index, onUpdate, onDelete, onClick }) => {
-    const [isEditing, setIsEditing] = useState(false);
-    const [editedTask, setEditedTask] = useState(task);
     const [isHovered, setIsHovered] = useState(false);
-
-    const handleSave = () => {
-        onUpdate(editedTask);
-        setIsEditing(false);
-    };
-
-    const handleCancel = () => {
-        setEditedTask(task);
-        setIsEditing(false);
-    };
-
     const dueStatus = getDueDateStatus(task.dueDate);
 
     return (
@@ -42,13 +26,19 @@ const TaskCard = ({ task, index, onUpdate, onDelete, onClick }) => {
                         </div>
                         <div className={`flex space-x-2 ${isHovered ? 'opacity-100' : 'opacity-0'} transition-opacity`}>
                             <button
-                                onClick={() => setIsEditing(true)}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onUpdate(task);
+                                }}
                                 className="text-gray-400 hover:text-gray-500"
                             >
                                 <PencilIcon className="h-4 w-4" />
                             </button>
                             <button
-                                onClick={() => onDelete(task.id)}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onDelete(task.id);
+                                }}
                                 className="text-gray-400 hover:text-red-500"
                             >
                                 <TrashIcon className="h-4 w-4" />
@@ -81,7 +71,7 @@ const TaskCard = ({ task, index, onUpdate, onDelete, onClick }) => {
     );
 };
 
-const TaskColumn = ({ title, count, children, droppableId, onTaskClick }) => (
+const TaskColumn = ({ title, count, children, droppableId }) => (
     <Droppable droppableId={droppableId}>
         {(provided, snapshot) => (
             <div 
@@ -112,14 +102,14 @@ const getDragStyle = (style, snapshot) => {
     if (snapshot.isDragging) {
         return {
             ...style,
-            transition: `all 0.001s ease`,
+            transition: 'all 0.001s ease',
         };
     }
     
     if (snapshot.isDropAnimating) {
         return {
             ...style,
-            transition: `all 0.2s cubic-bezier(.2,1,.1,1)`,
+            transition: 'all 0.2s cubic-bezier(.2,1,.1,1)',
         };
     }
     
@@ -151,55 +141,19 @@ const getDueDateStatus = (dueDate) => {
     return { class: 'text-gray-600', text: `Due in ${diffDays} days` };
 };
 
-const TaskBoard = ({ tasks: initialTasks, onUpdateTask, onDeleteTask, onTaskClick }) => {
-    const [tasks, setTasks] = useState(initialTasks);
-
+const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onTaskClick, onDragEnd }) => {
     const todoTasks = tasks.filter(task => task.status === 'todo');
     const inProgressTasks = tasks.filter(task => task.status === 'in_progress');
     const reviewTasks = tasks.filter(task => task.status === 'review');
     const doneTasks = tasks.filter(task => task.status === 'done');
 
-    const handleDragEnd = (result) => {
-        if (!result.destination) return;
-
-        const sourceStatus = result.source.droppableId;
-        const destinationStatus = result.destination.droppableId;
-        const taskId = parseInt(result.draggableId);
-
-        if (sourceStatus !== destinationStatus) {
-            // Update local state first
-            setTasks(prevTasks => 
-                prevTasks.map(task => 
-                    task.id === taskId 
-                        ? { ...task, status: destinationStatus }
-                        : task
-                )
-            );
-
-            // Then update the server
-            axios.patch(`/task/${taskId}/status`, {
-                status: destinationStatus
-            }).catch(error => {
-                console.error('Error updating task status:', error);
-                // Revert the state on error
-                setTasks(prevTasks => 
-                    prevTasks.map(task => 
-                        task.id === taskId 
-                            ? { ...task, status: sourceStatus }
-                            : task
-                    )
-                );
-            });
-        }
-    };
-
     return (
-        <DragDropContext onDragEnd={handleDragEnd}>
+        <DragDropContext onDragEnd={onDragEnd}>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 h-[calc(100vh-16rem)]">
-                <TaskColumn title="To Do" count={todoTasks.length} droppableId="todo" onTaskClick={onTaskClick}>
+                <TaskColumn title="To Do" count={todoTasks.length} droppableId="todo">
                     {todoTasks.map((task, index) => (
-                        <TaskCard 
-                            key={task.id} 
+                        <TaskCard
+                            key={task.id}
                             task={task}
                             index={index}
                             onUpdate={onUpdateTask}
@@ -209,10 +163,10 @@ const TaskBoard = ({ tasks: initialTasks, onUpdateTask, onDeleteTask, onTaskClic
                     ))}
                 </TaskColumn>
 
-                <TaskColumn title="In Progress" count={inProgressTasks.length} droppableId="in_progress" onTaskClick={onTaskClick}>
+                <TaskColumn title="In Progress" count={inProgressTasks.length} droppableId="in_progress">
                     {inProgressTasks.map((task, index) => (
-                        <TaskCard 
-                            key={task.id} 
+                        <TaskCard
+                            key={task.id}
                             task={task}
                             index={index}
                             onUpdate={onUpdateTask}
@@ -222,10 +176,10 @@ const TaskBoard = ({ tasks: initialTasks, onUpdateTask, onDeleteTask, onTaskClic
                     ))}
                 </TaskColumn>
 
-                <TaskColumn title="Review" count={reviewTasks.length} droppableId="review" onTaskClick={onTaskClick}>
+                <TaskColumn title="Review" count={reviewTasks.length} droppableId="review">
                     {reviewTasks.map((task, index) => (
-                        <TaskCard 
-                            key={task.id} 
+                        <TaskCard
+                            key={task.id}
                             task={task}
                             index={index}
                             onUpdate={onUpdateTask}
@@ -235,10 +189,10 @@ const TaskBoard = ({ tasks: initialTasks, onUpdateTask, onDeleteTask, onTaskClic
                     ))}
                 </TaskColumn>
 
-                <TaskColumn title="Done" count={doneTasks.length} droppableId="done" onTaskClick={onTaskClick}>
+                <TaskColumn title="Done" count={doneTasks.length} droppableId="done">
                     {doneTasks.map((task, index) => (
-                        <TaskCard 
-                            key={task.id} 
+                        <TaskCard
+                            key={task.id}
                             task={task}
                             index={index}
                             onUpdate={onUpdateTask}

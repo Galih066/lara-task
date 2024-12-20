@@ -10,6 +10,7 @@ import TaskCalendar from "@/Components/Task/TaskCalendar";
 import CreateTaskForm from "@/Components/Task/CreateTaskForm";
 import TaskDetail from "@/Components/Task/TaskDetail";
 import SuccessAlert from "@/Components/AlertComp/SuccessAlert";
+import axios from 'axios';
 
 const Task = ({ user, empOrg, initialTasks }) => {
     const [showFilters, setShowFilters] = useState(false);
@@ -48,9 +49,23 @@ const Task = ({ user, empOrg, initialTasks }) => {
     };
 
     const handleUpdateTask = (updatedTask) => {
+        // Update local state first
         setTasks(tasks.map(task =>
             task.id === updatedTask.id ? updatedTask : task
         ));
+
+        // If it's a status update, send to server
+        if ('status' in updatedTask) {
+            axios.patch(`/task/${updatedTask.id}/status`, {
+                status: updatedTask.status
+            }).catch(error => {
+                console.error('Error updating task status:', error);
+                // Revert the state on error
+                setTasks(tasks.map(task =>
+                    task.id === updatedTask.id ? task : task
+                ));
+            });
+        }
     };
 
     const handleDeleteTask = (taskId) => {
@@ -66,13 +81,16 @@ const Task = ({ user, empOrg, initialTasks }) => {
             return;
         }
 
-        const updatedTasks = Array.from(tasks);
-        const draggedTask = updatedTasks.find(task => task.id.toString() === draggableId);
+        const taskId = parseInt(draggableId);
+        const newStatus = destination.droppableId;
+        const taskToUpdate = tasks.find(t => t.id === taskId);
 
-        if (!draggedTask) return;
+        if (!taskToUpdate) return;
 
-        draggedTask.status = destination.droppableId;
-        setTasks(updatedTasks);
+        handleUpdateTask({
+            ...taskToUpdate,
+            status: newStatus
+        });
     };
 
     const filteredTasks = tasks.filter(task => {
