@@ -13,18 +13,20 @@ const TaskDetail = ({ taskId, onClose, isModalOpen, isEntering }) => {
         const due = new Date(dueDate);
         const diffTime = due - now;
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
-        if (diffDays < 0) {
-            return { text: 'Overdue', class: 'text-red-600' };
-        } else if (diffDays === 0) {
-            return { text: 'Due today', class: 'text-yellow-600' };
-        } else if (diffDays === 1) {
-            return { text: 'Due tomorrow', class: 'text-yellow-600' };
-        } else if (diffDays <= 7) {
-            return { text: `${diffDays} days left`, class: 'text-blue-600' };
-        } else {
-            return { text: `${diffDays} days left`, class: 'text-green-600' };
-        }
+
+        const timeStates = {
+            overdue: { threshold: 0, text: 'Overdue', class: 'text-red-600' },
+            dueToday: { threshold: 0, text: 'Due today', class: 'text-yellow-600' },
+            dueTomorrow: { threshold: 1, text: 'Due tomorrow', class: 'text-yellow-600' },
+            dueThisWeek: { threshold: 7, text: `${diffDays} days left`, class: 'text-blue-600' },
+            dueLater: { threshold: Infinity, text: `${diffDays} days left`, class: 'text-green-600' }
+        };
+
+        const state = Object.values(timeStates).find(({ threshold }) => 
+            diffDays < threshold || threshold === Infinity
+        );
+
+        return state || timeStates.dueLater;
     };
 
     const formatDate = (date) => {
@@ -77,9 +79,8 @@ const TaskDetail = ({ taskId, onClose, isModalOpen, isEntering }) => {
     return (
         <div className="fixed inset-0 z-50 bg-gray-500 bg-opacity-75 transition-opacity">
             <div className="flex min-h-screen items-start justify-center p-4">
-                <div className={`relative w-full max-w-4xl transform rounded-xl bg-white shadow-2xl transition-all duration-300 ease-out overflow-hidden ${
-                    isEntering ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-4 opacity-0 scale-95'
-                }`}>
+                <div className={`relative w-full max-w-4xl transform rounded-xl bg-white shadow-2xl transition-all duration-300 ease-out overflow-hidden ${isEntering ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-4 opacity-0 scale-95'
+                    }`}>
                     <div className="flex flex-col h-[calc(100vh-8rem)]">
                         <div className="border-b border-gray-200 bg-white px-6 py-4">
                             <div className="flex items-center justify-between">
@@ -160,13 +161,13 @@ const TaskDetail = ({ taskId, onClose, isModalOpen, isEntering }) => {
                                                 {/* Progress Timeline */}
                                                 <div className="relative">
                                                     <div className="absolute left-0 top-5 h-0.5 w-full bg-gray-200">
-                                                        <div 
-                                                            className="h-full bg-blue-500" 
-                                                            style={{ 
-                                                                width: `${Math.min(100, Math.max(0, 
-                                                                    ((new Date() - new Date(task.createdAt)) / 
-                                                                    (new Date(task.dueDate) - new Date(task.createdAt))) * 100
-                                                                ))}%` 
+                                                        <div
+                                                            className="h-full bg-blue-500"
+                                                            style={{
+                                                                width: `${Math.min(100, Math.max(0,
+                                                                    ((new Date() - new Date(task.createdAt)) /
+                                                                        (new Date(task.dueDate) - new Date(task.createdAt))) * 100
+                                                                ))}%`
                                                             }}
                                                         />
                                                     </div>
@@ -211,24 +212,22 @@ const TaskDetail = ({ taskId, onClose, isModalOpen, isEntering }) => {
                                                 <div className="space-y-6">
                                                     <div>
                                                         <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                                                            task.status === 'todo' ? 'bg-yellow-100 text-yellow-800' :
-                                                            task.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-                                                            'bg-green-100 text-green-800'
-                                                        }`}>
+                                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${task.status === 'todo' ? 'bg-yellow-100 text-yellow-800' :
+                                                                task.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                                                                    'bg-green-100 text-green-800'
+                                                            }`}>
                                                             {task.status === 'todo' ? 'To Do' :
-                                                             task.status === 'in_progress' ? 'In Progress' :
-                                                             'Done'}
+                                                                task.status === 'in_progress' ? 'In Progress' :
+                                                                    'Done'}
                                                         </span>
                                                     </div>
 
                                                     <div>
                                                         <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
-                                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                                                            task.priority === 'low' ? 'bg-gray-100 text-gray-800' :
-                                                            task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                                                            'bg-red-100 text-red-800'
-                                                        }`}>
+                                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${task.priority === 'low' ? 'bg-gray-100 text-gray-800' :
+                                                                task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                                                                    'bg-red-100 text-red-800'
+                                                            }`}>
                                                             {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
                                                         </span>
                                                     </div>
@@ -244,7 +243,7 @@ const TaskDetail = ({ taskId, onClose, isModalOpen, isEntering }) => {
                                                             day: 'numeric'
                                                         })}</p>
                                                     </div>
-                                                    
+
                                                     {task.completedDate && (
                                                         <div>
                                                             <label className="block text-sm font-medium text-gray-700 mb-2">Completed Date</label>
