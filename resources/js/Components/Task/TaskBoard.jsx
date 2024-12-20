@@ -81,12 +81,11 @@ const TaskCard = ({ task, index, onUpdate, onDelete, onClick, isUpdating }) => {
 const TaskColumn = ({ title, count, children, droppableId }) => (
     <Droppable droppableId={droppableId}>
         {(provided, snapshot) => (
-            <div 
+            <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
-                className={`bg-white rounded-xl shadow-sm p-4 transition-colors duration-200 flex flex-col h-full ${
-                    snapshot.isDraggingOver ? 'bg-blue-50 ring-2 ring-blue-200' : ''
-                }`}
+                className={`bg-white rounded-xl shadow-sm p-4 transition-colors duration-200 flex flex-col h-full ${snapshot.isDraggingOver ? 'bg-blue-50 ring-2 ring-blue-200' : ''
+                    }`}
             >
                 <div className="flex items-center justify-between mb-4 flex-shrink-0">
                     <h3 className="text-lg font-medium text-gray-900">{title}</h3>
@@ -105,21 +104,21 @@ const TaskColumn = ({ title, count, children, droppableId }) => (
 
 const getDragStyle = (style, snapshot) => {
     if (!style) return {};
-    
+
     if (snapshot.isDragging) {
         return {
             ...style,
             transition: 'all 0.001s ease',
         };
     }
-    
+
     if (snapshot.isDropAnimating) {
         return {
             ...style,
             transition: 'all 0.2s cubic-bezier(.2,1,.1,1)',
         };
     }
-    
+
     return style;
 };
 
@@ -141,7 +140,7 @@ const getDueDateStatus = (dueDate) => {
     const today = new Date();
     const due = new Date(dueDate);
     const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays < 0) return { class: 'text-red-600', text: 'Overdue' };
     if (diffDays === 0) return { class: 'text-orange-600', text: 'Due Today' };
     if (diffDays <= 2) return { class: 'text-yellow-600', text: 'Due Soon' };

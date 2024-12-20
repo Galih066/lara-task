@@ -62,16 +62,16 @@ const Task = ({ user, empOrg, initialTasks }) => {
             axios.patch(`/task/${updatedTask.id}/status`, {
                 status: updatedTask.status
             })
-            .then(() => {
-                setUpdatingTaskId(null);
-            })
-            .catch(error => {
-                console.error('Error updating task status:', error);
-                setTasks(tasks.map(task =>
-                    task.id === updatedTask.id ? task : task
-                ));
-                setUpdatingTaskId(null);
-            });
+                .then(() => {
+                    setUpdatingTaskId(null);
+                })
+                .catch(error => {
+                    console.error('Error updating task status:', error);
+                    setTasks(tasks.map(task =>
+                        task.id === updatedTask.id ? task : task
+                    ));
+                    setUpdatingTaskId(null);
+                });
         }
     };
 
