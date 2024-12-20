@@ -41,6 +41,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('task')->group(function () {
         Route::get('/', [TaskController::class, 'index'])->name('task');
         Route::post('/store', [TaskController::class, 'store'])->name('tasks.store');
-        Route::get('/{task}', [TaskController::class, 'show'])->name('task.show');
+        Route::get('/{taskId}', [TaskController::class, 'show'])->name('task.show');
+        Route::patch('/{taskId}/status', [TaskController::class, 'updateStatus'])->name('task.updateStatus');
     });
 });

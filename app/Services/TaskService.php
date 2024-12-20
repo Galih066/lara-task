@@ -62,6 +62,14 @@ class TaskService
         return $task;
     }
 
+    public function updateTaskStatus($taskId, $status)
+    {
+        $task = Task::findOrFail($taskId);
+        $task->status = $status;
+        $task->save();
+        return $task;
+    }
+
     public function getAllTasks()
     {
         $userId = Auth::id();

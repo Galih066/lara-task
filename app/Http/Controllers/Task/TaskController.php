@@ -45,4 +45,11 @@ class TaskController extends Controller
         $task = $this->taskService->getTaskDetail($taskId);
         return response()->json($task);
     }
+
+    public function updateStatus($taskId)
+    {
+        $status = request()->input('status');
+        $task = $this->taskService->updateTaskStatus($taskId, $status);
+        return response()->json($task);
+    }
 }
