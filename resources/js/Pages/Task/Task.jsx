@@ -22,6 +22,7 @@ const Task = ({ user, empOrg, initialTasks }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [tasks, setTasks] = useState(initialTasks);
     const [showSuccess, setShowSuccess] = useState(false);
+    const [updatingTaskId, setUpdatingTaskId] = useState(null);
 
     const handleNewTask = () => {
         setShowCreateForm(true);
@@ -49,21 +50,27 @@ const Task = ({ user, empOrg, initialTasks }) => {
     };
 
     const handleUpdateTask = (updatedTask) => {
-        // Update local state first
+        if ('status' in updatedTask) {
+            setUpdatingTaskId(updatedTask.id);
+        }
+
         setTasks(tasks.map(task =>
             task.id === updatedTask.id ? updatedTask : task
         ));
 
-        // If it's a status update, send to server
         if ('status' in updatedTask) {
             axios.patch(`/task/${updatedTask.id}/status`, {
                 status: updatedTask.status
-            }).catch(error => {
+            })
+            .then(() => {
+                setUpdatingTaskId(null);
+            })
+            .catch(error => {
                 console.error('Error updating task status:', error);
-                // Revert the state on error
                 setTasks(tasks.map(task =>
                     task.id === updatedTask.id ? task : task
                 ));
+                setUpdatingTaskId(null);
             });
         }
     };
@@ -138,10 +145,11 @@ const Task = ({ user, empOrg, initialTasks }) => {
                         {currentView === 'board' && (
                             <TaskBoard
                                 tasks={filteredTasks}
-                                onTaskClick={handleTaskClick}
                                 onUpdateTask={handleUpdateTask}
                                 onDeleteTask={handleDeleteTask}
+                                onTaskClick={handleTaskClick}
                                 onDragEnd={handleDragEnd}
+                                updatingTaskId={updatingTaskId}
                             />
                         )}
                         {currentView === 'list' && (

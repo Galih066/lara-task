@@ -2,7 +2,13 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useState } from "react";
 import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 
-const TaskCard = ({ task, index, onUpdate, onDelete, onClick }) => {
+const LoadingOverlay = () => (
+    <div className="absolute inset-0 bg-white/50 flex items-center justify-center rounded-lg">
+        <div className="animate-spin rounded-full h-6 w-6 border-2 border-gray-900 border-t-transparent"></div>
+    </div>
+);
+
+const TaskCard = ({ task, index, onUpdate, onDelete, onClick, isUpdating }) => {
     const [isHovered, setIsHovered] = useState(false);
     const dueStatus = getDueDateStatus(task.dueDate);
 
@@ -14,11 +20,12 @@ const TaskCard = ({ task, index, onUpdate, onDelete, onClick }) => {
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                     style={getDragStyle(provided.draggableProps.style, snapshot)}
-                    className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm group"
+                    className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm group relative"
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
                     onClick={() => onClick(task)}
                 >
+                    {isUpdating && <LoadingOverlay />}
                     <div className="flex justify-between items-start">
                         <div className="flex-1">
                             <h4 className="text-sm font-medium text-gray-900">{task.title}</h4>
@@ -141,7 +148,7 @@ const getDueDateStatus = (dueDate) => {
     return { class: 'text-gray-600', text: `Due in ${diffDays} days` };
 };
 
-const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onTaskClick, onDragEnd }) => {
+const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onTaskClick, onDragEnd, updatingTaskId }) => {
     const todoTasks = tasks.filter(task => task.status === 'todo');
     const inProgressTasks = tasks.filter(task => task.status === 'in_progress');
     const reviewTasks = tasks.filter(task => task.status === 'review');
@@ -159,6 +166,7 @@ const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onTaskClick, onDragEnd }
                             onUpdate={onUpdateTask}
                             onDelete={onDeleteTask}
                             onClick={onTaskClick}
+                            isUpdating={updatingTaskId === task.id}
                         />
                     ))}
                 </TaskColumn>
@@ -172,6 +180,7 @@ const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onTaskClick, onDragEnd }
                             onUpdate={onUpdateTask}
                             onDelete={onDeleteTask}
                             onClick={onTaskClick}
+                            isUpdating={updatingTaskId === task.id}
                         />
                     ))}
                 </TaskColumn>
@@ -185,6 +194,7 @@ const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onTaskClick, onDragEnd }
                             onUpdate={onUpdateTask}
                             onDelete={onDeleteTask}
                             onClick={onTaskClick}
+                            isUpdating={updatingTaskId === task.id}
                         />
                     ))}
                 </TaskColumn>
@@ -198,6 +208,7 @@ const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onTaskClick, onDragEnd }
                             onUpdate={onUpdateTask}
                             onDelete={onDeleteTask}
                             onClick={onTaskClick}
+                            isUpdating={updatingTaskId === task.id}
                         />
                     ))}
                 </TaskColumn>
