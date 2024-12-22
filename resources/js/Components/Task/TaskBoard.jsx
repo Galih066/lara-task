@@ -20,7 +20,7 @@ const TaskCard = ({ task, index, onUpdate, onDelete, onClick, isUpdating }) => {
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                     style={getDragStyle(provided.draggableProps.style, snapshot)}
-                    className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm group relative"
+                    className={`p-4 border border-gray-200 rounded-lg shadow-sm group relative ${getBackgroundColor(task.priority)}`}
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
                     onClick={() => onClick(task)}
@@ -132,6 +132,19 @@ const getPriorityColor = (priority) => {
             return 'bg-green-100 text-green-800';
         default:
             return 'bg-gray-100 text-gray-800';
+    }
+};
+
+const getBackgroundColor = (priority) => {
+    switch (priority.toLowerCase()) {
+        case 'high':
+            return 'bg-red-50';
+        case 'medium':
+            return 'bg-yellow-50';
+        case 'low':
+            return 'bg-green-50';
+        default:
+            return 'bg-white';
     }
 };
 
