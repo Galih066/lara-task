@@ -1,6 +1,7 @@
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useState } from "react";
 import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
+import TaskDetail from './TaskDetail';
 
 const LoadingOverlay = () => (
     <div className="absolute inset-0 bg-white/50 flex items-center justify-center rounded-lg">
@@ -177,6 +178,18 @@ const formatStatus = (status) => {
 };
 
 const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onTaskClick, onDragEnd, updatingTaskId }) => {
+    const [selectedTaskId, setSelectedTaskId] = useState(null);
+    const [isDetailOpen, setIsDetailOpen] = useState(false);
+
+    const handleTaskClick = (task) => {
+        setSelectedTaskId(task.id);
+        setIsDetailOpen(true);
+    };
+
+    const handleCloseDetail = () => {
+        setIsDetailOpen(false);
+    };
+
     const tasksByStatus = {
         todo: tasks.filter(task => task.status === 'todo'),
         in_progress: tasks.filter(task => task.status === 'in_progress'),
@@ -199,7 +212,7 @@ const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onTaskClick, onDragEnd, 
                                             index={index}
                                             onUpdate={onUpdateTask}
                                             onDelete={onDeleteTask}
-                                            onClick={onTaskClick}
+                                            onClick={handleTaskClick}
                                             isUpdating={updatingTaskId === task.id}
                                         />
                                     ))}
@@ -209,6 +222,12 @@ const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onTaskClick, onDragEnd, 
                     </div>
                 </div>
             </div>
+
+            <TaskDetail
+                taskId={selectedTaskId}
+                isModalOpen={isDetailOpen}
+                onClose={handleCloseDetail}
+            />
         </DragDropContext>
     );
 };
