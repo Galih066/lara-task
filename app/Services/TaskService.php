@@ -88,7 +88,7 @@ class TaskService
                     'description' => $task->description,
                     'priority' => $task->priority,
                     'status' => $task->status,
-                    'initiator' => $task->initiatorUser->name,
+                    'initiator' => ucwords(strtolower($task->initiatorUser->name)),
                     'dueDate' => $task->due_date,
                     'assignees' => json_decode($task->assignees)
                 ];

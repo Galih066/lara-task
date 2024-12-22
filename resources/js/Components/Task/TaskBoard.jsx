@@ -54,7 +54,7 @@ const TaskCard = ({ task, index, onUpdate, onDelete, onClick, isUpdating }) => {
                     </div>
                     <div className="mt-4 flex flex-wrap gap-2">
                         <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${getPriorityColor(task.priority)}`}>
-                            {task.priority}
+                            {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
                         </span>
                         {dueStatus && (
                             <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${dueStatus.class}`}>
