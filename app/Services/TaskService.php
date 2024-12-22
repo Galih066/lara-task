@@ -90,6 +90,7 @@ class TaskService
                     'status' => $task->status,
                     'initiator' => $task->initiatorUser->name,
                     'dueDate' => $task->due_date,
+                    'assignees' => json_decode($task->assignees)
                 ];
             });
         
