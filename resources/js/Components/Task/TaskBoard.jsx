@@ -20,15 +20,15 @@ const TaskCard = ({ task, index, onUpdate, onDelete, onClick, isUpdating }) => {
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                     style={getDragStyle(provided.draggableProps.style, snapshot)}
-                    className={`p-4 border border-gray-200 rounded-lg shadow-sm group relative ${getBackgroundColor(task.priority)}`}
+                    className={`p-4 border border-gray-200 rounded-lg shadow-sm group relative hover:shadow-md transition-shadow duration-200 ${getBackgroundColor(task.priority)}`}
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
                     onClick={() => onClick(task)}
                 >
                     {isUpdating && <LoadingOverlay />}
-                    <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                            <h4 className="text-sm font-medium text-gray-900">{task.title}</h4>
+                    <div className="flex justify-between items-start space-x-4">
+                        <div className="flex-1 min-w-0">
+                            <h4 className="text-base font-medium text-gray-900 truncate">{task.title}</h4>
                             <p className="mt-1 text-sm text-gray-600 line-clamp-2">{task.description}</p>
                         </div>
                         <div className={`flex space-x-2 ${isHovered ? 'opacity-100' : 'opacity-0'} transition-opacity`}>
@@ -52,24 +52,26 @@ const TaskCard = ({ task, index, onUpdate, onDelete, onClick, isUpdating }) => {
                             </button>
                         </div>
                     </div>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                        <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${getPriorityColor(task.priority)}`}>
-                            {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-                        </span>
-                        {dueStatus && (
-                            <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${dueStatus.class}`}>
-                                {dueStatus.text}
+                    <div className="mt-3 flex items-center justify-between">
+                        <div className="flex flex-wrap gap-2">
+                            <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${getPriorityColor(task.priority)}`}>
+                                {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
                             </span>
-                        )}
-                    </div>
-                    <div className="mt-4 flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                            <span className="text-xs text-gray-500">Initiator:</span>
-                            <span className="text-xs font-medium text-gray-700">{task.initiator}</span>
+                            {dueStatus && (
+                                <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${dueStatus.class}`}>
+                                    {dueStatus.text}
+                                </span>
+                            )}
                         </div>
-                        <div className="flex items-center space-x-2">
-                            <span className="text-xs text-gray-500">Assignees:</span>
-                            <span className="text-xs font-medium text-gray-700">{task.assignees?.length || 0}</span>
+                        <div className="flex items-center gap-4 text-xs text-gray-500">
+                            <div className="flex items-center gap-1">
+                                <span>By:</span>
+                                <span className="font-medium text-gray-700">{task.initiator}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <span>Assignees:</span>
+                                <span className="font-medium text-gray-700">{task.assignees?.length || 0}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -84,16 +86,15 @@ const TaskColumn = ({ title, count, children, droppableId }) => (
             <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
-                className={`bg-white rounded-xl shadow-sm p-4 transition-colors duration-200 flex flex-col h-full ${snapshot.isDraggingOver ? 'bg-blue-50 ring-2 ring-blue-200' : ''
-                    }`}
+                className={`bg-gray-50 rounded-lg p-4`}
             >
-                <div className="flex items-center justify-between mb-4 flex-shrink-0">
-                    <h3 className="text-lg font-medium text-gray-900">{title}</h3>
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                        {count}
-                    </span>
-                </div>
-                <div className="space-y-3 overflow-y-auto flex-grow">
+                <h3 className="text-sm font-medium text-gray-900 mb-4">
+                    {title} ({count})
+                </h3>
+                <div
+                    {...provided.droppableProps}
+                    className="space-y-3"
+                >
                     {children}
                     {provided.placeholder}
                 </div>
@@ -160,70 +161,53 @@ const getDueDateStatus = (dueDate) => {
     return { class: 'text-gray-600', text: `Due in ${diffDays} days` };
 };
 
+const formatStatus = (status) => {
+    switch (status) {
+        case 'todo':
+            return 'To Do';
+        case 'in_progress':
+            return 'In Progress';
+        case 'review':
+            return 'Review';
+        case 'done':
+            return 'Done';
+        default:
+            return status.charAt(0).toUpperCase() + status.slice(1);
+    }
+};
+
 const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onTaskClick, onDragEnd, updatingTaskId }) => {
-    const todoTasks = tasks.filter(task => task.status === 'todo');
-    const inProgressTasks = tasks.filter(task => task.status === 'in_progress');
-    const reviewTasks = tasks.filter(task => task.status === 'review');
-    const doneTasks = tasks.filter(task => task.status === 'done');
+    const tasksByStatus = {
+        todo: tasks.filter(task => task.status === 'todo'),
+        in_progress: tasks.filter(task => task.status === 'in_progress'),
+        review: tasks.filter(task => task.status === 'review'),
+        done: tasks.filter(task => task.status === 'done'),
+    };
 
     return (
         <DragDropContext onDragEnd={onDragEnd}>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 h-[calc(100vh-16rem)]">
-                <TaskColumn title="To Do" count={todoTasks.length} droppableId="todo">
-                    {todoTasks.map((task, index) => (
-                        <TaskCard
-                            key={task.id}
-                            task={task}
-                            index={index}
-                            onUpdate={onUpdateTask}
-                            onDelete={onDeleteTask}
-                            onClick={onTaskClick}
-                            isUpdating={updatingTaskId === task.id}
-                        />
-                    ))}
-                </TaskColumn>
-
-                <TaskColumn title="In Progress" count={inProgressTasks.length} droppableId="in_progress">
-                    {inProgressTasks.map((task, index) => (
-                        <TaskCard
-                            key={task.id}
-                            task={task}
-                            index={index}
-                            onUpdate={onUpdateTask}
-                            onDelete={onDeleteTask}
-                            onClick={onTaskClick}
-                            isUpdating={updatingTaskId === task.id}
-                        />
-                    ))}
-                </TaskColumn>
-
-                <TaskColumn title="Review" count={reviewTasks.length} droppableId="review">
-                    {reviewTasks.map((task, index) => (
-                        <TaskCard
-                            key={task.id}
-                            task={task}
-                            index={index}
-                            onUpdate={onUpdateTask}
-                            onDelete={onDeleteTask}
-                            onClick={onTaskClick}
-                            isUpdating={updatingTaskId === task.id}
-                        />
-                    ))}
-                </TaskColumn>
-
-                <TaskColumn title="Done" count={doneTasks.length} droppableId="done">
-                    {doneTasks.map((task, index) => (
-                        <TaskCard
-                            key={task.id}
-                            task={task}
-                            index={index}
-                            onUpdate={onUpdateTask}
-                            onDelete={onDeleteTask}
-                            onClick={onTaskClick}
-                            isUpdating={updatingTaskId === task.id}
-                        />
-                    ))}
-                </TaskColumn>
+            <div className="flex flex-col h-full">
+                <div className="overflow-x-auto -mx-4 px-4 scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400 scrollbar-track-rounded-full scrollbar-thumb-rounded-full order-first mb-4">
+                    <div className="flex space-x-4 min-w-max py-2">
+                        {Object.entries(tasksByStatus).map(([status, statusTasks]) => (
+                            <div key={status} className="flex-none w-[400px]">
+                                <TaskColumn title={formatStatus(status)} count={statusTasks.length} droppableId={status}>
+                                    {statusTasks.map((task, index) => (
+                                        <TaskCard
+                                            key={task.id}
+                                            task={task}
+                                            index={index}
+                                            onUpdate={onUpdateTask}
+                                            onDelete={onDeleteTask}
+                                            onClick={onTaskClick}
+                                            isUpdating={updatingTaskId === task.id}
+                                        />
+                                    ))}
+                                </TaskColumn>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
         </DragDropContext>
     );
