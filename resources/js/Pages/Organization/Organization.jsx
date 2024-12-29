@@ -2,8 +2,11 @@ import { useState } from "react";
 import { Head } from "@inertiajs/react";
 import Navigation from "@/Layouts/Navigation";
 import { motion } from "framer-motion";
+import { usePage } from "@inertiajs/react";
 
-const OrganizationPage = ({ user }) => {
+const OrganizationPage = () => {
+    const { user, organization: org } = usePage().props;
+    console.log(user);
     const [organization] = useState({
         name: "TaskFlow Inc.",
         logo: "/dummy-logo.png",
