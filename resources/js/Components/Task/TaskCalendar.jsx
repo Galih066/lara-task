@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
+import TaskListModal from './TaskListModal';
 
 const TaskCalendar = ({ tasks, onUpdateTask, onDeleteTask }) => {
     const [currentDate, setCurrentDate] = useState(new Date());
-    
+    const [selectedDate, setSelectedDate] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     const getDaysInMonth = (year, month) => {
         return new Date(year, month + 1, 0).getDate();
     };
@@ -69,7 +72,13 @@ const TaskCalendar = ({ tasks, onUpdateTask, onDeleteTask }) => {
                        today.getFullYear() === year;
 
         return (
-            <div className={`h-32 border border-gray-200 p-2 ${isToday ? 'bg-blue-50' : 'bg-white'}`}>
+            <div 
+                className={`h-32 border border-gray-200 p-2 ${isToday ? 'bg-blue-50' : 'bg-white'} cursor-pointer hover:bg-gray-50 transition-colors`}
+                onClick={() => {
+                    setSelectedDate(date);
+                    setIsModalOpen(true);
+                }}
+            >
                 <div className="flex justify-between items-start">
                     <span className={`inline-flex items-center justify-center w-6 h-6 text-sm ${
                         isToday ? 'bg-blue-500 text-white rounded-full' : 'text-gray-700'
@@ -103,38 +112,49 @@ const TaskCalendar = ({ tasks, onUpdateTask, onDeleteTask }) => {
     }
 
     return (
-        <div className="bg-white rounded-lg shadow">
-            <div className="p-4 flex items-center justify-between border-b border-gray-200">
-                <h2 className="text-lg font-semibold text-gray-900">
-                    {formatDate(currentDate)}
-                </h2>
+        <div>
+            <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-900">{formatDate(currentDate)}</h2>
                 <div className="flex space-x-2">
                     <button
                         onClick={previousMonth}
-                        className="p-2 hover:bg-gray-100 rounded-full"
+                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                     >
-                        <ChevronLeftIcon className="w-5 h-5" />
+                        <ChevronLeftIcon className="h-5 w-5" />
                     </button>
                     <button
                         onClick={nextMonth}
-                        className="p-2 hover:bg-gray-100 rounded-full"
+                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                     >
-                        <ChevronRightIcon className="w-5 h-5" />
+                        <ChevronRightIcon className="h-5 w-5" />
                     </button>
                 </div>
             </div>
-            <div className="grid grid-cols-7 gap-px">
-                {weekDays.map(day => (
-                    <div key={day} className="p-2 text-center text-sm font-medium text-gray-700 bg-gray-50">
+
+            <div className="grid grid-cols-7 gap-px bg-gray-200 border border-gray-200 rounded-lg overflow-hidden">
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                    <div key={day} className="bg-gray-50 py-2 text-center text-sm font-medium text-gray-500">
                         {day}
                     </div>
                 ))}
-                {cells.map((dayNumber, index) => (
-                    <div key={index}>
-                        {renderCell(dayNumber)}
+                {[...Array(firstDayOfMonth).fill(null), ...Array(daysInMonth).keys()].map((day, index) => (
+                    <div key={index} className="bg-white">
+                        {renderCell(day !== null ? day + 1 : null)}
                     </div>
                 ))}
             </div>
+
+            {selectedDate && (
+                <TaskListModal
+                    isOpen={isModalOpen}
+                    onClose={() => {
+                        setIsModalOpen(false);
+                        setSelectedDate(null);
+                    }}
+                    date={selectedDate}
+                    tasks={tasksByDate[selectedDate.toISOString().split('T')[0]] || []}
+                />
+            )}
         </div>
     );
 };

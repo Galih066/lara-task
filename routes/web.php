@@ -27,17 +27,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/update/contact', [ProfileController::class, 'updateContact'])->name('profile.update.contact');
     });
 
-    // Organization Membership
+    // Membership Routes
     Route::prefix('member')->group(function () {
         Route::get('/', [MemberController::class, 'index'])->name('member');
         Route::post('/add-member', [MemberController::class, 'store'])->name('member.store');
     });
 
-    // Organization Data
+    // Organization Routes
     Route::prefix('organization')->group(function () {
         Route::get('/', [OrganizationController::class, 'index'])->name('organization');
     });
 
+    // Task Routes
     Route::prefix('task')->group(function () {
         Route::get('/', [TaskController::class, 'index'])->name('task');
         Route::post('/store', [TaskController::class, 'store'])->name('tasks.store');
