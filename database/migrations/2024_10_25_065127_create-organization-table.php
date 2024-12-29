@@ -17,6 +17,11 @@ return new class extends Migration
             $table->string('user_id')->unique();
             $table->string('admin_email')->unique();
             $table->string('password');
+            $table->text('description')->nullable();
+            $table->string('logo_path')->nullable();
+            $table->string('industry')->nullable();
+            $table->string('size_category')->nullable();
+            $table->string('location')->nullable();
             $table->timestamps();
         });
     }

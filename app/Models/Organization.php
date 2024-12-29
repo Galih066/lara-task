@@ -13,23 +13,40 @@ class Organization extends Model
 
     protected $primaryKey = 'id';
 
+    const SIZE_SMALL = '1-50 employees';
+    const SIZE_MEDIUM = '51-200 employees';
+    const SIZE_LARGE = '201-1000 employees';
+    const SIZE_ENTERPRISE = '1000+ employees';
+
     protected $fillable = [
         'org_name',
         'user_id',
         'admin_email',
         'password',
+        'description',
+        'logo_path',
+        'industry',
+        'size_category',
+        'location'
     ];
     
     protected $hidden = [
         'password',
     ];
 
-    protected function casts(): array
+    protected $casts = [
+        'password' => 'hashed',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    public static function getSizeCategories()
     {
         return [
-            'created_at' => 'datetime',
-            'updated_at' => 'datetime',
-            'password' => 'hashed',
+            self::SIZE_SMALL,
+            self::SIZE_MEDIUM,
+            self::SIZE_LARGE,
+            self::SIZE_ENTERPRISE
         ];
     }
 }
