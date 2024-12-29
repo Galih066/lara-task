@@ -52,7 +52,7 @@ class OrganizationService
             ->toArray();
             
         return Task::whereIn('initiator', $userIds)
-            ->where('status', 'completed')
+            ->where('status', 'done')
             ->count();
     }
 }
