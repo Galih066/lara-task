@@ -182,54 +182,67 @@ const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onTaskClick, onDragEnd, 
     const [selectedTaskId, setSelectedTaskId] = useState(null);
     const [isDetailOpen, setIsDetailOpen] = useState(false);
 
-    const handleTaskClick = (task) => {
-        setSelectedTaskId(task.id);
+    const priorityOrder = { high: 0, medium: 1, low: 2 };
+
+    const handleTaskClick = (taskId) => {
+        setSelectedTaskId(taskId);
         setIsDetailOpen(true);
     };
 
     const handleCloseDetail = () => {
+        setSelectedTaskId(null);
         setIsDetailOpen(false);
     };
 
+    // Group and sort tasks
     const tasksByStatus = {
-        todo: tasks.filter(task => task.status === 'todo'),
+        todo: tasks.filter(task => task.status === 'todo')
+            .sort((a, b) => {
+                // First sort by priority
+                const priorityDiff = priorityOrder[a.priority] - priorityOrder[b.priority];
+                if (priorityDiff !== 0) return priorityDiff;
+                // Then by due date
+                return new Date(a.dueDate) - new Date(b.dueDate);
+            }),
         in_progress: tasks.filter(task => task.status === 'in_progress'),
         review: tasks.filter(task => task.status === 'review'),
         done: tasks.filter(task => task.status === 'done'),
     };
 
+    if (!tasks.length) {
+        return (
+            <EmptyState
+                icon={ClipboardDocumentCheckIcon}
+                title="No tasks yet"
+                description="Add a task to start organizing your work"
+            />
+        );
+    }
+
     return (
         <DragDropContext onDragEnd={onDragEnd}>
             <div className="flex flex-col h-full">
-                {tasks.length === 0 ? (
-                    <EmptyState
-                        icon={ClipboardDocumentCheckIcon}
-                        title="No tasks on the board"
-                        description="Add a task to start organizing your work"
-                    />
-                ) : (
-                    <div className="overflow-x-auto -mx-4 px-4 mb-4">
-                        <div className="flex space-x-4 min-w-max py-2">
-                            {Object.entries(tasksByStatus).map(([status, statusTasks]) => (
-                                <div key={status} className="flex-none w-[400px]">
-                                    <TaskColumn title={formatStatus(status)} count={statusTasks.length} droppableId={status}>
-                                        {statusTasks.map((task, index) => (
-                                            <TaskCard
-                                                key={task.id}
-                                                task={task}
-                                                index={index}
-                                                onUpdate={onUpdateTask}
-                                                onDelete={onDeleteTask}
-                                                onClick={handleTaskClick}
-                                                isUpdating={updatingTaskId === task.id}
-                                            />
-                                        ))}
-                                    </TaskColumn>
-                                </div>
-                            ))}
-                        </div>
+                <div className="overflow-x-auto -mx-4 px-4 mb-4">
+                    <div className="flex space-x-4 min-w-max py-2">
+                        {Object.entries(tasksByStatus).map(([status, statusTasks]) => (
+                            <div key={status} className="flex-none w-[400px]">
+                                <TaskColumn title={formatStatus(status)} count={statusTasks.length} droppableId={status}>
+                                    {statusTasks.map((task, index) => (
+                                        <TaskCard
+                                            key={task.id}
+                                            task={task}
+                                            index={index}
+                                            onUpdate={onUpdateTask}
+                                            onDelete={onDeleteTask}
+                                            onClick={handleTaskClick}
+                                            isUpdating={updatingTaskId === task.id}
+                                        />
+                                    ))}
+                                </TaskColumn>
+                            </div>
+                        ))}
                     </div>
-                )}
+                </div>
             </div>
 
             <TaskDetail
