@@ -15,13 +15,43 @@ const TaskListModal = ({ isOpen, onClose, date, tasks }) => {
     const getPriorityBadgeColor = (priority) => {
         switch (priority.toLowerCase()) {
             case 'high':
-                return 'bg-red-100 text-red-800';
+                return 'bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/20';
             case 'medium':
-                return 'bg-yellow-100 text-yellow-800';
+                return 'bg-yellow-50 text-yellow-700 ring-1 ring-inset ring-yellow-600/20';
             case 'low':
-                return 'bg-green-100 text-green-800';
+                return 'bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20';
             default:
-                return 'bg-gray-100 text-gray-800';
+                return 'bg-gray-50 text-gray-600 ring-1 ring-inset ring-gray-500/10';
+        }
+    };
+
+    const getStatusColor = (status) => {
+        switch (status.toLowerCase()) {
+            case 'todo':
+                return 'bg-gray-50 text-gray-600 ring-1 ring-inset ring-gray-500/10';
+            case 'in_progress':
+                return 'bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-600/20';
+            case 'review':
+                return 'bg-purple-50 text-purple-700 ring-1 ring-inset ring-purple-600/20';
+            case 'done':
+                return 'bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20';
+            default:
+                return 'bg-gray-50 text-gray-600 ring-1 ring-inset ring-gray-500/10';
+        }
+    };
+
+    const getStatusIcon = (status) => {
+        switch (status.toLowerCase()) {
+            case 'todo':
+                return '';
+            case 'in_progress':
+                return '';
+            case 'review':
+                return '';
+            case 'done':
+                return '';
+            default:
+                return '';
         }
     };
 
@@ -51,49 +81,74 @@ const TaskListModal = ({ isOpen, onClose, date, tasks }) => {
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                                <Dialog.Title as="div" className="flex items-center justify-between mb-4">
-                                    <h3 className="text-lg font-medium leading-6 text-gray-900">
-                                        Tasks for {formatDate(date)}
-                                    </h3>
-                                    <button
-                                        type="button"
-                                        className="rounded-md text-gray-400 hover:text-gray-500 focus:outline-none"
-                                        onClick={onClose}
-                                    >
-                                        <XMarkIcon className="h-6 w-6" />
-                                    </button>
-                                </Dialog.Title>
+                            <Dialog.Panel className="w-full max-w-3xl transform overflow-hidden rounded-md bg-white shadow-xl transition-all">
+                                <div className="px-6 py-4 border-b bg-gray-50">
+                                    <div className="flex items-center justify-between">
+                                        <Dialog.Title as="h3" className="text-xl font-semibold leading-6 text-gray-900">
+                                            Tasks for {formatDate(date)}
+                                            <span className="ml-2 text-sm font-normal text-gray-500">
+                                                ({tasks.length} {tasks.length === 1 ? 'task' : 'tasks'})
+                                            </span>
+                                        </Dialog.Title>
+                                        <button
+                                            type="button"
+                                            className="rounded-md p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none"
+                                            onClick={onClose}
+                                        >
+                                            <XMarkIcon className="h-6 w-6" />
+                                        </button>
+                                    </div>
+                                </div>
 
-                                <div className="mt-2">
+                                <div className="px-6 py-4 max-h-[calc(100vh-200px)] overflow-y-auto">
                                     {tasks.length === 0 ? (
-                                        <p className="text-gray-500 text-center py-4">No tasks for this date</p>
+                                        <div className="text-center py-12">
+                                            <p className="text-gray-500 text-lg">No tasks scheduled for this date</p>
+                                        </div>
                                     ) : (
-                                        <div className="space-y-3">
+                                        <div className="space-y-4">
                                             {tasks.map((task) => (
                                                 <div
                                                     key={task.id}
-                                                    className="bg-white border rounded-lg p-4 shadow-sm"
+                                                    className="group bg-white border rounded-md p-4 hover:shadow-md transition-all duration-200"
                                                 >
-                                                    <div className="flex items-center justify-between">
-                                                        <h4 className="text-sm font-medium text-gray-900">
-                                                            {task.title}
-                                                        </h4>
-                                                        <span
-                                                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityBadgeColor(
-                                                                task.priority
-                                                            )}`}
-                                                        >
-                                                            {task.priority}
-                                                        </span>
-                                                    </div>
-                                                    {task.description && (
-                                                        <p className="mt-1 text-sm text-gray-500">
-                                                            {task.description}
-                                                        </p>
-                                                    )}
-                                                    <div className="mt-2 flex items-center text-xs text-gray-500">
-                                                        <span>Status: {task.status}</span>
+                                                    <div className="flex items-start gap-4">
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="flex items-center">
+                                                                <span className="text-lg">{getStatusIcon(task.status)}</span>
+                                                                <h4 className="text-base m-0 font-medium text-gray-900">
+                                                                    {task.title}
+                                                                </h4>
+                                                            </div>
+                                                            {task.description && (
+                                                                <div className="mt-2 mb-3">
+                                                                    <p className="text-sm text-gray-600 text-left">
+                                                                        {task.description}
+                                                                    </p>
+                                                                </div>
+                                                            )}
+                                                            <div className="flex flex-wrap items-center gap-2">
+                                                                <span
+                                                                    className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${getPriorityBadgeColor(
+                                                                        task.priority
+                                                                    )}`}
+                                                                >
+                                                                    Priority: {task.priority}
+                                                                </span>
+                                                                <span
+                                                                    className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${getStatusColor(
+                                                                        task.status
+                                                                    )}`}
+                                                                >
+                                                                    Status: {task.status}
+                                                                </span>
+                                                                {task.assignee && (
+                                                                    <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-50 text-gray-600 ring-1 ring-inset ring-gray-500/10">
+                                                                        {task.assignee}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             ))}
