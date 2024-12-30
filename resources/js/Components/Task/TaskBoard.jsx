@@ -208,7 +208,7 @@ const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onTaskClick, onDragEnd, 
                         description="Add a task to start organizing your work"
                     />
                 ) : (
-                    <div className="overflow-x-auto -mx-4 px-4 scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400 scrollbar-track-rounded-full scrollbar-thumb-rounded-full order-first mb-4">
+                    <div className="overflow-x-auto -mx-4 px-4 mb-4">
                         <div className="flex space-x-4 min-w-max py-2">
                             {Object.entries(tasksByStatus).map(([status, statusTasks]) => (
                                 <div key={status} className="flex-none w-[400px]">
