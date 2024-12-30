@@ -1,7 +1,8 @@
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useState } from "react";
-import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { PencilIcon, TrashIcon, ClipboardDocumentCheckIcon } from '@heroicons/react/24/outline';
 import TaskDetail from './TaskDetail';
+import EmptyState from '../EmptyState';
 
 const LoadingOverlay = () => (
     <div className="absolute inset-0 bg-white/50 flex items-center justify-center rounded-lg">
@@ -200,27 +201,35 @@ const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onTaskClick, onDragEnd, 
     return (
         <DragDropContext onDragEnd={onDragEnd}>
             <div className="flex flex-col h-full">
-                <div className="overflow-x-auto -mx-4 px-4 scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400 scrollbar-track-rounded-full scrollbar-thumb-rounded-full order-first mb-4">
-                    <div className="flex space-x-4 min-w-max py-2">
-                        {Object.entries(tasksByStatus).map(([status, statusTasks]) => (
-                            <div key={status} className="flex-none w-[400px]">
-                                <TaskColumn title={formatStatus(status)} count={statusTasks.length} droppableId={status}>
-                                    {statusTasks.map((task, index) => (
-                                        <TaskCard
-                                            key={task.id}
-                                            task={task}
-                                            index={index}
-                                            onUpdate={onUpdateTask}
-                                            onDelete={onDeleteTask}
-                                            onClick={handleTaskClick}
-                                            isUpdating={updatingTaskId === task.id}
-                                        />
-                                    ))}
-                                </TaskColumn>
-                            </div>
-                        ))}
+                {tasks.length === 0 ? (
+                    <EmptyState
+                        icon={ClipboardDocumentCheckIcon}
+                        title="No tasks on the board"
+                        description="Add a task to start organizing your work"
+                    />
+                ) : (
+                    <div className="overflow-x-auto -mx-4 px-4 scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400 scrollbar-track-rounded-full scrollbar-thumb-rounded-full order-first mb-4">
+                        <div className="flex space-x-4 min-w-max py-2">
+                            {Object.entries(tasksByStatus).map(([status, statusTasks]) => (
+                                <div key={status} className="flex-none w-[400px]">
+                                    <TaskColumn title={formatStatus(status)} count={statusTasks.length} droppableId={status}>
+                                        {statusTasks.map((task, index) => (
+                                            <TaskCard
+                                                key={task.id}
+                                                task={task}
+                                                index={index}
+                                                onUpdate={onUpdateTask}
+                                                onDelete={onDeleteTask}
+                                                onClick={handleTaskClick}
+                                                isUpdating={updatingTaskId === task.id}
+                                            />
+                                        ))}
+                                    </TaskColumn>
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
 
             <TaskDetail

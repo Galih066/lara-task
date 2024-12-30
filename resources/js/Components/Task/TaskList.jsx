@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
-import { ChevronUpIcon, ChevronDownIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { ChevronUpIcon, ChevronDownIcon, PencilIcon, TrashIcon, ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
+import EmptyState from "../EmptyState";
 
 const TaskRow = ({ task, onUpdate, onDelete }) => {
     const getPriorityColor = (priority) => {
@@ -161,14 +162,24 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                     </div>
                 </div>
                 <div className="divide-y divide-gray-200">
-                    {sortedTasks.map(task => (
-                        <TaskRow
-                            key={task.id}
-                            task={task}
-                            onUpdate={onUpdateTask}
-                            onDelete={onDeleteTask}
+                    {tasks.length === 0 ? (
+                        <EmptyState
+                            icon={ClipboardDocumentListIcon}
+                            title="No tasks found"
+                            description="Create a new task to get started"
                         />
-                    ))}
+                    ) : (
+                        <div className="mt-4 space-y-4">
+                            {sortedTasks.map((task) => (
+                                <TaskRow
+                                    key={task.id}
+                                    task={task}
+                                    onUpdate={onUpdateTask}
+                                    onDelete={onDeleteTask}
+                                />
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

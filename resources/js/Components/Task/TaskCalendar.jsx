@@ -67,12 +67,12 @@ const TaskCalendar = ({ tasks, onUpdateTask, onDeleteTask }) => {
         const date = new Date(year, month, dayNumber);
         const dateKey = date.toISOString().split('T')[0];
         const dayTasks = tasksByDate[dateKey] || [];
-        const isToday = today.getDate() === dayNumber && 
-                       today.getMonth() === month && 
-                       today.getFullYear() === year;
+        const isToday = today.getDate() === dayNumber &&
+            today.getMonth() === month &&
+            today.getFullYear() === year;
 
         return (
-            <div 
+            <div
                 className={`h-32 border border-gray-200 p-2 ${isToday ? 'bg-blue-50' : 'bg-white'} cursor-pointer hover:bg-gray-50 transition-colors`}
                 onClick={() => {
                     setSelectedDate(date);
@@ -80,9 +80,8 @@ const TaskCalendar = ({ tasks, onUpdateTask, onDeleteTask }) => {
                 }}
             >
                 <div className="flex justify-between items-start">
-                    <span className={`inline-flex items-center justify-center w-6 h-6 text-sm ${
-                        isToday ? 'bg-blue-500 text-white rounded-full' : 'text-gray-700'
-                    }`}>
+                    <span className={`inline-flex items-center justify-center w-6 h-6 text-sm ${isToday ? 'bg-blue-500 text-white rounded-full' : 'text-gray-700'
+                        }`}>
                         {dayNumber}
                     </span>
                 </div>
