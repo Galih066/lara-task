@@ -88,15 +88,12 @@ const TaskColumn = ({ title, count, children, droppableId }) => (
             <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
-                className={`bg-gray-50 rounded-lg p-4`}
+                className={`bg-gray-50 rounded-lg p-4 min-h-[24rem] h-full flex flex-col`}
             >
                 <h3 className="text-sm font-medium text-gray-900 mb-4">
                     {title} ({count})
                 </h3>
-                <div
-                    {...provided.droppableProps}
-                    className="space-y-3"
-                >
+                <div className="space-y-4 flex-1">
                     {children}
                     {provided.placeholder}
                 </div>
@@ -223,9 +220,9 @@ const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onTaskClick, onDragEnd, 
         <DragDropContext onDragEnd={onDragEnd}>
             <div className="flex flex-col h-full">
                 <div className="overflow-x-auto -mx-4 px-4 mb-4">
-                    <div className="flex space-x-4 min-w-max py-2">
+                    <div className="grid grid-flow-col gap-4 min-w-max py-2 auto-cols-[400px]">
                         {Object.entries(tasksByStatus).map(([status, statusTasks]) => (
-                            <div key={status} className="flex-none w-[400px]">
+                            <div key={status} className="h-full">
                                 <TaskColumn title={formatStatus(status)} count={statusTasks.length} droppableId={status}>
                                     {statusTasks.map((task, index) => (
                                         <TaskCard
