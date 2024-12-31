@@ -184,8 +184,8 @@ const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onTaskClick, onDragEnd, 
 
     const priorityOrder = { high: 0, medium: 1, low: 2 };
 
-    const handleTaskClick = (taskId) => {
-        setSelectedTaskId(taskId);
+    const handleTaskClick = (task) => {
+        setSelectedTaskId(task.id);
         setIsDetailOpen(true);
     };
 
