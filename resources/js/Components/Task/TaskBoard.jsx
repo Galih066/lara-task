@@ -3,6 +3,7 @@ import { useState } from "react";
 import { PencilIcon, TrashIcon, ClipboardDocumentCheckIcon } from '@heroicons/react/24/outline';
 import TaskDetail from './TaskDetail';
 import EmptyState from '../EmptyState';
+import ErrorAlert from '../AlertComp/ErrorAlert';
 
 const LoadingOverlay = () => (
     <div className="absolute inset-0 bg-white/50 flex items-center justify-center rounded-lg">
@@ -190,6 +191,7 @@ const formatStatus = (status) => {
 const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onTaskClick, onDragEnd, updatingTaskId }) => {
     const [selectedTaskId, setSelectedTaskId] = useState(null);
     const [isDetailOpen, setIsDetailOpen] = useState(false);
+    const [showError, setShowError] = useState(false);
 
     const priorityOrder = { high: 0, medium: 1, low: 2 };
 
@@ -199,67 +201,123 @@ const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onTaskClick, onDragEnd, 
     };
 
     const handleCloseDetail = () => {
-        setSelectedTaskId(null);
         setIsDetailOpen(false);
+        setSelectedTaskId(null);
     };
 
-    // Group and sort tasks
-    const tasksByStatus = {
-        todo: tasks.filter(task => task.status === 'todo')
-            .sort((a, b) => {
-                // First sort by priority
-                const priorityDiff = priorityOrder[a.priority] - priorityOrder[b.priority];
-                if (priorityDiff !== 0) return priorityDiff;
-                // Then by due date
-                return new Date(a.dueDate) - new Date(b.dueDate);
-            }),
+    const handleDragEnd = (result) => {
+        const { destination, source, draggableId } = result;
+
+        if (!destination) return;
+
+        if (
+            destination.droppableId === source.droppableId &&
+            destination.index === source.index
+        ) {
+            return;
+        }
+
+        const task = tasks.find(t => t.id.toString() === draggableId);
+        
+        if (!task.start_date && !task.due_date && destination.droppableId !== 'todo') {
+            setShowError(true);
+            return;
+        }
+
+        onDragEnd(result);
+    };
+
+    const groupedTasks = {
+        todo: tasks.filter(task => task.status === 'todo'),
         in_progress: tasks.filter(task => task.status === 'in_progress'),
-        review: tasks.filter(task => task.status === 'review'),
-        done: tasks.filter(task => task.status === 'done'),
+        done: tasks.filter(task => task.status === 'done')
     };
-
-    if (!tasks.length) {
-        return (
-            <EmptyState
-                icon={ClipboardDocumentCheckIcon}
-                title="No tasks yet"
-                description="Add a task to start organizing your work"
-            />
-        );
-    }
 
     return (
-        <DragDropContext onDragEnd={onDragEnd}>
-            <div className="flex flex-col h-full">
-                <div className="overflow-x-auto -mx-4 px-4 mb-4">
-                    <div className="grid grid-flow-col gap-4 min-w-max py-2 auto-cols-[400px]">
-                        {Object.entries(tasksByStatus).map(([status, statusTasks]) => (
-                            <div key={status} className="h-full">
-                                <TaskColumn title={formatStatus(status)} count={statusTasks.length} droppableId={status}>
-                                    {statusTasks.map((task, index) => (
-                                        <TaskCard
-                                            key={task.id}
-                                            task={task}
-                                            index={index}
-                                            onUpdate={onUpdateTask}
-                                            onDelete={onDeleteTask}
-                                            onClick={handleTaskClick}
-                                            isUpdating={updatingTaskId === task.id}
-                                        />
-                                    ))}
-                                </TaskColumn>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
+        <div className="h-full">
+            {showError && (
+                <ErrorAlert
+                    title="Task Dates Required"
+                    description="Please set start and due dates before moving the task"
+                    onClose={() => setShowError(false)}
+                />
+            )}
+            <DragDropContext onDragEnd={handleDragEnd}>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full">
+                    <TaskColumn
+                        title="To Do"
+                        count={groupedTasks.todo.length}
+                        droppableId="todo"
+                    >
+                        {groupedTasks.todo
+                            .sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority])
+                            .map((task, index) => (
+                                <TaskCard
+                                    key={task.id}
+                                    task={task}
+                                    index={index}
+                                    onUpdate={onUpdateTask}
+                                    onDelete={onDeleteTask}
+                                    onClick={handleTaskClick}
+                                    isUpdating={updatingTaskId === task.id}
+                                />
+                            ))}
+                    </TaskColumn>
 
-            <TaskDetail
-                taskId={selectedTaskId}
-                isModalOpen={isDetailOpen}
-                onClose={handleCloseDetail}
-            />
-        </DragDropContext>
+                    <TaskColumn
+                        title="In Progress"
+                        count={groupedTasks.in_progress.length}
+                        droppableId="in_progress"
+                    >
+                        {groupedTasks.in_progress
+                            .sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority])
+                            .map((task, index) => (
+                                <TaskCard
+                                    key={task.id}
+                                    task={task}
+                                    index={index}
+                                    onUpdate={onUpdateTask}
+                                    onDelete={onDeleteTask}
+                                    onClick={handleTaskClick}
+                                    isUpdating={updatingTaskId === task.id}
+                                />
+                            ))}
+                    </TaskColumn>
+
+                    <TaskColumn
+                        title="Done"
+                        count={groupedTasks.done.length}
+                        droppableId="done"
+                    >
+                        {groupedTasks.done
+                            .sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority])
+                            .map((task, index) => (
+                                <TaskCard
+                                    key={task.id}
+                                    task={task}
+                                    index={index}
+                                    onUpdate={onUpdateTask}
+                                    onDelete={onDeleteTask}
+                                    onClick={handleTaskClick}
+                                    isUpdating={updatingTaskId === task.id}
+                                />
+                            ))}
+                    </TaskColumn>
+                </div>
+            </DragDropContext>
+
+            {selectedTaskId && (
+                <TaskDetail
+                    taskId={selectedTaskId}
+                    isModalOpen={isDetailOpen}
+                    onClose={handleCloseDetail}
+                    onSuccess={() => {
+                        handleCloseDetail();
+                        // router.visit(window.location.pathname);
+                    }}
+                />
+            )}
+        </div>
     );
 };
 
