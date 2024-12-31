@@ -40,6 +40,7 @@ class TaskService
         $task = new Task();
         $task->title = $request->title;
         $task->description = $request->description;
+        $task->start_date = $request->start_date;
         $task->due_date = $request->due_date;
         $task->priority = $request->priority;
         $task->status = $request->status;
@@ -73,7 +74,7 @@ class TaskService
     public function getAllTasks()
     {
         $userId = Auth::id();
-        $tasks = Task::select('id', 'title', 'description', 'priority', 'status', 'due_date', 'initiator', 'assignees')
+        $tasks = Task::select('id', 'title', 'description', 'priority', 'status', 'start_date', 'due_date', 'initiator', 'assignees')
             ->where(function($query) use ($userId) {
                 $query->whereRaw('JSON_SEARCH(assignees, "one", ?) IS NOT NULL', [$userId])
                       ->orWhere('initiator', $userId);
@@ -89,7 +90,8 @@ class TaskService
                     'priority' => $task->priority,
                     'status' => $task->status,
                     'initiator' => ucwords(strtolower($task->initiatorUser->name)),
-                    'dueDate' => $task->due_date,
+                    'start_date' => $task->start_date,
+                    'due_date' => $task->due_date,
                     'assignees' => json_decode($task->assignees)
                 ];
             });
@@ -129,7 +131,8 @@ class TaskService
                 'email' => $task->initiatorUser->email,
             ],
             'assignees' => $assignees,
-            'dueDate' => $task->due_date,
+            'start_date' => $task->start_date,
+            'due_date' => $task->due_date,
             'completedDate' => $task->completed_date,
             'createdAt' => $task->created_at,
             'updatedAt' => $task->updated_at,

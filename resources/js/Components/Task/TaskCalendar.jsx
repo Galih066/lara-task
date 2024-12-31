@@ -42,30 +42,23 @@ const TaskCalendar = ({ tasks, onUpdateTask, onDeleteTask }) => {
         }
     };
 
-    // Group tasks by date
-    const tasksByDate = tasks.reduce((acc, task) => {
-        const date = moment(task.due_date).startOf('day');
-        const key = date.format('YYYY-MM-DD');
-        if (!acc[key]) {
-            acc[key] = [];
-        }
-        acc[key].push(task);
-        return acc;
-    }, {});
-
     const renderCell = (dayNumber) => {
         if (!dayNumber) return <div className="h-32 bg-gray-50" />;
 
         const date = moment(currentDate).date(dayNumber);
-        const key = date.format('YYYY-MM-DD');
-        const dayTasks = tasksByDate[key] || [];
+        const dayTasks = tasks.filter(task => {
+            const startDate = moment(task.start_date);
+            const endDate = moment(task.due_date);
+            return date.isSameOrAfter(startDate, 'day') && 
+                   date.isSameOrBefore(endDate, 'day');
+        });
         const isToday = moment().isSame(date, 'day');
         const isCurrentMonth = moment(currentDate).isSame(date, 'month');
 
         return (
             <div
                 className={`min-h-[8rem] p-2 ${isToday ? 'bg-blue-50' : 'bg-white'
-                    } hover:bg-gray-50 transition-colors cursor-pointer group`}
+                    } hover:bg-gray-50 transition-colors cursor-pointer group relative`}
                 onClick={() => {
                     setSelectedDate(date);
                     setIsModalOpen(true);
@@ -86,34 +79,48 @@ const TaskCalendar = ({ tasks, onUpdateTask, onDeleteTask }) => {
                     )}
                 </div>
                 <div className="mt-2 space-y-1 overflow-y-auto max-h-24 custom-scrollbar">
-                    {dayTasks.map(task => (
-                        <motion.div
-                            key={task.id}
-                            initial={{ opacity: 0, y: 5 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className={`
-                                p-1.5 rounded-md text-xs border group/task
-                                ${getPriorityColor(task.priority)}
-                                hover:shadow-sm transition-shadow
-                            `}
-                        >
-                            <div className="flex items-center justify-between">
-                                <span className="truncate flex-1">{task.title}</span>
-                                <span className={`
-                                    ml-1 px-1.5 py-0.5 rounded text-[10px] font-medium opacity-0 
-                                    group-hover/task:opacity-100 transition-opacity
-                                    ${task.status === 'todo' ? 'bg-gray-100 text-gray-600' :
-                                        task.status === 'in_progress' ? 'bg-blue-100 text-blue-600' :
-                                            task.status === 'review' ? 'bg-purple-100 text-purple-600' :
-                                                'bg-green-100 text-green-600'}
-                                `}>
-                                    {task.status === 'in_progress' ? 'IP' :
-                                        task.status === 'todo' ? 'TD' :
-                                            task.status === 'review' ? 'RV' : 'DN'}
-                                </span>
-                            </div>
-                        </motion.div>
-                    ))}
+                    {dayTasks.map(task => {
+                        const isStart = moment(task.start_date).isSame(date, 'day');
+                        const isEnd = moment(task.due_date).isSame(date, 'day');
+                        return (
+                            <motion.div
+                                key={task.id}
+                                initial={{ opacity: 0, y: 5 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className={`
+                                    p-1.5 text-xs border group/task
+                                    ${getPriorityColor(task.priority)}
+                                    hover:shadow-sm transition-shadow
+                                    ${isStart ? 'rounded-l-md' : 'border-l-0 rounded-l-none'}
+                                    ${isEnd ? 'rounded-r-md' : 'border-r-0 rounded-r-none'}
+                                    relative
+                                `}
+                                style={{
+                                    marginLeft: isStart ? '0' : '-1px',
+                                    marginRight: isEnd ? '0' : '-1px',
+                                    zIndex: 10
+                                }}
+                            >
+                                <div className="flex items-center justify-between">
+                                    <span className="truncate flex-1">{task.title}</span>
+                                    {(isStart || isEnd) && (
+                                        <span className={`
+                                            ml-1 px-1.5 py-0.5 rounded text-[10px] font-medium opacity-0 
+                                            group-hover/task:opacity-100 transition-opacity
+                                            ${task.status === 'todo' ? 'bg-gray-100 text-gray-600' :
+                                                task.status === 'in_progress' ? 'bg-blue-100 text-blue-600' :
+                                                    task.status === 'review' ? 'bg-purple-100 text-purple-600' :
+                                                        'bg-green-100 text-green-600'}
+                                        `}>
+                                            {task.status === 'in_progress' ? 'IP' :
+                                                task.status === 'todo' ? 'TD' :
+                                                    task.status === 'review' ? 'RV' : 'DN'}
+                                        </span>
+                                    )}
+                                </div>
+                            </motion.div>
+                        );
+                    })}
                 </div>
             </div>
         );
@@ -170,7 +177,12 @@ const TaskCalendar = ({ tasks, onUpdateTask, onDeleteTask }) => {
                         setSelectedDate(null);
                     }}
                     date={selectedDate.toDate()}
-                    tasks={tasksByDate[selectedDate.format('YYYY-MM-DD')] || []}
+                    tasks={tasks.filter(task => {
+                        const startDate = moment(task.start_date);
+                        const endDate = moment(task.due_date);
+                        return moment(selectedDate).isSameOrAfter(startDate, 'day') && 
+                               moment(selectedDate).isSameOrBefore(endDate, 'day');
+                    })}
                 />
             )}
         </div>

@@ -18,6 +18,7 @@ class Task extends Model
         'description',
         'initiator',
         'assignees',
+        'start_date',
         'due_date',
         'completed_date',
         'priority',
