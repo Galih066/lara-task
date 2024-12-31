@@ -21,7 +21,7 @@ const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering, onSuccess }) 
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        
+
         const formData = new FormData();
         formData.append('title', formState.title);
         formData.append('description', formState.description);
@@ -138,18 +138,21 @@ const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering, onSuccess }) 
                                                 {errors.assignees && <p className="mt-2 text-sm text-red-600">{errors.assignees}</p>}
                                             </div>
                                             <div>
-                                                <label htmlFor="due_date" className="block text-sm font-medium text-gray-700 mb-2">
-                                                    Due Date
-                                                </label>
+                                                <label htmlFor="start_date" className="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
                                                 <input
                                                     type="date"
-                                                    id="due_date"
-                                                    value={formState.due_date}
-                                                    onChange={e => setFormState(prev => ({ ...prev, due_date: e.target.value }))}
-                                                    min={formState.start_date || new Date().toISOString().split('T')[0]}
+                                                    id="start_date"
+                                                    value={formState.start_date}
+                                                    onChange={e => {
+                                                        setFormState(prev => ({ ...prev, start_date: e.target.value }));
+                                                        if (formState.due_date && e.target.value > formState.due_date) {
+                                                            setFormState(prev => ({ ...prev, due_date: e.target.value }));
+                                                        }
+                                                    }}
+                                                    min={new Date().toISOString().split('T')[0]}
                                                     className="w-full h-10 px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                                 />
-                                                {errors.due_date && <p className="mt-2 text-sm text-red-600">{errors.due_date}</p>}
+                                                {errors.start_date && <p className="mt-2 text-sm text-red-600">{errors.start_date}</p>}
                                             </div>
                                         </div>
                                     </div>
@@ -172,21 +175,18 @@ const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering, onSuccess }) 
                                             </div>
 
                                             <div>
-                                                <label htmlFor="start_date" className="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
+                                                <label htmlFor="due_date" className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Due Date
+                                                </label>
                                                 <input
                                                     type="date"
-                                                    id="start_date"
-                                                    value={formState.start_date}
-                                                    onChange={e => {
-                                                        setFormState(prev => ({ ...prev, start_date: e.target.value }));
-                                                        if (formState.due_date && e.target.value > formState.due_date) {
-                                                            setFormState(prev => ({ ...prev, due_date: e.target.value }));
-                                                        }
-                                                    }}
-                                                    min={new Date().toISOString().split('T')[0]}
+                                                    id="due_date"
+                                                    value={formState.due_date}
+                                                    onChange={e => setFormState(prev => ({ ...prev, due_date: e.target.value }))}
+                                                    min={formState.start_date || new Date().toISOString().split('T')[0]}
                                                     className="w-full h-10 px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                                 />
-                                                {errors.start_date && <p className="mt-2 text-sm text-red-600">{errors.start_date}</p>}
+                                                {errors.due_date && <p className="mt-2 text-sm text-red-600">{errors.due_date}</p>}
                                             </div>
                                         </div>
                                     </div>
