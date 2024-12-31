@@ -230,6 +230,7 @@ const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onTaskClick, onDragEnd, 
     const groupedTasks = {
         todo: tasks.filter(task => task.status === 'todo'),
         in_progress: tasks.filter(task => task.status === 'in_progress'),
+        review: tasks.filter(task => task.status === 'review'),
         done: tasks.filter(task => task.status === 'done')
     };
 
@@ -243,66 +244,98 @@ const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onTaskClick, onDragEnd, 
                 />
             )}
             <DragDropContext onDragEnd={handleDragEnd}>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full">
-                    <TaskColumn
-                        title="To Do"
-                        count={groupedTasks.todo.length}
-                        droppableId="todo"
-                    >
-                        {groupedTasks.todo
-                            .sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority])
-                            .map((task, index) => (
-                                <TaskCard
-                                    key={task.id}
-                                    task={task}
-                                    index={index}
-                                    onUpdate={onUpdateTask}
-                                    onDelete={onDeleteTask}
-                                    onClick={handleTaskClick}
-                                    isUpdating={updatingTaskId === task.id}
-                                />
-                            ))}
-                    </TaskColumn>
+                <div className="flex flex-col h-full">
+                    <div className="overflow-x-auto -mx-4 px-4 mb-4">
+                        <div className="inline-flex gap-4 min-w-max py-2">
+                            <div className="w-[400px]">
+                                <TaskColumn
+                                    title="To Do"
+                                    count={groupedTasks.todo.length}
+                                    droppableId="todo"
+                                >
+                                    {groupedTasks.todo
+                                        .sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority])
+                                        .map((task, index) => (
+                                            <TaskCard
+                                                key={task.id}
+                                                task={task}
+                                                index={index}
+                                                onUpdate={onUpdateTask}
+                                                onDelete={onDeleteTask}
+                                                onClick={handleTaskClick}
+                                                isUpdating={updatingTaskId === task.id}
+                                            />
+                                        ))}
+                                </TaskColumn>
+                            </div>
 
-                    <TaskColumn
-                        title="In Progress"
-                        count={groupedTasks.in_progress.length}
-                        droppableId="in_progress"
-                    >
-                        {groupedTasks.in_progress
-                            .sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority])
-                            .map((task, index) => (
-                                <TaskCard
-                                    key={task.id}
-                                    task={task}
-                                    index={index}
-                                    onUpdate={onUpdateTask}
-                                    onDelete={onDeleteTask}
-                                    onClick={handleTaskClick}
-                                    isUpdating={updatingTaskId === task.id}
-                                />
-                            ))}
-                    </TaskColumn>
+                            <div className="w-[400px]">
+                                <TaskColumn
+                                    title="In Progress"
+                                    count={groupedTasks.in_progress.length}
+                                    droppableId="in_progress"
+                                >
+                                    {groupedTasks.in_progress
+                                        .sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority])
+                                        .map((task, index) => (
+                                            <TaskCard
+                                                key={task.id}
+                                                task={task}
+                                                index={index}
+                                                onUpdate={onUpdateTask}
+                                                onDelete={onDeleteTask}
+                                                onClick={handleTaskClick}
+                                                isUpdating={updatingTaskId === task.id}
+                                            />
+                                        ))}
+                                </TaskColumn>
+                            </div>
 
-                    <TaskColumn
-                        title="Done"
-                        count={groupedTasks.done.length}
-                        droppableId="done"
-                    >
-                        {groupedTasks.done
-                            .sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority])
-                            .map((task, index) => (
-                                <TaskCard
-                                    key={task.id}
-                                    task={task}
-                                    index={index}
-                                    onUpdate={onUpdateTask}
-                                    onDelete={onDeleteTask}
-                                    onClick={handleTaskClick}
-                                    isUpdating={updatingTaskId === task.id}
-                                />
-                            ))}
-                    </TaskColumn>
+                            <div className="w-[400px]">
+                                <TaskColumn
+                                    title="Review"
+                                    count={groupedTasks.review.length}
+                                    droppableId="review"
+                                >
+                                    {groupedTasks.review
+                                        .sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority])
+                                        .map((task, index) => (
+                                            <TaskCard
+                                                key={task.id}
+                                                task={task}
+                                                index={index}
+                                                onUpdate={onUpdateTask}
+                                                onDelete={onDeleteTask}
+                                                onClick={handleTaskClick}
+                                                isUpdating={updatingTaskId === task.id}
+                                            />
+                                        ))}
+                                </TaskColumn>
+                            </div>
+
+                            <div className="w-[400px]">
+                                <TaskColumn
+                                    title="Done"
+                                    count={groupedTasks.done.length}
+                                    droppableId="done"
+                                >
+                                    {groupedTasks.done
+                                        .sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority])
+                                        .map((task, index) => (
+                                            <TaskCard
+                                                key={task.id}
+                                                task={task}
+                                                index={index}
+                                                onUpdate={onUpdateTask}
+                                                onDelete={onDeleteTask}
+                                                onClick={handleTaskClick}
+                                                isUpdating={updatingTaskId === task.id}
+                                            />
+                                        ))}
+                                </TaskColumn>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </DragDropContext>
 
