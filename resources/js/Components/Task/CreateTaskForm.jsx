@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useForm, router } from '@inertiajs/react';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import AssigneeSelect from './Form/AssigneeSelect';
 import ImageUpload from './Form/ImageUpload';
 
 const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering, onSuccess }) => {
     const [selectedFiles, setSelectedFiles] = useState([]);
-    
+
     const { data, setData, post, processing, errors, reset } = useForm({
         title: '',
         description: '',
@@ -115,7 +115,13 @@ const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering, onSuccess }) 
                             </div>
 
                             <div className="bg-gray-50 p-6 rounded-lg">
-                                <h3 className="text-lg font-medium text-gray-900 mb-6">Task Details</h3>
+                                <div className="flex items-center justify-between mb-6">
+                                    <h3 className="text-lg font-medium text-gray-900">Task Details</h3>
+                                    <div className="flex items-center gap-1 text-blue-600">
+                                        <InformationCircleIcon className="h-4 w-4" />
+                                        <p className="text-sm font-medium">Start and due dates can be set later</p>
+                                    </div>
+                                </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     <div className="space-y-6">
                                         <div className='space-y-4'>
