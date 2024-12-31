@@ -1,7 +1,12 @@
 import { useState, useEffect } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import { CalendarIcon, ClockIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
+import moment from 'moment';
+
+import TaskDates from './Detail/TaskDates';
+import TaskStatus from './Detail/TaskStatus';
+import TaskPeople from './Detail/TaskPeople';
+import TaskAttachments from './Detail/TaskAttachments';
 
 const TaskDetail = ({ taskId, onClose, isModalOpen: isOpen }) => {
     const [task, setTask] = useState(null);
@@ -13,7 +18,6 @@ const TaskDetail = ({ taskId, onClose, isModalOpen: isOpen }) => {
     useEffect(() => {
         if (isOpen) {
             setIsMounted(true);
-            // Delay setting visibility to allow initial render
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
                     setIsVisible(true);
@@ -21,7 +25,6 @@ const TaskDetail = ({ taskId, onClose, isModalOpen: isOpen }) => {
             });
         } else {
             setIsVisible(false);
-            // Delay unmounting to allow exit animation
             const timer = setTimeout(() => {
                 setIsMounted(false);
             }, 300);
@@ -31,24 +34,18 @@ const TaskDetail = ({ taskId, onClose, isModalOpen: isOpen }) => {
 
     useEffect(() => {
         if (isOpen) {
-            // Disable scroll on body when modal opens
             document.body.style.overflow = 'hidden';
         } else {
-            // Re-enable scroll when modal closes
             document.body.style.overflow = 'unset';
         }
 
-        // Cleanup function to re-enable scroll when component unmounts
         return () => {
             document.body.style.overflow = 'unset';
         };
     }, [isOpen]);
 
     const getTimeRemaining = (dueDate) => {
-        const now = new Date();
-        const due = new Date(dueDate);
-        const diffTime = due - now;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const diffDays = moment(dueDate).diff(moment(), 'days');
 
         const timeStates = {
             overdue: { threshold: 0, text: 'Overdue', class: 'text-red-600' },
@@ -66,12 +63,39 @@ const TaskDetail = ({ taskId, onClose, isModalOpen: isOpen }) => {
     };
 
     const formatDate = (date) => {
+        if (!date) return '';
         return new Date(date).toLocaleDateString('en-US', {
             weekday: 'long',
             year: 'numeric',
             month: 'long',
             day: 'numeric'
         });
+    };
+
+    const getPriorityColor = (priority) => {
+        const colors = {
+            low: 'bg-blue-100 text-blue-800',
+            medium: 'bg-yellow-100 text-yellow-800',
+            high: 'bg-red-100 text-red-800'
+        };
+        return colors[priority] || colors.medium;
+    };
+
+    const getStatusColor = (status) => {
+        const colors = {
+            pending: 'bg-yellow-100 text-yellow-800',
+            in_progress: 'bg-blue-100 text-blue-800',
+            completed: 'bg-green-100 text-green-800',
+            cancelled: 'bg-gray-100 text-gray-800'
+        };
+        return colors[status] || colors.pending;
+    };
+
+    const formatStatus = (status) => {
+        return status
+            .split('_')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
     };
 
     useEffect(() => {
@@ -98,19 +122,14 @@ const TaskDetail = ({ taskId, onClose, isModalOpen: isOpen }) => {
 
     return (
         <>
-            {/* Backdrop */}
             <div
-                className={`fixed inset-0 bg-black transition-opacity duration-300 ease-in-out z-[60] ${isVisible ? 'bg-opacity-25' : 'bg-opacity-0 pointer-events-none'
-                    }`}
+                className={`fixed inset-0 bg-black transition-opacity duration-300 ease-in-out z-[60] ${isVisible ? 'bg-opacity-25' : 'bg-opacity-0 pointer-events-none'}`}
                 onClick={onClose}
             />
 
-            {/* Panel */}
             <div
-                className={`fixed inset-y-0 right-0 w-[800px] bg-white shadow-xl transform transition-all duration-300 ease-in-out z-[70] flex flex-col ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
-                    }`}
+                className={`fixed inset-y-0 right-0 w-[800px] bg-white shadow-xl transform transition-all duration-300 ease-in-out z-[70] flex flex-col ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}`}
             >
-                {/* Header - Fixed */}
                 <div className="flex-none p-6 border-b">
                     <div className="flex items-center justify-between">
                         <h2 className="text-xl font-semibold text-gray-900">Task Details</h2>
@@ -123,7 +142,6 @@ const TaskDetail = ({ taskId, onClose, isModalOpen: isOpen }) => {
                     </div>
                 </div>
 
-                {/* Content - Scrollable */}
                 <div className="flex-1 overflow-y-auto p-6">
                     {loading ? (
                         <div className="flex items-center justify-center h-full">
@@ -133,192 +151,33 @@ const TaskDetail = ({ taskId, onClose, isModalOpen: isOpen }) => {
                         <div className="text-center text-red-500">{error}</div>
                     ) : task ? (
                         <div className="space-y-6 pb-20">
-                            {/* Title and Description */}
                             <div>
-                                <h3 className="text-2xl font-medium text-gray-900">{task.title}</h3>
-                                <p className="mt-2 text-gray-600 whitespace-pre-wrap">{task.description}</p>
+                                <h3 className="text-2xl font-medium text-gray-900 mb-2">{task.title}</h3>
+                                <p className="text-gray-600 whitespace-pre-wrap">{task.description}</p>
                             </div>
 
-                            {/* Status and Priority */}
-                            <div className="flex items-center space-x-4">
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
-                                    {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-                                </span>
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}>
-                                    {formatStatus(task.status)}
-                                </span>
-                                <span className={`inline-flex items-center gap-1 text-sm ${getTimeRemaining(task.dueDate).class}`}>
-                                    <ClockIcon className="h-4 w-4" />
-                                    {getTimeRemaining(task.dueDate).text}
-                                </span>
-                            </div>
+                            <TaskStatus 
+                                task={task}
+                                getPriorityColor={getPriorityColor}
+                                getStatusColor={getStatusColor}
+                                formatStatus={formatStatus}
+                                getTimeRemaining={getTimeRemaining}
+                            />
 
-                            {/* Dates */}
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="bg-gray-50 rounded-lg p-4">
-                                    <h4 className="text-sm font-medium text-gray-500">Created</h4>
-                                    <p className="mt-1 text-sm text-gray-900">{formatDate(task.createdAt)}</p>
-                                </div>
-                                <div className="bg-gray-50 rounded-lg p-4">
-                                    <h4 className="text-sm font-medium text-gray-500">Due Date</h4>
-                                    <p className="mt-1 text-sm text-gray-900">{formatDate(task.dueDate)}</p>
-                                </div>
-                                {task.completedDate && (
-                                    <div className="bg-gray-50 rounded-lg p-4 col-span-2">
-                                        <h4 className="text-sm font-medium text-gray-500">Completed</h4>
-                                        <p className="mt-1 text-sm text-gray-900">{formatDate(task.completedDate)}</p>
-                                    </div>
-                                )}
-                            </div>
+                            <TaskDates 
+                                task={task}
+                                formatDate={formatDate}
+                            />
 
-                            {/* People */}
-                            <div className="space-y-4">
-                                {/* Initiator */}
-                                <div>
-                                    <h4 className="text-sm font-medium text-gray-500 mb-2">Initiator</h4>
-                                    <div className="bg-gray-50 rounded-lg p-4">
-                                        <div className="flex items-center space-x-3">
-                                            <div className="flex-shrink-0">
-                                                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                                    <span className="text-sm font-medium text-blue-800">
-                                                        {task.initiator.name.charAt(0)}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <p className="text-sm font-medium text-gray-900">{task.initiator.name}</p>
-                                                <p className="text-sm text-gray-500">{task.initiator.email}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                            <TaskPeople task={task} />
 
-                                {/* Assignees */}
-                                <div>
-                                    <h4 className="text-sm font-medium text-gray-500 mb-2">Assignees</h4>
-                                    <div className="space-y-2">
-                                        {task.assignees && task.assignees.length > 0 ? (
-                                            task.assignees.map((assignee, index) => (
-                                                <div key={index} className="bg-gray-50 rounded-lg p-4">
-                                                    <div className="flex items-center space-x-3">
-                                                        <div className="flex-shrink-0">
-                                                            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                                                <span className="text-sm font-medium text-blue-800">
-                                                                    {assignee.name.charAt(0)}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-sm font-medium text-gray-900">{assignee.name}</p>
-                                                            <div className="text-sm text-gray-500 space-x-2">
-                                                                <span>{assignee.email}</span>
-                                                                {assignee.job_title && (
-                                                                    <>
-                                                                        <span>•</span>
-                                                                        <span>{assignee.job_title}</span>
-                                                                    </>
-                                                                )}
-                                                                {assignee.department && (
-                                                                    <>
-                                                                        <span>•</span>
-                                                                        <span>{assignee.department}</span>
-                                                                    </>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <div className="bg-gray-50 rounded-lg p-4">
-                                                <p className="text-sm text-gray-500">No assignees</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Attachments */}
-                            {task.images && task.images.length > 0 && (
-                                <div>
-                                    <h4 className="text-sm font-medium text-gray-500 mb-4">Attachments</h4>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        {task.images.map((image, index) => (
-                                            <div key={index} className="relative group">
-                                                <img
-                                                    src={`/storage/${image.path}`}
-                                                    alt={image.name}
-                                                    className="w-full h-40 object-cover rounded-lg"
-                                                />
-                                                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity duration-200 rounded-lg flex items-center justify-center">
-                                                    <a
-                                                        href={`/storage/${image.path}`}
-                                                        target="_blank"
-                                                        className="opacity-0 group-hover:opacity-100 bg-white text-gray-900 px-4 py-2 rounded-md text-sm font-medium transform scale-95 group-hover:scale-100 transition-all duration-200"
-                                                    >
-                                                        View Full Size
-                                                    </a>
-                                                </div>
-                                                <div className="mt-1">
-                                                    <p className="text-sm text-gray-900 truncate">{image.name}</p>
-                                                    <p className="text-xs text-gray-500">
-                                                        {(image.size / 1024).toFixed(1)} KB • {image.type.split('/')[1].toUpperCase()}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
+                            <TaskAttachments images={task.images} />
                         </div>
                     ) : null}
                 </div>
             </div>
         </>
     );
-};
-
-const formatStatus = (status) => {
-    switch (status) {
-        case 'todo':
-            return 'To Do';
-        case 'in_progress':
-            return 'In Progress';
-        case 'review':
-            return 'Review';
-        case 'done':
-            return 'Done';
-        default:
-            return status.charAt(0).toUpperCase() + status.slice(1);
-    }
-};
-
-const getPriorityColor = (priority) => {
-    switch (priority.toLowerCase()) {
-        case 'high':
-            return 'bg-red-100 text-red-800';
-        case 'medium':
-            return 'bg-yellow-100 text-yellow-800';
-        case 'low':
-            return 'bg-green-100 text-green-800';
-        default:
-            return 'bg-gray-100 text-gray-800';
-    }
-};
-
-const getStatusColor = (status) => {
-    switch (status.toLowerCase()) {
-        case 'todo':
-            return 'bg-gray-100 text-gray-800';
-        case 'in_progress':
-            return 'bg-blue-100 text-blue-800';
-        case 'review':
-            return 'bg-yellow-100 text-yellow-800';
-        case 'done':
-            return 'bg-green-100 text-green-800';
-        default:
-            return 'bg-gray-100 text-gray-800';
-    }
 };
 
 export default TaskDetail;
