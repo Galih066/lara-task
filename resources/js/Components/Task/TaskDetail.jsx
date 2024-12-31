@@ -45,18 +45,34 @@ const TaskDetail = ({ taskId, onClose, isModalOpen: isOpen }) => {
     }, [isOpen]);
 
     const getTimeRemaining = (startDate, dueDate) => {
-        const now = moment();
-        const start = moment(startDate);
-        const due = moment(dueDate);
-
-        if (now.isBefore(start)) {
-            const daysToStart = start.diff(now, 'days');
+        if (!startDate && !dueDate) {
             return {
-                text: `Starts in ${daysToStart} days`,
-                class: 'text-blue-600'
+                text: 'No dates set',
+                class: 'text-gray-500'
             };
         }
 
+        const now = moment();
+        
+        if (startDate) {
+            const start = moment(startDate);
+            if (now.isBefore(start)) {
+                const daysToStart = start.diff(now, 'days');
+                return {
+                    text: `Starts in ${daysToStart} days`,
+                    class: 'text-blue-600'
+                };
+            }
+        }
+
+        if (!dueDate) {
+            return {
+                text: 'No due date set',
+                class: 'text-gray-500'
+            };
+        }
+
+        const due = moment(dueDate);
         const diffDays = due.diff(now, 'days');
 
         const timeStates = {

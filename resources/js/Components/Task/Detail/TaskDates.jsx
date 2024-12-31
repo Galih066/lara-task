@@ -1,6 +1,11 @@
 import { CalendarIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import moment from 'moment';
 
-const TaskDates = ({ task, formatDate }) => {
+const TaskDates = ({ task }) => {
+    const formatDate = (date) => {
+        return date ? moment(date).format('MMM D, YYYY') : 'Not set';
+    };
+
     return (
         <div className="grid grid-cols-2 gap-4">
             <div className="bg-gray-50 rounded-lg p-4">
