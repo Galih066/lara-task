@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('description');
             $table->string('initiator');
             $table->json('assignees');
-            $table->date('start_date');
-            $table->date('due_date');
+            $table->date('start_date')->nullable();
+            $table->date('due_date')->nullable();
             $table->date('completed_date')->nullable();
             $table->string('attachment_id')->nullable();
             $table->string('priority');
