@@ -15,9 +15,9 @@ const TaskStatus = ({ task, getPriorityColor, getStatusColor, formatStatus, getT
                     {formatStatus(task.status)}
                 </span>
             </div>
-            <span className={`inline-flex items-center gap-1 text-sm ${getTimeRemaining(task.due_date).class}`}>
+            <span className={`inline-flex items-center gap-1 text-sm ${getTimeRemaining(task.start_date, task.due_date).class}`}>
                 <ClockIcon className="h-4 w-4" />
-                {getTimeRemaining(task.due_date).text}
+                {getTimeRemaining(task.start_date, task.due_date).text}
             </span>
         </div>
     );
