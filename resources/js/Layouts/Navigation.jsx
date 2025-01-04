@@ -1,4 +1,4 @@
-import { Link, useForm } from "@inertiajs/react";
+import { Link, useForm, usePage } from "@inertiajs/react";
 import { useState, useRef, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -7,6 +7,7 @@ export default function Navigation({ user }) {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
     const { post } = useForm();
+    const { url } = usePage();
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -53,27 +54,43 @@ export default function Navigation({ user }) {
                         <nav className="hidden md:flex items-center gap-6">
                             <Link
                                 href="/dashboard"
-                                className="px-3 py-2 text-sm font-medium text-gray-900 hover:text-blue-600 transition-colors duration-150"
+                                className={`px-3 py-2 text-sm font-medium ${
+                                    url === '/dashboard' 
+                                    ? 'text-blue-600 bg-blue-50 rounded-md' 
+                                    : 'text-gray-600 hover:text-blue-600'
+                                } transition-colors duration-150`}
                             >
                                 Dashboard
                             </Link>
                             <Link
                                 href="/task"
-                                className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors duration-150"
+                                className={`px-3 py-2 text-sm font-medium ${
+                                    url.startsWith('/task') 
+                                    ? 'text-blue-600 bg-blue-50 rounded-md' 
+                                    : 'text-gray-600 hover:text-blue-600'
+                                } transition-colors duration-150`}
                             >
                                 Tasks
                             </Link>
                             {(user.role === 'admin' || user.role === 'owner') && (
                                 <Link
                                     href="/member"
-                                    className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors duration-150"
+                                    className={`px-3 py-2 text-sm font-medium ${
+                                        url.startsWith('/member') 
+                                        ? 'text-blue-600 bg-blue-50 rounded-md' 
+                                        : 'text-gray-600 hover:text-blue-600'
+                                    } transition-colors duration-150`}
                                 >
                                     Members
                                 </Link>
                             )}
                             <Link
                                 href="/profile"
-                                className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors duration-150"
+                                className={`px-3 py-2 text-sm font-medium ${
+                                    url === '/profile' 
+                                    ? 'text-blue-600 bg-blue-50 rounded-md' 
+                                    : 'text-gray-600 hover:text-blue-600'
+                                } transition-colors duration-150`}
                             >
                                 Profile
                             </Link>
@@ -208,27 +225,43 @@ export default function Navigation({ user }) {
                         <div className="px-2 pt-2 pb-3 space-y-1">
                             <Link
                                 href="/dashboard"
-                                className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:text-blue-600 hover:bg-blue-50"
+                                className={`block px-3 py-2 rounded-md text-base font-medium ${
+                                    url === '/dashboard' 
+                                    ? 'text-blue-600 bg-blue-50' 
+                                    : 'text-gray-900 hover:text-blue-600 hover:bg-blue-50'
+                                }`}
                             >
                                 Dashboard
                             </Link>
                             <Link
                                 href="/task"
-                                className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                                className={`block px-3 py-2 rounded-md text-base font-medium ${
+                                    url.startsWith('/task') 
+                                    ? 'text-blue-600 bg-blue-50' 
+                                    : 'text-gray-900 hover:text-blue-600 hover:bg-blue-50'
+                                }`}
                             >
                                 Tasks
                             </Link>
                             {(user.role === 'admin' || user.role === 'owner') && (
                                 <Link
                                     href="/member"
-                                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                                    className={`block px-3 py-2 rounded-md text-base font-medium ${
+                                        url.startsWith('/member') 
+                                        ? 'text-blue-600 bg-blue-50' 
+                                        : 'text-gray-900 hover:text-blue-600 hover:bg-blue-50'
+                                    }`}
                                 >
                                     Members
                                 </Link>
                             )}
                             <Link
                                 href="/profile"
-                                className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                                className={`block px-3 py-2 rounded-md text-base font-medium ${
+                                    url === '/profile' 
+                                    ? 'text-blue-600 bg-blue-50' 
+                                    : 'text-gray-900 hover:text-blue-600 hover:bg-blue-50'
+                                }`}
                             >
                                 Profile
                             </Link>
