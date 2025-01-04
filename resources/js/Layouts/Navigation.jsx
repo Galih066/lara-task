@@ -54,45 +54,85 @@ export default function Navigation({ user }) {
                         <nav className="hidden md:flex items-center gap-6">
                             <Link
                                 href="/dashboard"
-                                className={`px-3 py-2 text-sm font-medium ${
+                                className={`relative px-3 py-2 text-sm font-medium ${
                                     url === '/dashboard' 
-                                    ? 'text-blue-600 bg-blue-50 rounded-md' 
+                                    ? 'text-blue-600' 
                                     : 'text-gray-600 hover:text-blue-600'
-                                } transition-colors duration-150`}
+                                } transition-all duration-200 ease-in-out group`}
                             >
+                                {url === '/dashboard' && (
+                                    <motion.div
+                                        layoutId="navbar-active"
+                                        className="absolute inset-0 bg-blue-50 rounded-md -z-10"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ duration: 0.2 }}
+                                    />
+                                )}
                                 Dashboard
+                                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-200 ease-out" />
                             </Link>
                             <Link
                                 href="/task"
-                                className={`px-3 py-2 text-sm font-medium ${
+                                className={`relative px-3 py-2 text-sm font-medium ${
                                     url.startsWith('/task') 
-                                    ? 'text-blue-600 bg-blue-50 rounded-md' 
+                                    ? 'text-blue-600' 
                                     : 'text-gray-600 hover:text-blue-600'
-                                } transition-colors duration-150`}
+                                } transition-all duration-200 ease-in-out group`}
                             >
+                                {url.startsWith('/task') && (
+                                    <motion.div
+                                        layoutId="navbar-active"
+                                        className="absolute inset-0 bg-blue-50 rounded-md -z-10"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ duration: 0.2 }}
+                                    />
+                                )}
                                 Tasks
+                                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-200 ease-out" />
                             </Link>
                             {(user.role === 'admin' || user.role === 'owner') && (
                                 <Link
                                     href="/member"
-                                    className={`px-3 py-2 text-sm font-medium ${
+                                    className={`relative px-3 py-2 text-sm font-medium ${
                                         url.startsWith('/member') 
-                                        ? 'text-blue-600 bg-blue-50 rounded-md' 
+                                        ? 'text-blue-600' 
                                         : 'text-gray-600 hover:text-blue-600'
-                                    } transition-colors duration-150`}
+                                    } transition-all duration-200 ease-in-out group`}
                                 >
+                                    {url.startsWith('/member') && (
+                                        <motion.div
+                                            layoutId="navbar-active"
+                                            className="absolute inset-0 bg-blue-50 rounded-md -z-10"
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            transition={{ duration: 0.2 }}
+                                        />
+                                    )}
                                     Members
+                                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-200 ease-out" />
                                 </Link>
                             )}
                             <Link
                                 href="/profile"
-                                className={`px-3 py-2 text-sm font-medium ${
+                                className={`relative px-3 py-2 text-sm font-medium ${
                                     url === '/profile' 
-                                    ? 'text-blue-600 bg-blue-50 rounded-md' 
+                                    ? 'text-blue-600' 
                                     : 'text-gray-600 hover:text-blue-600'
-                                } transition-colors duration-150`}
+                                } transition-all duration-200 ease-in-out group`}
                             >
+                                {url === '/profile' && (
+                                    <motion.div
+                                        layoutId="navbar-active"
+                                        className="absolute inset-0 bg-blue-50 rounded-md -z-10"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ duration: 0.2 }}
+                                    />
+                                )}
                                 Profile
+                                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-200 ease-out" />
                             </Link>
                         </nav>
                     </div>
