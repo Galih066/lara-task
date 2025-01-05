@@ -31,7 +31,6 @@ const Task = ({ user, empOrg, initialTasks }) => {
 
     const handleTaskCreated = () => {
         setShowSuccess(true);
-        setTimeout(() => setShowSuccess(false), 3000);
     };
 
     const handleCloseTask = () => {

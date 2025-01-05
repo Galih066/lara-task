@@ -41,9 +41,14 @@ const CreateTaskForm = ({ onClose, users, isModalOpen, isEntering, onSuccess }) 
             onSuccess: () => {
                 reset();
                 setSelectedFiles([]);
-                onSuccess();
                 onClose();
-                router.visit(window.location.pathname);
+                // Delay the success message and page refresh
+                setTimeout(() => {
+                    onSuccess();
+                    setTimeout(() => {
+                        router.visit(window.location.pathname);
+                    }, 3000); // Wait for success message duration
+                }, 300); // Wait for modal close animation
             },
             onError: (errors) => {
                 console.error('Form submission errors:', errors);
