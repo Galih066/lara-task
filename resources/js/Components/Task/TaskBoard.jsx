@@ -1,8 +1,7 @@
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useState } from "react";
-import { PencilIcon, TrashIcon, ClipboardDocumentCheckIcon } from '@heroicons/react/24/outline';
+import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import TaskDetail from './TaskDetail';
-import EmptyState from '../EmptyState';
 import ErrorAlert from '../AlertComp/ErrorAlert';
 
 const LoadingOverlay = () => (
@@ -23,11 +22,10 @@ const TaskCard = ({ task, index, onUpdate, onDelete, onClick, isUpdating }) => {
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                     style={getDragStyle(provided.draggableProps.style, snapshot)}
-                    className={`p-4 border border-gray-200 rounded-lg shadow-sm group relative hover:shadow-md ${
-                        snapshot.isDragging 
-                            ? 'shadow-lg ring-2 ring-blue-500 bg-white' 
+                    className={`p-4 border border-gray-200 rounded-lg shadow-sm group relative hover:shadow-md ${snapshot.isDragging
+                            ? 'shadow-lg ring-2 ring-blue-500 bg-white'
                             : getBackgroundColor(task.priority)
-                    } transition-all duration-200`}
+                        } transition-all duration-200`}
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
                     onClick={() => onClick(task)}
@@ -93,18 +91,16 @@ const TaskColumn = ({ title, count, children, droppableId }) => (
             <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
-                className={`bg-gray-50 rounded-lg p-4 min-h-[24rem] h-full flex flex-col border-2 ${
-                    snapshot.isDraggingOver 
-                        ? 'border-blue-300 bg-blue-50 ring-2 ring-blue-200 ring-opacity-50' 
+                className={`bg-gray-50 rounded-lg p-4 min-h-[24rem] h-full flex flex-col border-2 ${snapshot.isDraggingOver
+                        ? 'border-blue-300 bg-blue-50 ring-2 ring-blue-200 ring-opacity-50'
                         : 'border-transparent'
-                } transition-all duration-200`}
+                    } transition-all duration-200`}
             >
                 <h3 className="text-sm font-medium text-gray-900 mb-4">
                     {title} ({count})
                 </h3>
-                <div className={`space-y-4 flex-1 ${
-                    snapshot.isDraggingOver ? 'opacity-50' : ''
-                } ${children ? '' : 'flex items-center justify-center border-2 border-dashed border-gray-200 rounded-lg'}`}>
+                <div className={`space-y-4 flex-1 ${snapshot.isDraggingOver ? 'opacity-50' : ''
+                    } ${children ? '' : 'flex items-center justify-center border-2 border-dashed border-gray-200 rounded-lg'}`}>
                     {children || (
                         <p className="text-gray-400 text-sm">Drop tasks here</p>
                     )}
@@ -218,7 +214,7 @@ const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onTaskClick, onDragEnd, 
         }
 
         const task = tasks.find(t => t.id.toString() === draggableId);
-        
+
         if (!task.start_date && !task.due_date && destination.droppableId !== 'todo') {
             setShowError(true);
             return;
