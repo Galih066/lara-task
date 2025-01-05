@@ -52,4 +52,14 @@ class TaskController extends Controller
         $task = $this->taskService->updateTaskStatus($taskId, $status);
         return response()->json($task);
     }
+
+    public function destroy($taskId)
+    {
+        try {
+            $this->taskService->deleteTask($taskId);
+            return response()->json(['message' => 'Task deleted successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to delete task'], 500);
+        }
+    }
 }

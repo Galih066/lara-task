@@ -75,15 +75,27 @@ const Task = ({ user, empOrg, initialTasks }) => {
     };
 
     const handleDeleteTask = (taskId) => {
-        setTasks(tasks.filter(task => task.id !== taskId));
+        if (window.confirm('Are you sure you want to delete this task?')) {
+            axios.delete(`/task/${taskId}`)
+                .then(() => {
+                    setTasks(tasks.filter(task => task.id !== taskId));
+                    setShowSuccess(true);
+                    handleCloseTask();
+                })
+                .catch(error => {
+                    console.error('Error deleting task:', error);
+                    alert('Failed to delete task. Please try again.');
+                });
+        }
     };
 
     const handleDragEnd = (result) => {
         const { destination, source, draggableId } = result;
 
-        if (!destination ||
-            (destination.droppableId === source.droppableId &&
-                destination.index === source.index)) {
+        if (
+            !destination ||
+            (destination.droppableId === source.droppableId && destination.index === source.index)
+        ) {
             return;
         }
 

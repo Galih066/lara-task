@@ -147,4 +147,10 @@ class TaskService
             })
         ];
     }
+
+    public function deleteTask($taskId)
+    {
+        $task = Task::findOrFail($taskId);
+        return $task->delete();
+    }
 }

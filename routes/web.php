@@ -44,5 +44,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/store', [TaskController::class, 'store'])->name('tasks.store');
         Route::get('/{taskId}', [TaskController::class, 'show'])->name('task.show');
         Route::patch('/{taskId}/status', [TaskController::class, 'updateStatus'])->name('task.updateStatus');
+        Route::delete('/{taskId}', [TaskController::class, 'destroy'])->name('task.destroy');
     });
 });
