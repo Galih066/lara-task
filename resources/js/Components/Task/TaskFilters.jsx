@@ -14,7 +14,6 @@ const TaskFilters = ({ showFilters, onFilterChange }) => {
         >
             <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {/* Status Filter */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Status
@@ -30,7 +29,6 @@ const TaskFilters = ({ showFilters, onFilterChange }) => {
                         </select>
                     </div>
 
-                    {/* Priority Filter */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Priority
@@ -46,7 +44,6 @@ const TaskFilters = ({ showFilters, onFilterChange }) => {
                         </select>
                     </div>
 
-                    {/* Assignee Filter */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Assignee
