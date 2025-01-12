@@ -7,11 +7,20 @@ import {
     ClipboardDocumentListIcon
 } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
+import moment from "moment";
 import EmptyState from "../EmptyState";
 
 const TaskRow = ({ task, onUpdate, onDelete }) => {
+    const formatText = (text) => {
+        if (!text) return '';
+        return text
+            .split('_')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(' ');
+    };
+
     const getPriorityColor = (priority) => {
-        switch (priority.toLowerCase()) {
+        switch (priority?.toLowerCase()) {
             case 'high':
                 return 'bg-red-100 text-red-800';
             case 'medium':
@@ -24,7 +33,7 @@ const TaskRow = ({ task, onUpdate, onDelete }) => {
     };
 
     const getStatusColor = (status) => {
-        switch (status.toLowerCase()) {
+        switch (status?.toLowerCase()) {
             case 'todo':
                 return 'bg-gray-100 text-gray-800';
             case 'in_progress':
@@ -36,19 +45,51 @@ const TaskRow = ({ task, onUpdate, onDelete }) => {
         }
     };
 
-    const getDueDateStatus = (dueDate) => {
-        if (!dueDate) return null;
-        const today = new Date();
-        const due = new Date(dueDate);
-        const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
-
-        if (diffDays < 0) return { class: 'text-red-600', text: 'Overdue' };
-        if (diffDays === 0) return { class: 'text-orange-600', text: 'Due Today' };
-        if (diffDays <= 2) return { class: 'text-yellow-600', text: 'Due Soon' };
-        return { class: 'text-gray-600', text: `Due in ${diffDays} days` };
+    const formatDate = (date) => {
+        if (!date) return '';
+        return moment(date).format('MMM D, YYYY');
     };
 
-    const dueStatus = getDueDateStatus(task.dueDate);
+    const getDueDateStatus = (dueDate) => {
+        if (!dueDate) return { class: 'text-gray-600 font-semibold', text: 'Not Set' };
+        const now = moment();
+        const due = moment(dueDate);
+        const diffDays = due.diff(now, 'days');
+        const diffHours = due.diff(now, 'hours');
+
+        if (diffDays < 0) {
+            const overdueDays = Math.abs(diffDays);
+            return {
+                class: 'text-red-600 font-bold',
+                text: `Overdue by ${overdueDays} ${overdueDays === 1 ? 'day' : 'days'}`
+            };
+        }
+
+        if (diffHours < 24) {
+            if (diffHours < 0) {
+                const overdueHours = Math.abs(diffHours);
+                return {
+                    class: 'text-red-600 font-bold',
+                    text: `Overdue by ${overdueHours} ${overdueHours === 1 ? 'hour' : 'hours'}`
+                };
+            }
+            return {
+                class: 'text-orange-600 font-semibold',
+                text: diffHours === 0 ? 'Due now' : `Due in ${diffHours} ${diffHours === 1 ? 'hour' : 'hours'}`
+            };
+        }
+
+        if (diffDays === 0) return { class: 'text-orange-600', text: 'Due Today' };
+        if (diffDays <= 2) return { class: 'text-yellow-600', text: `Due in ${diffDays} ${diffDays === 1 ? 'day' : 'days'}` };
+
+        if (diffDays <= 7) {
+            return { class: 'text-blue-600', text: `Due in ${diffDays} days` };
+        }
+
+        return { class: 'text-gray-600', text: `Due ${due.format('MMM D')}` };
+    };
+
+    const dueStatus = getDueDateStatus(task.due_date);
     const assigneesCount = task.assignees?.length || 0;
 
     return (
@@ -65,12 +106,12 @@ const TaskRow = ({ task, onUpdate, onDelete }) => {
             </td>
             <td className="px-6 py-4 whitespace-nowrap">
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
-                    {task.priority}
+                    {formatText(task.priority)}
                 </span>
             </td>
             <td className="px-6 py-4 whitespace-nowrap">
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}>
-                    {task.status.replace('_', ' ')}
+                    {formatText(task.status)}
                 </span>
             </td>
             <td className="px-6 py-4 whitespace-nowrap">
@@ -80,11 +121,9 @@ const TaskRow = ({ task, onUpdate, onDelete }) => {
                             {dueStatus.text}
                         </span>
                     )}
-                    {task.dueDate && (
-                        <span className="text-xs text-gray-500">
-                            {new Date(task.dueDate).toLocaleDateString()}
-                        </span>
-                    )}
+                    <span className="text-xs text-gray-500">
+                        {formatDate(task.dueDate)}
+                    </span>
                 </div>
             </td>
             <td className="px-6 py-4 whitespace-nowrap">
@@ -222,7 +261,7 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                                     {status === 'all'
                                         ? 'All Statuses'
                                         : status.split('_').map(word =>
-                                            word.charAt(0).toUpperCase() + word.slice(1)
+                                            word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
                                         ).join(' ')
                                     }
                                 </option>
@@ -241,7 +280,7 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                                 <option key={priority} value={priority}>
                                     {priority === 'all'
                                         ? 'All Priorities'
-                                        : priority.charAt(0).toUpperCase() + priority.slice(1)
+                                        : priority.charAt(0).toUpperCase() + priority.slice(1).toLowerCase()
                                     }
                                 </option>
                             ))}
@@ -265,7 +304,7 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                     {statusFilter !== 'all' && (
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                             Status: {statusFilter.split('_').map(word =>
-                                word.charAt(0).toUpperCase() + word.slice(1)
+                                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
                             ).join(' ')}
                             <button
                                 onClick={() => setStatusFilter('all')}
@@ -277,7 +316,7 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                     )}
                     {priorityFilter !== 'all' && (
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                            Priority: {priorityFilter.charAt(0).toUpperCase() + priorityFilter.slice(1)}
+                            Priority: {priorityFilter.charAt(0).toUpperCase() + priorityFilter.slice(1).toLowerCase()}
                             <button
                                 onClick={() => setPriorityFilter('all')}
                                 className="ml-1 hover:text-gray-900"
