@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Head } from "@inertiajs/react";
 import Navigation from "@/Layouts/Navigation";
 import TaskHeader from "@/Components/Task/TaskHeader";
-import TaskFilters from "@/Components/Task/TaskFilters";
 import TaskSummary from "@/Components/Task/TaskSummary";
 import TaskBoard from "@/Components/Task/TaskBoard";
 import TaskList from "@/Components/Task/TaskList";
