@@ -22,6 +22,7 @@ const Task = ({ user, empOrg, initialTasks }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [tasks, setTasks] = useState(initialTasks);
     const [showSuccess, setShowSuccess] = useState(false);
+    const [showSuccessDelete, setShowSuccessDelete] = useState(false);
     const [updatingTaskId, setUpdatingTaskId] = useState(null);
 
     const handleNewTask = () => {
@@ -79,7 +80,7 @@ const Task = ({ user, empOrg, initialTasks }) => {
             axios.delete(`/task/${taskId}`)
                 .then(() => {
                     setTasks(tasks.filter(task => task.id !== taskId));
-                    setShowSuccess(true);
+                    setShowSuccessDelete(true);
                     handleCloseTask();
                 })
                 .catch(error => {
@@ -126,6 +127,14 @@ const Task = ({ user, empOrg, initialTasks }) => {
             <Head title="Tasks" />
             <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50/30">
                 <Navigation user={user} />
+                {showSuccessDelete && (
+                    <SuccessAlert
+                        title="Task Deleted"
+                        message="Your task has been successfully deleted."
+                        duration={5000}
+                        onClose={() => setShowSuccessDelete(false)}
+                    />
+                )}
                 {showSuccess && (
                     <SuccessAlert
                         title="Task Created"
