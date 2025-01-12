@@ -1,6 +1,12 @@
-import { motion } from "framer-motion";
-import { ChevronUpIcon, ChevronDownIcon, PencilIcon, TrashIcon, ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
 import { useState, useMemo, useEffect } from "react";
+import {
+    ChevronUpIcon,
+    ChevronDownIcon,
+    PencilIcon,
+    TrashIcon,
+    ClipboardDocumentListIcon
+} from "@heroicons/react/24/outline";
+import { motion } from "framer-motion";
 import EmptyState from "../EmptyState";
 
 const TaskRow = ({ task, onUpdate, onDelete }) => {
@@ -35,7 +41,7 @@ const TaskRow = ({ task, onUpdate, onDelete }) => {
         const today = new Date();
         const due = new Date(dueDate);
         const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
-        
+
         if (diffDays < 0) return { class: 'text-red-600', text: 'Overdue' };
         if (diffDays === 0) return { class: 'text-orange-600', text: 'Due Today' };
         if (diffDays <= 2) return { class: 'text-yellow-600', text: 'Due Soon' };
@@ -46,7 +52,7 @@ const TaskRow = ({ task, onUpdate, onDelete }) => {
     const assigneesCount = task.assignees?.length || 0;
 
     return (
-        <motion.tr 
+        <motion.tr
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="group hover:bg-gray-50"
@@ -147,10 +153,10 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
     // Filtering function
     const filteredTasks = useMemo(() => {
         return sortedTasks.filter(task => {
-            const matchesSearch = 
+            const matchesSearch =
                 task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 task.description.toLowerCase().includes(searchTerm.toLowerCase());
-            
+
             const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
             const matchesPriority = priorityFilter === 'all' || task.priority.toLowerCase() === priorityFilter;
 
@@ -175,13 +181,13 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
         if (sortConfig.key !== columnName) {
             return <ChevronUpIcon className="h-4 w-4 text-gray-400" />;
         }
-        return sortConfig.direction === 'asc' 
+        return sortConfig.direction === 'asc'
             ? <ChevronUpIcon className="h-4 w-4 text-blue-500" />
             : <ChevronDownIcon className="h-4 w-4 text-blue-500" />;
     };
 
     if (!tasks || tasks.length === 0) {
-        return <EmptyState 
+        return <EmptyState
             icon={<ClipboardDocumentListIcon className="h-12 w-12" />}
             title="No tasks found"
             description="Get started by creating a new task."
@@ -203,7 +209,7 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    
+
                     {/* Status filter */}
                     <div className="w-full sm:w-48">
                         <select
@@ -213,11 +219,11 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                         >
                             {statusOptions.map(status => (
                                 <option key={status} value={status}>
-                                    {status === 'all' 
+                                    {status === 'all'
                                         ? 'All Statuses'
-                                        : status.split('_').map(word => 
+                                        : status.split('_').map(word =>
                                             word.charAt(0).toUpperCase() + word.slice(1)
-                                          ).join(' ')
+                                        ).join(' ')
                                     }
                                 </option>
                             ))}
@@ -233,7 +239,7 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                         >
                             {priorityOptions.map(priority => (
                                 <option key={priority} value={priority}>
-                                    {priority === 'all' 
+                                    {priority === 'all'
                                         ? 'All Priorities'
                                         : priority.charAt(0).toUpperCase() + priority.slice(1)
                                     }
@@ -258,7 +264,7 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                     )}
                     {statusFilter !== 'all' && (
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                            Status: {statusFilter.split('_').map(word => 
+                            Status: {statusFilter.split('_').map(word =>
                                 word.charAt(0).toUpperCase() + word.slice(1)
                             ).join(' ')}
                             <button
@@ -288,7 +294,7 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th scope="col" 
+                            <th scope="col"
                                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer w-2/5"
                                 onClick={() => requestSort('title')}
                             >
@@ -297,7 +303,7 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                                     {getSortIcon('title')}
                                 </div>
                             </th>
-                            <th scope="col" 
+                            <th scope="col"
                                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer w-24"
                                 onClick={() => requestSort('priority')}
                             >
@@ -306,7 +312,7 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                                     {getSortIcon('priority')}
                                 </div>
                             </th>
-                            <th scope="col" 
+                            <th scope="col"
                                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer w-28"
                                 onClick={() => requestSort('status')}
                             >
@@ -315,7 +321,7 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                                     {getSortIcon('status')}
                                 </div>
                             </th>
-                            <th scope="col" 
+                            <th scope="col"
                                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer w-32"
                                 onClick={() => requestSort('dueDate')}
                             >
@@ -324,12 +330,12 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                                     {getSortIcon('dueDate')}
                                 </div>
                             </th>
-                            <th scope="col" 
+                            <th scope="col"
                                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24"
                             >
                                 Assignees
                             </th>
-                            <th scope="col" 
+                            <th scope="col"
                                 className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-24"
                             >
                                 Actions
@@ -338,9 +344,9 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                         {filteredTasks.slice(currentPage * itemsPerPage - itemsPerPage, currentPage * itemsPerPage).map((task) => (
-                            <TaskRow 
-                                key={task.id} 
-                                task={task} 
+                            <TaskRow
+                                key={task.id}
+                                task={task}
                                 onUpdate={onUpdateTask}
                                 onDelete={onDeleteTask}
                             />
@@ -389,11 +395,10 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                                     <button
                                         key={index + 1}
                                         onClick={() => setCurrentPage(index + 1)}
-                                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                                            currentPage === index + 1
-                                                ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                                                : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                                        }`}
+                                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${currentPage === index + 1
+                                            ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                                            }`}
                                     >
                                         {index + 1}
                                     </button>
