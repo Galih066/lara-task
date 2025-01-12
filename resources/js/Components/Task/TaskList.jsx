@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { motion } from "framer-motion";
 import {
     ChevronUpIcon,
     ChevronDownIcon,
@@ -6,91 +6,17 @@ import {
     TrashIcon,
     ClipboardDocumentListIcon
 } from "@heroicons/react/24/outline";
-import { motion } from "framer-motion";
-import moment from "moment";
+import { useState, useMemo, useEffect } from "react";
 import EmptyState from "../EmptyState";
+import {
+    utils,
+    getDueDateStatus,
+    getStatusColor,
+    getPriorityColor
+} from "../../utils/taskUtils";
 
 const TaskRow = ({ task, onUpdate, onDelete }) => {
-    const formatText = (text) => {
-        if (!text) return '';
-        return text
-            .split('_')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-            .join(' ');
-    };
-
-    const getPriorityColor = (priority) => {
-        switch (priority?.toLowerCase()) {
-            case 'high':
-                return 'bg-red-100 text-red-800';
-            case 'medium':
-                return 'bg-yellow-100 text-yellow-800';
-            case 'low':
-                return 'bg-green-100 text-green-800';
-            default:
-                return 'bg-gray-100 text-gray-800';
-        }
-    };
-
-    const getStatusColor = (status) => {
-        switch (status?.toLowerCase()) {
-            case 'todo':
-                return 'bg-gray-100 text-gray-800';
-            case 'in_progress':
-                return 'bg-blue-100 text-blue-800';
-            case 'done':
-                return 'bg-green-100 text-green-800';
-            default:
-                return 'bg-gray-100 text-gray-800';
-        }
-    };
-
-    const formatDate = (date) => {
-        if (!date) return '';
-        return moment(date).format('MMM D, YYYY');
-    };
-
-    const getDueDateStatus = (dueDate) => {
-        if (!dueDate) return { class: 'text-gray-600 font-semibold', text: 'Not Set' };
-        const now = moment();
-        const due = moment(dueDate);
-        const diffDays = due.diff(now, 'days');
-        const diffHours = due.diff(now, 'hours');
-
-        if (diffDays < 0) {
-            const overdueDays = Math.abs(diffDays);
-            return {
-                class: 'text-red-600 font-bold',
-                text: `Overdue by ${overdueDays} ${overdueDays === 1 ? 'day' : 'days'}`
-            };
-        }
-
-        if (diffHours < 24) {
-            if (diffHours < 0) {
-                const overdueHours = Math.abs(diffHours);
-                return {
-                    class: 'text-red-600 font-bold',
-                    text: `Overdue by ${overdueHours} ${overdueHours === 1 ? 'hour' : 'hours'}`
-                };
-            }
-            return {
-                class: 'text-orange-600 font-semibold',
-                text: diffHours === 0 ? 'Due now' : `Due in ${diffHours} ${diffHours === 1 ? 'hour' : 'hours'}`
-            };
-        }
-
-        if (diffDays === 0) return { class: 'text-orange-600', text: 'Due Today' };
-        if (diffDays <= 2) return { class: 'text-yellow-600', text: `Due in ${diffDays} ${diffDays === 1 ? 'day' : 'days'}` };
-
-        if (diffDays <= 7) {
-            return { class: 'text-blue-600', text: `Due in ${diffDays} days` };
-        }
-
-        return { class: 'text-gray-600', text: `Due ${due.format('MMM D')}` };
-    };
-
     const dueStatus = getDueDateStatus(task.due_date);
-    const assigneesCount = task.assignees?.length || 0;
 
     return (
         <motion.tr
@@ -106,12 +32,12 @@ const TaskRow = ({ task, onUpdate, onDelete }) => {
             </td>
             <td className="px-6 py-4 whitespace-nowrap">
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
-                    {formatText(task.priority)}
+                    {utils.formatText(task.priority)}
                 </span>
             </td>
             <td className="px-6 py-4 whitespace-nowrap">
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}>
-                    {formatText(task.status)}
+                    {utils.formatText(task.status)}
                 </span>
             </td>
             <td className="px-6 py-4 whitespace-nowrap">
@@ -122,40 +48,23 @@ const TaskRow = ({ task, onUpdate, onDelete }) => {
                         </span>
                     )}
                     <span className="text-xs text-gray-500">
-                        {formatDate(task.dueDate)}
+                        {utils.formatDate(task.due_date)}
                     </span>
                 </div>
             </td>
-            <td className="px-6 py-4 whitespace-nowrap">
-                {assigneesCount > 0 && (
-                    <div className="flex -space-x-1">
-                        {assigneesCount === 1 ? (
-                            <span className="inline-block h-6 w-6 rounded-full bg-gray-200 text-xs flex items-center justify-center">
-                                {task.initiator?.charAt(0) || '?'}
-                            </span>
-                        ) : (
-                            <span className="inline-block h-6 px-2 rounded-full bg-gray-200 text-xs flex items-center justify-center">
-                                +{assigneesCount}
-                            </span>
-                        )}
-                    </div>
-                )}
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <div className="flex items-center justify-end space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
-                        onClick={() => onUpdate(task)}
-                        className="p-1 hover:bg-gray-100 rounded-full"
-                    >
-                        <PencilIcon className="h-4 w-4 text-gray-500" />
-                    </button>
-                    <button
-                        onClick={() => onDelete(task.id)}
-                        className="p-1 hover:bg-red-100 rounded-full"
-                    >
-                        <TrashIcon className="h-4 w-4 text-red-500" />
-                    </button>
-                </div>
+            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                <button
+                    onClick={() => onUpdate(task)}
+                    className="text-blue-600 hover:text-blue-900"
+                >
+                    <PencilIcon className="w-4" />
+                </button>
+                <button
+                    onClick={() => onDelete(task.id)}
+                    className="text-red-600 hover:text-red-900"
+                >
+                    <TrashIcon className="w-4" />
+                </button>
             </td>
         </motion.tr>
     );
@@ -169,15 +78,33 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
     const [statusFilter, setStatusFilter] = useState('all');
     const [priorityFilter, setPriorityFilter] = useState('all');
 
-    // Status and Priority options
     const statusOptions = ['all', 'todo', 'in_progress', 'done'];
     const priorityOptions = ['all', 'high', 'medium', 'low'];
 
-    // Sorting function
-    const sortedTasks = useMemo(() => {
-        if (!tasks) return [];
-        let sortedItems = [...tasks];
-        sortedItems.sort((a, b) => {
+    const sortedAndFilteredTasks = useMemo(() => {
+        let filteredTasks = [...tasks];
+
+        if (searchTerm) {
+            const searchLower = searchTerm.toLowerCase();
+            filteredTasks = filteredTasks.filter(task =>
+                task.title.toLowerCase().includes(searchLower) ||
+                task.description.toLowerCase().includes(searchLower)
+            );
+        }
+
+        if (statusFilter !== 'all') {
+            filteredTasks = filteredTasks.filter(task =>
+                task.status.toLowerCase() === statusFilter.toLowerCase()
+            );
+        }
+
+        if (priorityFilter !== 'all') {
+            filteredTasks = filteredTasks.filter(task =>
+                task.priority.toLowerCase() === priorityFilter.toLowerCase()
+            );
+        }
+
+        return filteredTasks.sort((a, b) => {
             if (a[sortConfig.key] < b[sortConfig.key]) {
                 return sortConfig.direction === 'asc' ? -1 : 1;
             }
@@ -186,70 +113,45 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
             }
             return 0;
         });
-        return sortedItems;
-    }, [tasks, sortConfig]);
+    }, [tasks, sortConfig, searchTerm, statusFilter, priorityFilter]);
 
-    // Filtering function
-    const filteredTasks = useMemo(() => {
-        return sortedTasks.filter(task => {
-            const matchesSearch =
-                task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                task.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const totalPages = Math.ceil(sortedAndFilteredTasks.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const visibleTasks = sortedAndFilteredTasks.slice(startIndex, startIndex + itemsPerPage);
 
-            const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
-            const matchesPriority = priorityFilter === 'all' || task.priority.toLowerCase() === priorityFilter;
+    const handleSort = (key) => {
+        setSortConfig(prevConfig => ({
+            key,
+            direction: prevConfig.key === key && prevConfig.direction === 'asc' ? 'desc' : 'asc'
+        }));
+    };
 
-            return matchesSearch && matchesStatus && matchesPriority;
-        });
-    }, [sortedTasks, searchTerm, statusFilter, priorityFilter]);
-
-    // Reset to first page when filters change
     useEffect(() => {
         setCurrentPage(1);
     }, [searchTerm, statusFilter, priorityFilter]);
 
-    const requestSort = (key) => {
-        let direction = 'asc';
-        if (sortConfig.key === key && sortConfig.direction === 'asc') {
-            direction = 'desc';
-        }
-        setSortConfig({ key, direction });
-    };
-
-    const getSortIcon = (columnName) => {
-        if (sortConfig.key !== columnName) {
-            return <ChevronUpIcon className="h-4 w-4 text-gray-400" />;
-        }
-        return sortConfig.direction === 'asc'
-            ? <ChevronUpIcon className="h-4 w-4 text-blue-500" />
-            : <ChevronDownIcon className="h-4 w-4 text-blue-500" />;
-    };
-
-    if (!tasks || tasks.length === 0) {
+    if (!tasks.length) {
         return <EmptyState
             icon={<ClipboardDocumentListIcon className="h-12 w-12" />}
             title="No tasks found"
-            description="Get started by creating a new task."
+            message="Get started by creating a new task"
         />;
     }
 
     return (
         <div className="bg-white rounded-lg shadow">
-            {/* Search and filters */}
             <div className="p-4 border-b border-gray-200">
                 <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
-                    {/* Search input */}
-                    <div className="flex-1">
+                    <div className="w-full sm:w-96">
                         <input
                             type="text"
-                            placeholder="Search tasks..."
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder="Search tasks..."
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
 
-                    {/* Status filter */}
                     <div className="w-full sm:w-48">
                         <select
                             value={statusFilter}
@@ -260,16 +162,13 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                                 <option key={status} value={status}>
                                     {status === 'all'
                                         ? 'All Statuses'
-                                        : status.split('_').map(word =>
-                                            word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-                                        ).join(' ')
+                                        : utils.formatText(status)
                                     }
                                 </option>
                             ))}
                         </select>
                     </div>
 
-                    {/* Priority filter */}
                     <div className="w-full sm:w-48">
                         <select
                             value={priorityFilter}
@@ -280,7 +179,7 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                                 <option key={priority} value={priority}>
                                     {priority === 'all'
                                         ? 'All Priorities'
-                                        : priority.charAt(0).toUpperCase() + priority.slice(1).toLowerCase()
+                                        : utils.formatText(priority)
                                     }
                                 </option>
                             ))}
@@ -288,14 +187,13 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                     </div>
                 </div>
 
-                {/* Active filters display */}
                 <div className="mt-2 flex flex-wrap gap-2">
                     {searchTerm && (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                             Search: {searchTerm}
                             <button
                                 onClick={() => setSearchTerm('')}
-                                className="ml-1 hover:text-blue-900"
+                                className="ml-1 hover:text-gray-900"
                             >
                                 ×
                             </button>
@@ -303,9 +201,7 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                     )}
                     {statusFilter !== 'all' && (
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                            Status: {statusFilter.split('_').map(word =>
-                                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-                            ).join(' ')}
+                            Status: {utils.formatText(statusFilter)}
                             <button
                                 onClick={() => setStatusFilter('all')}
                                 className="ml-1 hover:text-gray-900"
@@ -316,7 +212,7 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                     )}
                     {priorityFilter !== 'all' && (
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                            Priority: {priorityFilter.charAt(0).toUpperCase() + priorityFilter.slice(1).toLowerCase()}
+                            Priority: {utils.formatText(priorityFilter)}
                             <button
                                 onClick={() => setPriorityFilter('all')}
                                 className="ml-1 hover:text-gray-900"
@@ -328,61 +224,49 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                 </div>
             </div>
 
-            {/* Table */}
             <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th scope="col"
-                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer w-2/5"
-                                onClick={() => requestSort('title')}
-                            >
-                                <div className="flex items-center space-x-1">
-                                    <span>Title</span>
-                                    {getSortIcon('title')}
-                                </div>
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('title')}>
+                                Title
+                                {sortConfig.key === 'title' && (
+                                    sortConfig.direction === 'asc'
+                                        ? <ChevronUpIcon className="h-4 w-4 inline ml-1" />
+                                        : <ChevronDownIcon className="h-4 w-4 inline ml-1" />
+                                )}
                             </th>
-                            <th scope="col"
-                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer w-24"
-                                onClick={() => requestSort('priority')}
-                            >
-                                <div className="flex items-center space-x-1">
-                                    <span>Priority</span>
-                                    {getSortIcon('priority')}
-                                </div>
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('priority')}>
+                                Priority
+                                {sortConfig.key === 'priority' && (
+                                    sortConfig.direction === 'asc'
+                                        ? <ChevronUpIcon className="h-4 w-4 inline ml-1" />
+                                        : <ChevronDownIcon className="h-4 w-4 inline ml-1" />
+                                )}
                             </th>
-                            <th scope="col"
-                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer w-28"
-                                onClick={() => requestSort('status')}
-                            >
-                                <div className="flex items-center space-x-1">
-                                    <span>Status</span>
-                                    {getSortIcon('status')}
-                                </div>
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('status')}>
+                                Status
+                                {sortConfig.key === 'status' && (
+                                    sortConfig.direction === 'asc'
+                                        ? <ChevronUpIcon className="h-4 w-4 inline ml-1" />
+                                        : <ChevronDownIcon className="h-4 w-4 inline ml-1" />
+                                )}
                             </th>
-                            <th scope="col"
-                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer w-32"
-                                onClick={() => requestSort('dueDate')}
-                            >
-                                <div className="flex items-center space-x-1">
-                                    <span>Due Date</span>
-                                    {getSortIcon('dueDate')}
-                                </div>
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('due_date')}>
+                                Due Date
+                                {sortConfig.key === 'due_date' && (
+                                    sortConfig.direction === 'asc'
+                                        ? <ChevronUpIcon className="h-4 w-4 inline ml-1" />
+                                        : <ChevronDownIcon className="h-4 w-4 inline ml-1" />
+                                )}
                             </th>
-                            <th scope="col"
-                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24"
-                            >
-                                Assignees
-                            </th>
-                            <th scope="col"
-                                className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-24"
-                            >
+                            <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Actions
                             </th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {filteredTasks.slice(currentPage * itemsPerPage - itemsPerPage, currentPage * itemsPerPage).map((task) => (
+                        {visibleTasks.map(task => (
                             <TaskRow
                                 key={task.id}
                                 task={task}
@@ -394,66 +278,31 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                 </table>
             </div>
 
-            {/* Pagination */}
-            <div className="px-4 py-3 border-t border-gray-200 sm:px-6">
-                <div className="flex items-center justify-between">
-                    <div className="flex-1 flex justify-between sm:hidden">
-                        <button
-                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                            disabled={currentPage === 1}
-                            className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                        >
-                            Previous
-                        </button>
-                        <button
-                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(filteredTasks.length / itemsPerPage)))}
-                            disabled={currentPage === Math.ceil(filteredTasks.length / itemsPerPage)}
-                            className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                        >
-                            Next
-                        </button>
-                    </div>
-                    <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                        <div>
-                            <p className="text-sm text-gray-700">
-                                Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to{' '}
-                                <span className="font-medium">{Math.min(currentPage * itemsPerPage, filteredTasks.length)}</span> of{' '}
-                                <span className="font-medium">{filteredTasks.length}</span> results
-                            </p>
-                        </div>
-                        <div>
-                            <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                                <button
-                                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                                    disabled={currentPage === 1}
-                                    className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                                >
-                                    Previous
-                                </button>
-                                {[...Array(Math.ceil(filteredTasks.length / itemsPerPage))].map((_, index) => (
-                                    <button
-                                        key={index + 1}
-                                        onClick={() => setCurrentPage(index + 1)}
-                                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${currentPage === index + 1
-                                            ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                                            }`}
-                                    >
-                                        {index + 1}
-                                    </button>
-                                ))}
-                                <button
-                                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(filteredTasks.length / itemsPerPage)))}
-                                    disabled={currentPage === Math.ceil(filteredTasks.length / itemsPerPage)}
-                                    className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                                >
-                                    Next
-                                </button>
-                            </nav>
+            {totalPages > 1 && (
+                <div className="px-4 py-3 border-t border-gray-200 sm:px-6">
+                    <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-700">
+                            Page {currentPage} of {totalPages}
+                        </span>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                disabled={currentPage === 1}
+                                className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                            >
+                                Previous
+                            </button>
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                disabled={currentPage === totalPages}
+                                className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                            >
+                                Next
+                            </button>
                         </div>
                     </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 };
