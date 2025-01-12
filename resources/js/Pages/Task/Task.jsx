@@ -13,7 +13,6 @@ import SuccessAlert from "@/Components/AlertComp/SuccessAlert";
 import axios from 'axios';
 
 const Task = ({ user, empOrg, initialTasks }) => {
-    const [showFilters, setShowFilters] = useState(false);
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [showTaskDetail, setShowTaskDetail] = useState(false);
     const [selectedTask, setSelectedTask] = useState(null);
@@ -146,18 +145,11 @@ const Task = ({ user, empOrg, initialTasks }) => {
                 <div className="max-w-[90rem] mx-auto py-6 px-4 sm:px-6 lg:px-8">
                     <TaskHeader
                         onNewTask={handleNewTask}
-                        onToggleFilters={() => setShowFilters(!showFilters)}
                         onViewChange={setCurrentView}
                         view={currentView}
                         onSearch={setSearchQuery}
                         searchQuery={searchQuery}
                     />
-
-                    {showFilters && (
-                        <TaskFilters
-                            className="mb-6"
-                        />
-                    )}
 
                     <TaskSummary tasks={filteredTasks} />
 
