@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { ChevronUpIcon, ChevronDownIcon, PencilIcon, TrashIcon, ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import EmptyState from "../EmptyState";
 
 const TaskRow = ({ task, onUpdate, onDelete }) => {
@@ -46,45 +46,58 @@ const TaskRow = ({ task, onUpdate, onDelete }) => {
     const assigneesCount = task.assignees?.length || 0;
 
     return (
-        <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="group bg-white border border-gray-200 hover:border-blue-500 rounded-lg p-4 transition-all duration-200"
+        <motion.tr 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="group hover:bg-gray-50"
         >
-            <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4 flex-1">
-                    <div className="flex-1">
-                        <h3 className="text-sm font-medium text-gray-900">{task.title}</h3>
-                        <p className="mt-1 text-sm text-gray-500 line-clamp-1">{task.description}</p>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
-                            {task.priority}
+            <td className="px-6 py-4 whitespace-nowrap">
+                <div className="flex flex-col">
+                    <div className="text-sm font-medium text-gray-900">{task.title}</div>
+                    <div className="text-sm text-gray-500 truncate max-w-md">{task.description}</div>
+                </div>
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap">
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
+                    {task.priority}
+                </span>
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap">
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}>
+                    {task.status.replace('_', ' ')}
+                </span>
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap">
+                <div className="flex flex-col">
+                    {dueStatus && (
+                        <span className={`text-xs ${dueStatus.class}`}>
+                            {dueStatus.text}
                         </span>
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}>
-                            {task.status.replace('_', ' ')}
+                    )}
+                    {task.dueDate && (
+                        <span className="text-xs text-gray-500">
+                            {new Date(task.dueDate).toLocaleDateString()}
                         </span>
-                        {assigneesCount > 0 && (
-                            <div className="flex -space-x-1">
-                                {assigneesCount === 1 ? (
-                                    <span className="inline-block h-6 w-6 rounded-full bg-gray-200 text-xs flex items-center justify-center">
-                                        {task.initiator?.charAt(0) || '?'}
-                                    </span>
-                                ) : (
-                                    <span className="inline-block h-6 px-2 rounded-full bg-gray-200 text-xs flex items-center justify-center">
-                                        +{assigneesCount}
-                                    </span>
-                                )}
-                            </div>
-                        )}
-                        {dueStatus && (
-                            <span className={`text-xs ${dueStatus.class}`}>
-                                {dueStatus.text}
+                    )}
+                </div>
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap">
+                {assigneesCount > 0 && (
+                    <div className="flex -space-x-1">
+                        {assigneesCount === 1 ? (
+                            <span className="inline-block h-6 w-6 rounded-full bg-gray-200 text-xs flex items-center justify-center">
+                                {task.initiator?.charAt(0) || '?'}
+                            </span>
+                        ) : (
+                            <span className="inline-block h-6 px-2 rounded-full bg-gray-200 text-xs flex items-center justify-center">
+                                +{assigneesCount}
                             </span>
                         )}
                     </div>
-                </div>
-                <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                )}
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <div className="flex items-center justify-end space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                         onClick={() => onUpdate(task)}
                         className="p-1 hover:bg-gray-100 rounded-full"
@@ -98,88 +111,210 @@ const TaskRow = ({ task, onUpdate, onDelete }) => {
                         <TrashIcon className="h-4 w-4 text-red-500" />
                     </button>
                 </div>
-            </div>
-        </motion.div>
+            </td>
+        </motion.tr>
     );
 };
 
 const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
-    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+    const [sortConfig, setSortConfig] = useState({ key: 'title', direction: 'asc' });
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(5);
+    const [searchTerm, setSearchTerm] = useState('');
 
-    const sortedTasks = [...tasks].sort((a, b) => {
-        if (!sortConfig.key) return 0;
-        
-        const aValue = a[sortConfig.key];
-        const bValue = b[sortConfig.key];
-        
-        if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
-        if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
-        return 0;
-    });
+    // Sorting function
+    const sortedTasks = useMemo(() => {
+        if (!tasks) return [];
+        let sortedItems = [...tasks];
+        sortedItems.sort((a, b) => {
+            if (a[sortConfig.key] < b[sortConfig.key]) {
+                return sortConfig.direction === 'asc' ? -1 : 1;
+            }
+            if (a[sortConfig.key] > b[sortConfig.key]) {
+                return sortConfig.direction === 'asc' ? 1 : -1;
+            }
+            return 0;
+        });
+        return sortedItems;
+    }, [tasks, sortConfig]);
+
+    // Filtering function
+    const filteredTasks = useMemo(() => {
+        return sortedTasks.filter(task =>
+            task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            task.description.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [sortedTasks, searchTerm]);
+
+    // Pagination
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentTasks = filteredTasks.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredTasks.length / itemsPerPage);
 
     const requestSort = (key) => {
-        const direction = sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc';
+        let direction = 'asc';
+        if (sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc';
+        }
         setSortConfig({ key, direction });
     };
 
-    const SortIcon = ({ columnKey }) => {
-        if (sortConfig.key !== columnKey) return null;
-        return sortConfig.direction === 'asc' ? (
-            <ChevronUpIcon className="h-4 w-4" />
-        ) : (
-            <ChevronDownIcon className="h-4 w-4" />
-        );
+    const getSortIcon = (columnName) => {
+        if (sortConfig.key !== columnName) {
+            return <ChevronUpIcon className="h-4 w-4 text-gray-400" />;
+        }
+        return sortConfig.direction === 'asc' 
+            ? <ChevronUpIcon className="h-4 w-4 text-blue-500" />
+            : <ChevronDownIcon className="h-4 w-4 text-blue-500" />;
     };
 
+    if (!tasks || tasks.length === 0) {
+        return <EmptyState 
+            icon={<ClipboardDocumentListIcon className="h-12 w-12" />}
+            title="No tasks found"
+            description="Get started by creating a new task."
+        />;
+    }
+
     return (
-        <div className="space-y-4">
-            <div className="bg-white rounded-lg shadow">
-                <div className="px-4 py-3 border-b border-gray-200">
-                    <div className="flex justify-between items-center">
-                        <button
-                            onClick={() => requestSort('title')}
-                            className="flex items-center space-x-1 text-sm font-medium text-gray-700"
-                        >
-                            <span>Title</span>
-                            <SortIcon columnKey="title" />
-                        </button>
-                        <div className="flex items-center space-x-4">
-                            <button
+        <div className="bg-white rounded-lg shadow">
+            {/* Search and filters */}
+            <div className="p-4 border-b border-gray-200">
+                <input
+                    type="text"
+                    placeholder="Search tasks..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
+
+            {/* Table */}
+            <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                        <tr>
+                            <th scope="col" 
+                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer w-2/5"
+                                onClick={() => requestSort('title')}
+                            >
+                                <div className="flex items-center space-x-1">
+                                    <span>Title</span>
+                                    {getSortIcon('title')}
+                                </div>
+                            </th>
+                            <th scope="col" 
+                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer w-24"
                                 onClick={() => requestSort('priority')}
-                                className="flex items-center space-x-1 text-sm font-medium text-gray-700"
                             >
-                                <span>Priority</span>
-                                <SortIcon columnKey="priority" />
-                            </button>
-                            <button
+                                <div className="flex items-center space-x-1">
+                                    <span>Priority</span>
+                                    {getSortIcon('priority')}
+                                </div>
+                            </th>
+                            <th scope="col" 
+                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer w-28"
+                                onClick={() => requestSort('status')}
+                            >
+                                <div className="flex items-center space-x-1">
+                                    <span>Status</span>
+                                    {getSortIcon('status')}
+                                </div>
+                            </th>
+                            <th scope="col" 
+                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer w-32"
                                 onClick={() => requestSort('dueDate')}
-                                className="flex items-center space-x-1 text-sm font-medium text-gray-700"
                             >
-                                <span>Due Date</span>
-                                <SortIcon columnKey="dueDate" />
-                            </button>
+                                <div className="flex items-center space-x-1">
+                                    <span>Due Date</span>
+                                    {getSortIcon('dueDate')}
+                                </div>
+                            </th>
+                            <th scope="col" 
+                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24"
+                            >
+                                Assignees
+                            </th>
+                            <th scope="col" 
+                                className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-24"
+                            >
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                        {currentTasks.map((task) => (
+                            <TaskRow 
+                                key={task.id} 
+                                task={task} 
+                                onUpdate={onUpdateTask}
+                                onDelete={onDeleteTask}
+                            />
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* Pagination */}
+            <div className="px-4 py-3 border-t border-gray-200 sm:px-6">
+                <div className="flex items-center justify-between">
+                    <div className="flex-1 flex justify-between sm:hidden">
+                        <button
+                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                            className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                        >
+                            Previous
+                        </button>
+                        <button
+                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages}
+                            className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                        >
+                            Next
+                        </button>
+                    </div>
+                    <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                        <div>
+                            <p className="text-sm text-gray-700">
+                                Showing <span className="font-medium">{indexOfFirstItem + 1}</span> to{' '}
+                                <span className="font-medium">{Math.min(indexOfLastItem, filteredTasks.length)}</span> of{' '}
+                                <span className="font-medium">{filteredTasks.length}</span> results
+                            </p>
+                        </div>
+                        <div>
+                            <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                <button
+                                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                    disabled={currentPage === 1}
+                                    className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                                >
+                                    Previous
+                                </button>
+                                {[...Array(totalPages)].map((_, index) => (
+                                    <button
+                                        key={index + 1}
+                                        onClick={() => setCurrentPage(index + 1)}
+                                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                                            currentPage === index + 1
+                                                ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                                                : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                                        }`}
+                                    >
+                                        {index + 1}
+                                    </button>
+                                ))}
+                                <button
+                                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                    disabled={currentPage === totalPages}
+                                    className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                                >
+                                    Next
+                                </button>
+                            </nav>
                         </div>
                     </div>
-                </div>
-                <div className="divide-y divide-gray-200">
-                    {tasks.length === 0 ? (
-                        <EmptyState
-                            icon={ClipboardDocumentListIcon}
-                            title="No tasks found"
-                            description="Create a new task to get started"
-                        />
-                    ) : (
-                        <div className="mt-4 space-y-4">
-                            {sortedTasks.map((task) => (
-                                <TaskRow
-                                    key={task.id}
-                                    task={task}
-                                    onUpdate={onUpdateTask}
-                                    onDelete={onDeleteTask}
-                                />
-                            ))}
-                        </div>
-                    )}
                 </div>
             </div>
         </div>
