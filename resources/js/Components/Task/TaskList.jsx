@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { ChevronUpIcon, ChevronDownIcon, PencilIcon, TrashIcon, ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import EmptyState from "../EmptyState";
 
 const TaskRow = ({ task, onUpdate, onDelete }) => {
@@ -121,6 +121,12 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(5);
     const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('all');
+    const [priorityFilter, setPriorityFilter] = useState('all');
+
+    // Status and Priority options
+    const statusOptions = ['all', 'todo', 'in_progress', 'done'];
+    const priorityOptions = ['all', 'high', 'medium', 'low'];
 
     // Sorting function
     const sortedTasks = useMemo(() => {
@@ -140,17 +146,22 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
 
     // Filtering function
     const filteredTasks = useMemo(() => {
-        return sortedTasks.filter(task =>
-            task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            task.description.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-    }, [sortedTasks, searchTerm]);
+        return sortedTasks.filter(task => {
+            const matchesSearch = 
+                task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                task.description.toLowerCase().includes(searchTerm.toLowerCase());
+            
+            const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
+            const matchesPriority = priorityFilter === 'all' || task.priority.toLowerCase() === priorityFilter;
 
-    // Pagination
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentTasks = filteredTasks.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredTasks.length / itemsPerPage);
+            return matchesSearch && matchesStatus && matchesPriority;
+        });
+    }, [sortedTasks, searchTerm, statusFilter, priorityFilter]);
+
+    // Reset to first page when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, statusFilter, priorityFilter]);
 
     const requestSort = (key) => {
         let direction = 'asc';
@@ -181,13 +192,95 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
         <div className="bg-white rounded-lg shadow">
             {/* Search and filters */}
             <div className="p-4 border-b border-gray-200">
-                <input
-                    type="text"
-                    placeholder="Search tasks..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
+                <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
+                    {/* Search input */}
+                    <div className="flex-1">
+                        <input
+                            type="text"
+                            placeholder="Search tasks..."
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    
+                    {/* Status filter */}
+                    <div className="w-full sm:w-48">
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                        >
+                            {statusOptions.map(status => (
+                                <option key={status} value={status}>
+                                    {status === 'all' 
+                                        ? 'All Statuses'
+                                        : status.split('_').map(word => 
+                                            word.charAt(0).toUpperCase() + word.slice(1)
+                                          ).join(' ')
+                                    }
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Priority filter */}
+                    <div className="w-full sm:w-48">
+                        <select
+                            value={priorityFilter}
+                            onChange={(e) => setPriorityFilter(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                        >
+                            {priorityOptions.map(priority => (
+                                <option key={priority} value={priority}>
+                                    {priority === 'all' 
+                                        ? 'All Priorities'
+                                        : priority.charAt(0).toUpperCase() + priority.slice(1)
+                                    }
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
+                {/* Active filters display */}
+                <div className="mt-2 flex flex-wrap gap-2">
+                    {searchTerm && (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            Search: {searchTerm}
+                            <button
+                                onClick={() => setSearchTerm('')}
+                                className="ml-1 hover:text-blue-900"
+                            >
+                                ×
+                            </button>
+                        </span>
+                    )}
+                    {statusFilter !== 'all' && (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            Status: {statusFilter.split('_').map(word => 
+                                word.charAt(0).toUpperCase() + word.slice(1)
+                            ).join(' ')}
+                            <button
+                                onClick={() => setStatusFilter('all')}
+                                className="ml-1 hover:text-gray-900"
+                            >
+                                ×
+                            </button>
+                        </span>
+                    )}
+                    {priorityFilter !== 'all' && (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            Priority: {priorityFilter.charAt(0).toUpperCase() + priorityFilter.slice(1)}
+                            <button
+                                onClick={() => setPriorityFilter('all')}
+                                className="ml-1 hover:text-gray-900"
+                            >
+                                ×
+                            </button>
+                        </span>
+                    )}
+                </div>
             </div>
 
             {/* Table */}
@@ -244,7 +337,7 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {currentTasks.map((task) => (
+                        {filteredTasks.slice(currentPage * itemsPerPage - itemsPerPage, currentPage * itemsPerPage).map((task) => (
                             <TaskRow 
                                 key={task.id} 
                                 task={task} 
@@ -268,8 +361,8 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                             Previous
                         </button>
                         <button
-                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                            disabled={currentPage === totalPages}
+                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(filteredTasks.length / itemsPerPage)))}
+                            disabled={currentPage === Math.ceil(filteredTasks.length / itemsPerPage)}
                             className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
                         >
                             Next
@@ -278,8 +371,8 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                     <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                         <div>
                             <p className="text-sm text-gray-700">
-                                Showing <span className="font-medium">{indexOfFirstItem + 1}</span> to{' '}
-                                <span className="font-medium">{Math.min(indexOfLastItem, filteredTasks.length)}</span> of{' '}
+                                Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to{' '}
+                                <span className="font-medium">{Math.min(currentPage * itemsPerPage, filteredTasks.length)}</span> of{' '}
                                 <span className="font-medium">{filteredTasks.length}</span> results
                             </p>
                         </div>
@@ -292,7 +385,7 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                                 >
                                     Previous
                                 </button>
-                                {[...Array(totalPages)].map((_, index) => (
+                                {[...Array(Math.ceil(filteredTasks.length / itemsPerPage))].map((_, index) => (
                                     <button
                                         key={index + 1}
                                         onClick={() => setCurrentPage(index + 1)}
@@ -306,8 +399,8 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
                                     </button>
                                 ))}
                                 <button
-                                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                                    disabled={currentPage === totalPages}
+                                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(filteredTasks.length / itemsPerPage)))}
+                                    disabled={currentPage === Math.ceil(filteredTasks.length / itemsPerPage)}
                                     className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                                 >
                                     Next
