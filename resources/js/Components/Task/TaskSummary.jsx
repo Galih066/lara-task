@@ -1,3 +1,4 @@
+import moment from "moment";
 import TaskSummaryCard from "./TaskSummaryCard";
 import {
     ChartBarIcon,
@@ -8,8 +9,7 @@ import {
 
 const TaskSummary = ({ tasks }) => {
     const calculateStats = () => {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        const today = moment().startOf('day');
 
         const stats = {
             total: tasks.length,
@@ -22,16 +22,8 @@ const TaskSummary = ({ tasks }) => {
                 medium: tasks.filter(t => t.priority === 'medium').length,
                 low: tasks.filter(t => t.priority === 'low').length
             },
-            dueToday: tasks.filter(t => {
-                const dueDate = new Date(t.dueDate);
-                dueDate.setHours(0, 0, 0, 0);
-                return dueDate.getTime() === today.getTime();
-            }).length,
-            overdue: tasks.filter(t => {
-                const dueDate = new Date(t.dueDate);
-                dueDate.setHours(0, 0, 0, 0);
-                return dueDate < today;
-            }).length
+            dueToday: tasks.filter(t => moment(t.dueDate).startOf('day').isSame(today)).length,
+            overdue: tasks.filter(t => moment(t.dueDate).startOf('day').isBefore(today)).length
         };
 
         return stats;
