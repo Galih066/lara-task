@@ -23,8 +23,8 @@ const TaskCard = ({ task, index, onUpdate, onDelete, onClick, isUpdating }) => {
                     {...provided.dragHandleProps}
                     style={getDragStyle(provided.draggableProps.style, snapshot)}
                     className={`p-4 border border-gray-200 rounded-lg shadow-sm group relative hover:shadow-md ${snapshot.isDragging
-                            ? 'shadow-lg ring-2 ring-blue-500 bg-white'
-                            : getBackgroundColor(task.priority)
+                        ? 'shadow-lg ring-2 ring-blue-500 bg-white'
+                        : getBackgroundColor(task.priority)
                         } transition-all duration-200`}
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
@@ -92,8 +92,8 @@ const TaskColumn = ({ title, count, children, droppableId }) => (
                 ref={provided.innerRef}
                 {...provided.droppableProps}
                 className={`bg-gray-50 rounded-lg p-4 min-h-[24rem] h-full flex flex-col border-2 ${snapshot.isDraggingOver
-                        ? 'border-blue-300 bg-blue-50 ring-2 ring-blue-200 ring-opacity-50'
-                        : 'border-transparent'
+                    ? 'border-blue-300 bg-blue-50 ring-2 ring-blue-200 ring-opacity-50'
+                    : 'border-transparent'
                     } transition-all duration-200`}
             >
                 <h3 className="text-sm font-medium text-gray-900 mb-4">
@@ -167,21 +167,6 @@ const getDueDateStatus = (dueDate) => {
     if (diffDays === 0) return { class: 'text-orange-600', text: 'Due Today' };
     if (diffDays <= 2) return { class: 'text-yellow-600', text: 'Due Soon' };
     return { class: 'text-gray-600', text: `Due in ${diffDays} days` };
-};
-
-const formatStatus = (status) => {
-    switch (status) {
-        case 'todo':
-            return 'To Do';
-        case 'in_progress':
-            return 'In Progress';
-        case 'review':
-            return 'Review';
-        case 'done':
-            return 'Done';
-        default:
-            return status.charAt(0).toUpperCase() + status.slice(1);
-    }
 };
 
 const TaskBoard = ({ tasks, onUpdateTask, onDeleteTask, onTaskClick, onDragEnd, updatingTaskId }) => {
