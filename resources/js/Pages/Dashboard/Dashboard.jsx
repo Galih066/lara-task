@@ -60,7 +60,6 @@ const DashboardPage = ({ user }) => {
                 <Navigation user={user} />
 
                 <main className="max-w-7xl mx-auto py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
-                    {/* Welcome Section */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -88,7 +87,6 @@ const DashboardPage = ({ user }) => {
                         </motion.div>
                     </motion.div>
 
-                    {/* Stats Grid */}
                     <div className="mt-6 sm:mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         {stats.map((stat, index) => (
                             <motion.div
@@ -122,7 +120,6 @@ const DashboardPage = ({ user }) => {
                         ))}
                     </div>
 
-                    {/* Tabs */}
                     <div className="mt-8 border-b border-gray-200">
                         <nav className="flex space-x-8">
                             {['overview', 'activity', 'deadlines'].map((tab) => (
@@ -140,7 +137,6 @@ const DashboardPage = ({ user }) => {
                         </nav>
                     </div>
 
-                    {/* Tab Content */}
                     <div className="mt-6">
                         {activeTab === 'activity' && (
                             <motion.div
@@ -208,7 +204,6 @@ const DashboardPage = ({ user }) => {
                                 transition={{ duration: 0.3 }}
                                 className="grid grid-cols-1 md:grid-cols-2 gap-6"
                             >
-                                {/* Quick Actions */}
                                 <div className="bg-white rounded-xl p-6 shadow-sm">
                                     <h3 className="text-lg font-medium text-gray-900">Quick Actions</h3>
                                     <div className="mt-4 grid grid-cols-2 gap-4">
@@ -223,7 +218,6 @@ const DashboardPage = ({ user }) => {
                                     </div>
                                 </div>
 
-                                {/* Recent Updates */}
                                 <div className="bg-white rounded-xl p-6 shadow-sm">
                                     <h3 className="text-lg font-medium text-gray-900">Recent Updates</h3>
                                     <div className="mt-4 space-y-4">
