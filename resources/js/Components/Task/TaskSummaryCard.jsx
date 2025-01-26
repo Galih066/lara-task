@@ -21,13 +21,12 @@ const TaskSummaryCard = ({ icon: Icon, title, value, description, color, trend, 
                         <div className="flex items-baseline">
                             <div className="text-2xl font-semibold text-gray-900">{value}</div>
                             {trend && (
-                                <span className={`ml-2 text-sm font-medium ${
-                                    trend === 'up' 
-                                        ? 'text-green-600' 
-                                        : trend === 'down' 
-                                            ? 'text-red-600' 
+                                <span className={`ml-2 text-sm font-medium ${trend === 'up'
+                                        ? 'text-green-600'
+                                        : trend === 'down'
+                                            ? 'text-red-600'
                                             : 'text-gray-500'
-                                }`}>
+                                    }`}>
                                     {trend === 'up' ? (
                                         <span className="flex items-center">
                                             <ArrowTrendingUpIcon className="w-4 h-4 mr-1" />
@@ -43,7 +42,7 @@ const TaskSummaryCard = ({ icon: Icon, title, value, description, color, trend, 
                             )}
                         </div>
                         <p className="mt-1 text-sm text-gray-500">{description}</p>
-                        {dueToday && (
+                        {dueToday > 0 && (
                             <div className="mt-3 flex items-center text-sm text-orange-600">
                                 <CalendarIcon className="w-4 h-4 mr-1" />
                                 {dueToday} due today
