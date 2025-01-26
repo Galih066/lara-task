@@ -1,12 +1,11 @@
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
-import ErrorAlert from "../../Components/AlertComp/ErrorAlert";
 import SuccessAlert from "../../Components/AlertComp/SuccessAlert";
 import { useState } from "react";
 
 export default function SignUpOrg() {
     const { errors } = usePage().props;
     const [showSuccess, setShowSuccess] = useState(false);
-    
+
     const { data, setData, post, processing } = useForm({
         org_name: "",
         username: "",
@@ -36,7 +35,6 @@ export default function SignUpOrg() {
             <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50/30 flex items-center justify-center p-6 animate-gradient-x">
                 <div className="w-full max-w-md">
                     <div className="backdrop-blur-sm bg-white/60 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 space-y-8">
-                        {/* Logo/Brand */}
                         <div className="text-center space-y-2">
                             <div className="mx-auto h-12 w-12 bg-gradient-to-r from-blue-500/10 to-sky-500/10 rounded-xl flex items-center justify-center transform transition-transform duration-300 hover:scale-110">
                                 <svg className="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -49,7 +47,6 @@ export default function SignUpOrg() {
                             </p>
                         </div>
 
-                        {/* Success Alert */}
                         {showSuccess && (
                             <SuccessAlert
                                 title="Organization Created"
@@ -59,7 +56,6 @@ export default function SignUpOrg() {
                             />
                         )}
 
-                        {/* Form */}
                         <form onSubmit={handleSubmit} method="POST" className="space-y-6">
                             <div className="space-y-5">
                                 <div className="group">
