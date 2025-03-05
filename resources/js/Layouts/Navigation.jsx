@@ -55,8 +55,8 @@ export default function Navigation({ user }) {
                             <Link
                                 href="/dashboard"
                                 className={`relative px-3 py-2 text-sm font-medium ${url === '/dashboard'
-                                        ? 'text-blue-600'
-                                        : 'text-gray-600 hover:text-blue-600'
+                                    ? 'text-blue-600'
+                                    : 'text-gray-600 hover:text-blue-600'
                                     } transition-all duration-200 ease-in-out group`}
                             >
                                 {url === '/dashboard' && (
@@ -74,8 +74,8 @@ export default function Navigation({ user }) {
                             <Link
                                 href="/task"
                                 className={`relative px-3 py-2 text-sm font-medium ${url.startsWith('/task')
-                                        ? 'text-blue-600'
-                                        : 'text-gray-600 hover:text-blue-600'
+                                    ? 'text-blue-600'
+                                    : 'text-gray-600 hover:text-blue-600'
                                     } transition-all duration-200 ease-in-out group`}
                             >
                                 {url.startsWith('/task') && (
@@ -94,8 +94,8 @@ export default function Navigation({ user }) {
                                 <Link
                                     href="/member"
                                     className={`relative px-3 py-2 text-sm font-medium ${url.startsWith('/member')
-                                            ? 'text-blue-600'
-                                            : 'text-gray-600 hover:text-blue-600'
+                                        ? 'text-blue-600'
+                                        : 'text-gray-600 hover:text-blue-600'
                                         } transition-all duration-200 ease-in-out group`}
                                 >
                                     {url.startsWith('/member') && (
@@ -151,10 +151,10 @@ export default function Navigation({ user }) {
                                 className="flex items-center gap-3 focus:outline-none"
                             >
                                 <div className="h-8 w-8 rounded-full bg-gradient-to-r from-blue-600 to-blue-400 flex items-center justify-center">
-                                    <span className="text-sm font-medium text-white">{user.name.charAt(0)}</span>
+                                    <span className="text-sm font-medium text-white">{user.name.charAt(0).toUpperCase()}</span>
                                 </div>
                                 <span className="text-sm font-medium text-gray-700 hidden sm:block">
-                                    {user.name}
+                                    {user.name.toUpperCase()}
                                 </span>
                                 <svg
                                     className={`h-4 w-4 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
@@ -243,8 +243,8 @@ export default function Navigation({ user }) {
                             <Link
                                 href="/dashboard"
                                 className={`block px-3 py-2 rounded-md text-base font-medium ${url === '/dashboard'
-                                        ? 'text-blue-600 bg-blue-50'
-                                        : 'text-gray-900 hover:text-blue-600 hover:bg-blue-50'
+                                    ? 'text-blue-600 bg-blue-50'
+                                    : 'text-gray-900 hover:text-blue-600 hover:bg-blue-50'
                                     }`}
                             >
                                 Dashboard
@@ -252,8 +252,8 @@ export default function Navigation({ user }) {
                             <Link
                                 href="/task"
                                 className={`block px-3 py-2 rounded-md text-base font-medium ${url.startsWith('/task')
-                                        ? 'text-blue-600 bg-blue-50'
-                                        : 'text-gray-900 hover:text-blue-600 hover:bg-blue-50'
+                                    ? 'text-blue-600 bg-blue-50'
+                                    : 'text-gray-900 hover:text-blue-600 hover:bg-blue-50'
                                     }`}
                             >
                                 Tasks
@@ -262,8 +262,8 @@ export default function Navigation({ user }) {
                                 <Link
                                     href="/member"
                                     className={`block px-3 py-2 rounded-md text-base font-medium ${url.startsWith('/member')
-                                            ? 'text-blue-600 bg-blue-50'
-                                            : 'text-gray-900 hover:text-blue-600 hover:bg-blue-50'
+                                        ? 'text-blue-600 bg-blue-50'
+                                        : 'text-gray-900 hover:text-blue-600 hover:bg-blue-50'
                                         }`}
                                 >
                                     Members
@@ -272,8 +272,8 @@ export default function Navigation({ user }) {
                             <Link
                                 href="/profile"
                                 className={`block px-3 py-2 rounded-md text-base font-medium ${url === '/profile'
-                                        ? 'text-blue-600 bg-blue-50'
-                                        : 'text-gray-900 hover:text-blue-600 hover:bg-blue-50'
+                                    ? 'text-blue-600 bg-blue-50'
+                                    : 'text-gray-900 hover:text-blue-600 hover:bg-blue-50'
                                     }`}
                             >
                                 Profile

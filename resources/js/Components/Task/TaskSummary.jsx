@@ -30,6 +30,7 @@ const TaskSummary = ({ tasks }) => {
     };
 
     const stats = calculateStats();
+    const percentage = stats.completed || stats.total ? Math.round((stats.completed / stats.total) * 100) : 0;
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -39,7 +40,6 @@ const TaskSummary = ({ tasks }) => {
                 value={stats.total}
                 description={`${stats.inProgress} active, ${stats.review} in review`}
                 color="bg-blue-600"
-                dueToday={stats.dueToday}
             />
             <TaskSummaryCard
                 icon={ClockIcon}
@@ -47,13 +47,12 @@ const TaskSummary = ({ tasks }) => {
                 value={stats.inProgress}
                 description={`${stats.todo} to do, ${stats.completed} completed`}
                 color="bg-yellow-500"
-                dueToday={stats.dueToday}
             />
             <TaskSummaryCard
                 icon={CheckCircleIcon}
                 title="Completed"
                 value={stats.completed}
-                description={`${Math.round((stats.completed / stats.total) * 100)}% completion rate`}
+                description={`${percentage}% completion rate`}
                 color="bg-green-500"
             />
             <TaskSummaryCard
@@ -62,7 +61,6 @@ const TaskSummary = ({ tasks }) => {
                 value={stats.priority.high}
                 description={`${stats.priority.medium} medium, ${stats.priority.low} low priority`}
                 color="bg-red-500"
-                dueToday={stats.overdue}
             />
         </div>
     );
