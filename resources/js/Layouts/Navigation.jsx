@@ -54,11 +54,10 @@ export default function Navigation({ user }) {
                         <nav className="hidden md:flex items-center gap-6">
                             <Link
                                 href="/dashboard"
-                                className={`relative px-3 py-2 text-sm font-medium ${
-                                    url === '/dashboard' 
-                                    ? 'text-blue-600' 
-                                    : 'text-gray-600 hover:text-blue-600'
-                                } transition-all duration-200 ease-in-out group`}
+                                className={`relative px-3 py-2 text-sm font-medium ${url === '/dashboard'
+                                        ? 'text-blue-600'
+                                        : 'text-gray-600 hover:text-blue-600'
+                                    } transition-all duration-200 ease-in-out group`}
                             >
                                 {url === '/dashboard' && (
                                     <motion.div
@@ -74,11 +73,10 @@ export default function Navigation({ user }) {
                             </Link>
                             <Link
                                 href="/task"
-                                className={`relative px-3 py-2 text-sm font-medium ${
-                                    url.startsWith('/task') 
-                                    ? 'text-blue-600' 
-                                    : 'text-gray-600 hover:text-blue-600'
-                                } transition-all duration-200 ease-in-out group`}
+                                className={`relative px-3 py-2 text-sm font-medium ${url.startsWith('/task')
+                                        ? 'text-blue-600'
+                                        : 'text-gray-600 hover:text-blue-600'
+                                    } transition-all duration-200 ease-in-out group`}
                             >
                                 {url.startsWith('/task') && (
                                     <motion.div
@@ -95,11 +93,10 @@ export default function Navigation({ user }) {
                             {(user.role === 'admin' || user.role === 'owner') && (
                                 <Link
                                     href="/member"
-                                    className={`relative px-3 py-2 text-sm font-medium ${
-                                        url.startsWith('/member') 
-                                        ? 'text-blue-600' 
-                                        : 'text-gray-600 hover:text-blue-600'
-                                    } transition-all duration-200 ease-in-out group`}
+                                    className={`relative px-3 py-2 text-sm font-medium ${url.startsWith('/member')
+                                            ? 'text-blue-600'
+                                            : 'text-gray-600 hover:text-blue-600'
+                                        } transition-all duration-200 ease-in-out group`}
                                 >
                                     {url.startsWith('/member') && (
                                         <motion.div
@@ -114,26 +111,6 @@ export default function Navigation({ user }) {
                                     <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-200 ease-out" />
                                 </Link>
                             )}
-                            <Link
-                                href="/profile"
-                                className={`relative px-3 py-2 text-sm font-medium ${
-                                    url === '/profile' 
-                                    ? 'text-blue-600' 
-                                    : 'text-gray-600 hover:text-blue-600'
-                                } transition-all duration-200 ease-in-out group`}
-                            >
-                                {url === '/profile' && (
-                                    <motion.div
-                                        layoutId="navbar-active"
-                                        className="absolute inset-0 bg-blue-50 rounded-md -z-10"
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        transition={{ duration: 0.2 }}
-                                    />
-                                )}
-                                Profile
-                                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-200 ease-out" />
-                            </Link>
                         </nav>
                     </div>
 
@@ -265,43 +242,39 @@ export default function Navigation({ user }) {
                         <div className="px-2 pt-2 pb-3 space-y-1">
                             <Link
                                 href="/dashboard"
-                                className={`block px-3 py-2 rounded-md text-base font-medium ${
-                                    url === '/dashboard' 
-                                    ? 'text-blue-600 bg-blue-50' 
-                                    : 'text-gray-900 hover:text-blue-600 hover:bg-blue-50'
-                                }`}
+                                className={`block px-3 py-2 rounded-md text-base font-medium ${url === '/dashboard'
+                                        ? 'text-blue-600 bg-blue-50'
+                                        : 'text-gray-900 hover:text-blue-600 hover:bg-blue-50'
+                                    }`}
                             >
                                 Dashboard
                             </Link>
                             <Link
                                 href="/task"
-                                className={`block px-3 py-2 rounded-md text-base font-medium ${
-                                    url.startsWith('/task') 
-                                    ? 'text-blue-600 bg-blue-50' 
-                                    : 'text-gray-900 hover:text-blue-600 hover:bg-blue-50'
-                                }`}
+                                className={`block px-3 py-2 rounded-md text-base font-medium ${url.startsWith('/task')
+                                        ? 'text-blue-600 bg-blue-50'
+                                        : 'text-gray-900 hover:text-blue-600 hover:bg-blue-50'
+                                    }`}
                             >
                                 Tasks
                             </Link>
                             {(user.role === 'admin' || user.role === 'owner') && (
                                 <Link
                                     href="/member"
-                                    className={`block px-3 py-2 rounded-md text-base font-medium ${
-                                        url.startsWith('/member') 
-                                        ? 'text-blue-600 bg-blue-50' 
-                                        : 'text-gray-900 hover:text-blue-600 hover:bg-blue-50'
-                                    }`}
+                                    className={`block px-3 py-2 rounded-md text-base font-medium ${url.startsWith('/member')
+                                            ? 'text-blue-600 bg-blue-50'
+                                            : 'text-gray-900 hover:text-blue-600 hover:bg-blue-50'
+                                        }`}
                                 >
                                     Members
                                 </Link>
                             )}
                             <Link
                                 href="/profile"
-                                className={`block px-3 py-2 rounded-md text-base font-medium ${
-                                    url === '/profile' 
-                                    ? 'text-blue-600 bg-blue-50' 
-                                    : 'text-gray-900 hover:text-blue-600 hover:bg-blue-50'
-                                }`}
+                                className={`block px-3 py-2 rounded-md text-base font-medium ${url === '/profile'
+                                        ? 'text-blue-600 bg-blue-50'
+                                        : 'text-gray-900 hover:text-blue-600 hover:bg-blue-50'
+                                    }`}
                             >
                                 Profile
                             </Link>
