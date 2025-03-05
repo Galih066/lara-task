@@ -54,10 +54,7 @@ export default function Profile({ user }) {
             preserveScroll: true,
             onSuccess: (response) => {
                 setShowSuccess(true);
-                // Update the profile data with the latest response
-                if (response?.props?.user) {
-                    setProfileData(response.props.user);
-                }
+                if (response?.props?.user) setProfileData(response.props.user);
                 setTimeout(() => {
                     setShowSuccess(false);
                 }, 5000);
@@ -147,7 +144,7 @@ export default function Profile({ user }) {
                                             }
                                         </h2>
                                         <p className="text-sm font-medium text-gray-600">
-                                            {profileData.job_title || 'No job title set'} {profileData.department && `at ${data.department}`}
+                                            {profile.job_title || 'No job title set'} {profileData.department && `at ${data.department}`}
                                         </p>
                                     </div>
                                 </div>
