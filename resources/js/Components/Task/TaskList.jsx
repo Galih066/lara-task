@@ -132,9 +132,9 @@ const TaskList = ({ tasks, onUpdateTask, onDeleteTask }) => {
 
     if (!tasks.length) {
         return <EmptyState
-            icon={<ClipboardDocumentListIcon className="h-12 w-12" />}
+            icon={<ClipboardDocumentListIcon className="h-12 w-12 text-gray-400" />}
             title="No tasks found"
-            message="Get started by creating a new task"
+            description="Get started by creating a new task"
         />;
     }
 
